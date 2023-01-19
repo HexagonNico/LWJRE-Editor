@@ -35,7 +35,7 @@ public final class Editor implements Runnable {
 		this.canvas.setPreferredSize(new Dimension(960, 540));
 		JTabbedPane pane = new JTabbedPane();
 		pane.addTab("Scene tree", new JPanel());
-		pane.addTab("File system", new JPanel());
+		pane.addTab("File system", new EditorFileSystem());
 		pane.setMinimumSize(new Dimension(0, 0));
 		JTabbedPane pane2 = new JTabbedPane();
 		pane2.addTab("Inspector", new JPanel());
