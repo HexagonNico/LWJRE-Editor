@@ -1,14 +1,13 @@
 package gamma.engine.editor;
 
+import gamma.engine.core.Module;
 import gamma.engine.core.tree.SceneTree;
-import gamma.engine.graphics.Graphics;
-import gamma.engine.graphics.RenderingSystem3D;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.awt.AWTGLCanvas;
 import org.lwjgl.opengl.awt.GLData;
 
 import java.awt.*;
+import java.util.ServiceLoader;
 
 public final class EditorCanvas extends AWTGLCanvas {
 
@@ -18,25 +17,27 @@ public final class EditorCanvas extends AWTGLCanvas {
 		return SINGLETON;
 	}
 
+	private final ServiceLoader<Module> modules;
 	private String sceneToLoad = "";
 
 	private EditorCanvas() {
 		super(new GLData());
+		this.modules = ServiceLoader.load(Module.class);
+		// TODO: Canvas size and resizing
 		this.setPreferredSize(new Dimension(640, 360));
 	}
 
 	@Override
 	public void initGL() {
 		GL.createCapabilities();
-		GL11.glClearColor(0.1f, 0.4f, 0.9f, 1.0f);
+		this.modules.forEach(Module::onStart);
 	}
 
 	@Override
 	public void paintGL() {
 		if(this.sceneToLoad.isEmpty()) {
 			SceneTree.process();
-			Graphics.clearFramebuffer();
-			RenderingSystem3D.renderingProcess();
+			this.modules.forEach(Module::onUpdate);
 		} else {
 			SceneTree.loadScene(this.sceneToLoad);
 			this.sceneToLoad = "";
