@@ -9,13 +9,10 @@ import java.awt.*;
 
 public final class Editor implements Runnable {
 
-	private final EditorCanvas canvas;
 
 	private Editor() {
 		JFrame frame = new JFrame("Gamma Engine - Editor");
-		this.canvas = new EditorCanvas();
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		this.canvas.setPreferredSize(new Dimension(640, 360));
 		JTabbedPane pane = new JTabbedPane();
 		pane.addTab("Scene tree", SceneTreePanel.instance());
 		pane.addTab("File system", FileSystemPanel.instance());
@@ -28,7 +25,7 @@ public final class Editor implements Runnable {
 		pane3.addTab("Terminal", new JPanel());
 		pane3.setMinimumSize(new Dimension(0, 0));
 		JPanel canvasPanel = new JPanel();
-		canvasPanel.add(this.canvas);
+		canvasPanel.add(EditorCanvas.instance());
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, canvasPanel, pane3);
 		JSplitPane splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, pane, splitPane);
 		JSplitPane splitPane3 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitPane2, pane2);
@@ -52,12 +49,12 @@ public final class Editor implements Runnable {
 
 	@Override
 	public void run() {
-		if(!this.canvas.isValid()) {
+		if(!EditorCanvas.instance().isValid()) {
 			GL.setCapabilities(null);
 			System.out.println("Invalid");
 			return;
 		}
-		this.canvas.render();
+		EditorCanvas.instance().render();
 		SwingUtilities.invokeLater(this);
 	}
 

@@ -1,5 +1,7 @@
 package gamma.engine.editor.panels;
 
+import gamma.engine.editor.EditorCanvas;
+
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.TreeModelListener;
@@ -238,6 +240,12 @@ public class FileSystemPanel extends JPanel {
 					}));
 				}
 				popupMenu.show(FileSystemPanel.instance(), e.getX(), e.getY());
+			} else {
+				if(e.getClickCount() == 2) {
+					String path = FileSystemPanel.instance().getSelectedPath().substring(18);
+					System.out.println(path);
+					EditorCanvas.instance().setSceneToLoad(path);
+				}
 			}
 		}
 	}

@@ -1,8 +1,6 @@
 package gamma.engine.editor.panels;
 
 import gamma.engine.core.tree.Node;
-import gamma.engine.core.tree.SceneTree;
-import gamma.engine.core.tree.SubbranchLoader;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -29,12 +27,10 @@ public class SceneTreePanel extends JPanel {
 	}
 
 	public void loadScene(String file) {
-		SceneTree.loadScene(file);
-		Node rootNode = SubbranchLoader.load(file);
 		DefaultTreeModel treeModel = (DefaultTreeModel) this.sceneTree.getModel();
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-		this.createNodes(root, rootNode);
-		root.setUserObject(rootNode);
+//		this.createNodes(root, rootNode);
+//		root.setUserObject(rootNode);
 		treeModel.setRoot(root);
 		treeModel.reload();
 	}
