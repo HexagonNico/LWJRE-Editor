@@ -1,7 +1,7 @@
 package gamma.engine.editor;
 
-import gamma.engine.editor.panels.FileSystemPanel;
 import gamma.engine.editor.panels.SceneTreePanel;
+import gamma.engine.editor.view.FileSystemTree;
 import org.lwjgl.opengl.GL;
 
 import javax.swing.*;
@@ -9,13 +9,15 @@ import java.awt.*;
 
 public final class Editor implements Runnable {
 
-
 	private Editor() {
 		JFrame frame = new JFrame("Gamma Engine - Editor");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		JTabbedPane pane = new JTabbedPane();
 		pane.addTab("Scene tree", SceneTreePanel.instance());
-		pane.addTab("File system", FileSystemPanel.instance());
+		// File system panel
+		JPanel fileSystemPanel = new JPanel(new BorderLayout());
+		fileSystemPanel.add(BorderLayout.CENTER, new JScrollPane(new FileSystemTree()));
+		pane.addTab("File system", fileSystemPanel);
 		pane.setMinimumSize(new Dimension(120, 0));
 		JTabbedPane pane2 = new JTabbedPane();
 		pane2.addTab("Inspector", new JPanel());
