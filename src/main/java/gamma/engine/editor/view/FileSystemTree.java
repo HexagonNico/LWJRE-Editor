@@ -1,5 +1,6 @@
 package gamma.engine.editor.view;
 
+import gamma.engine.editor.EditorCanvas;
 import gamma.engine.editor.controller.FileTreeMouseListener;
 import gamma.engine.editor.model.FileTransferHandler;
 import gamma.engine.editor.model.FileTreeModel;
@@ -13,12 +14,12 @@ import java.util.List;
 
 public class FileSystemTree extends JTree {
 
-	public FileSystemTree() {
+	public FileSystemTree(EditorCanvas editorCanvas) {
 		super(new FileTreeModel());
 		this.setShowsRootHandles(true);
 		this.setDragEnabled(true);
 		this.setTransferHandler(new FileTransferHandler());
-		this.addMouseListener(new FileTreeMouseListener(this));
+		this.addMouseListener(new FileTreeMouseListener(this, editorCanvas));
 	}
 
 	public Path getSelectedPath() {

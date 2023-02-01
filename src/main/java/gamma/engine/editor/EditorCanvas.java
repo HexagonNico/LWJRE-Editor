@@ -1,7 +1,10 @@
 package gamma.engine.editor;
 
 import gamma.engine.core.Module;
-import gamma.engine.core.tree.SceneTree;
+import gamma.engine.core.node.Node;
+import gamma.engine.core.node.SceneTree;
+import gamma.engine.core.node.SubbranchLoader;
+import gamma.engine.editor.view.SceneTreeTree;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.awt.AWTGLCanvas;
 import org.lwjgl.opengl.awt.GLData;
@@ -11,18 +14,15 @@ import java.util.ServiceLoader;
 
 public final class EditorCanvas extends AWTGLCanvas {
 
-	private static final EditorCanvas SINGLETON = new EditorCanvas();
-
-	public static EditorCanvas instance() {
-		return SINGLETON;
-	}
-
 	private final ServiceLoader<Module> modules;
+
+	private final SceneTreeTree sceneTreeTree;
 	private String sceneToLoad = "";
 
-	private EditorCanvas() {
+	public EditorCanvas(SceneTreeTree sceneTreeTree) {
 		super(new GLData());
 		this.modules = ServiceLoader.load(Module.class);
+		this.sceneTreeTree = sceneTreeTree;
 		// TODO: Canvas size and resizing
 		this.setPreferredSize(new Dimension(640, 360));
 	}
@@ -39,7 +39,10 @@ public final class EditorCanvas extends AWTGLCanvas {
 			SceneTree.process();
 			this.modules.forEach(Module::onUpdate);
 		} else {
-			SceneTree.loadScene(this.sceneToLoad);
+			Node node = SubbranchLoader.load(this.sceneToLoad);
+			System.out.println(node + " -> " + node.getClass());
+			this.sceneTreeTree.setScene(node);
+			SceneTree.changeScene(node);
 			this.sceneToLoad = "";
 		}
 		super.swapBuffers();

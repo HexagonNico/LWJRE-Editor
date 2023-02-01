@@ -99,7 +99,7 @@ public class FileTreeModel implements TreeModel {
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(this.getUserObject());
+			return Objects.hash(this.path());
 		}
 	}
 }

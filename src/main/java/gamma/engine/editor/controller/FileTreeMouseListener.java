@@ -1,5 +1,6 @@
 package gamma.engine.editor.controller;
 
+import gamma.engine.editor.EditorCanvas;
 import gamma.engine.editor.view.FileSystemTree;
 
 import javax.swing.*;
@@ -15,9 +16,11 @@ import java.util.stream.Stream;
 public class FileTreeMouseListener extends MouseInputAdapter {
 
 	private final FileSystemTree fileSystemTree;
+	private final EditorCanvas editorCanvas;
 
-	public FileTreeMouseListener(FileSystemTree fileSystemTree) {
+	public FileTreeMouseListener(FileSystemTree fileSystemTree, EditorCanvas editorCanvas) {
 		this.fileSystemTree = fileSystemTree;
+		this.editorCanvas = editorCanvas;
 	}
 
 	@Override
@@ -63,6 +66,9 @@ public class FileTreeMouseListener extends MouseInputAdapter {
 				}));
 			}
 			popupMenu.show(this.fileSystemTree, event.getX(), event.getY());
+		} else if(event.getClickCount() == 2) {
+			Path path = this.fileSystemTree.getSelectedPath();
+			this.editorCanvas.setSceneToLoad(path.toString().substring(18));
 		}
 	}
 }

@@ -1,7 +1,7 @@
 package gamma.engine.editor;
 
-import gamma.engine.editor.panels.SceneTreePanel;
 import gamma.engine.editor.view.FileSystemTree;
+import gamma.engine.editor.view.SceneTreeTree;
 import org.lwjgl.opengl.GL;
 
 import javax.swing.*;
@@ -9,14 +9,21 @@ import java.awt.*;
 
 public final class Editor implements Runnable {
 
+	private final EditorCanvas editorCanvas;
+
 	private Editor() {
 		JFrame frame = new JFrame("Gamma Engine - Editor");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		JTabbedPane pane = new JTabbedPane();
-		pane.addTab("Scene tree", SceneTreePanel.instance());
+		// Scene tree panel
+		JPanel sceneTreePanel = new JPanel(new BorderLayout());
+		SceneTreeTree sceneTreeTree = new SceneTreeTree();
+		sceneTreePanel.add(BorderLayout.CENTER, new JScrollPane(sceneTreeTree));
+		pane.addTab("Scene tree", sceneTreePanel);
+		this.editorCanvas = new EditorCanvas(sceneTreeTree);
 		// File system panel
 		JPanel fileSystemPanel = new JPanel(new BorderLayout());
-		fileSystemPanel.add(BorderLayout.CENTER, new JScrollPane(new FileSystemTree()));
+		fileSystemPanel.add(BorderLayout.CENTER, new JScrollPane(new FileSystemTree(this.editorCanvas)));
 		pane.addTab("File system", fileSystemPanel);
 		pane.setMinimumSize(new Dimension(120, 0));
 		JTabbedPane pane2 = new JTabbedPane();
@@ -27,7 +34,7 @@ public final class Editor implements Runnable {
 		pane3.addTab("Terminal", new JPanel());
 		pane3.setMinimumSize(new Dimension(0, 0));
 		JPanel canvasPanel = new JPanel();
-		canvasPanel.add(EditorCanvas.instance());
+		canvasPanel.add(this.editorCanvas);
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, canvasPanel, pane3);
 		JSplitPane splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, pane, splitPane);
 		JSplitPane splitPane3 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitPane2, pane2);
@@ -51,12 +58,12 @@ public final class Editor implements Runnable {
 
 	@Override
 	public void run() {
-		if(!EditorCanvas.instance().isValid()) {
+		if(!this.editorCanvas.isValid()) {
 			GL.setCapabilities(null);
 			System.out.println("Invalid");
 			return;
 		}
-		EditorCanvas.instance().render();
+		this.editorCanvas.render();
 		SwingUtilities.invokeLater(this);
 	}
 
