@@ -60,6 +60,7 @@
 			<artifactId>gamma-engine-core</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
+		<!-- TODO: Find a way to make it work without runtime dependencies -->
 		<dependency>
 			<groupId>gamma.engine</groupId>
 			<artifactId>gamma-engine-graphics</artifactId>

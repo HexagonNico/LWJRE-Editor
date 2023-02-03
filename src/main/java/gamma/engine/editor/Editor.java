@@ -25,16 +25,12 @@ public final class Editor implements Runnable {
 		JPanel fileSystemPanel = new JPanel(new BorderLayout());
 		fileSystemPanel.add(BorderLayout.CENTER, new JScrollPane(new FileSystemTree(this.editorCanvas)));
 		pane.addTab("File system", fileSystemPanel);
-		pane.setMinimumSize(new Dimension(120, 0));
 		JTabbedPane pane2 = new JTabbedPane();
 		pane2.addTab("Inspector", new JPanel());
-		pane2.setMinimumSize(new Dimension(120, 0));
-		pane2.setMinimumSize(new Dimension(0, 0));
 		JTabbedPane pane3 = new JTabbedPane();
 		pane3.addTab("Terminal", new JPanel());
-		pane3.setMinimumSize(new Dimension(0, 0));
-		JPanel canvasPanel = new JPanel();
-		canvasPanel.add(this.editorCanvas);
+		JPanel canvasPanel = new JPanel(new BorderLayout());
+		canvasPanel.add(BorderLayout.CENTER, this.editorCanvas);
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, canvasPanel, pane3);
 		JSplitPane splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, pane, splitPane);
 		JSplitPane splitPane3 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitPane2, pane2);
