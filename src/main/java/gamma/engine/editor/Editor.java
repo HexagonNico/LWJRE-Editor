@@ -1,7 +1,10 @@
 package gamma.engine.editor;
 
-import gamma.engine.editor.view.FileSystemTree;
-import gamma.engine.editor.view.SceneTreeTree;
+import gamma.engine.core.scene.Scene;
+import gamma.engine.core.utils.YamlParser;
+import gamma.engine.editor.filesystem.FileSystemPanel;
+import gamma.engine.editor.inspector.InspectorPanel;
+import gamma.engine.editor.scene.ScenePanel;
 import org.lwjgl.opengl.GL;
 
 import javax.swing.*;
@@ -9,45 +12,21 @@ import java.awt.*;
 
 public final class Editor implements Runnable {
 
-	private final EditorCanvas editorCanvas;
+	private final EditorCanvas editorCanvas = new EditorCanvas();
 
 	private Editor() {
 		JFrame frame = new JFrame("Gamma Engine - Editor");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		JTabbedPane pane = new JTabbedPane();
-		// Scene tree panel
-		JPanel sceneTreePanel = new JPanel(new BorderLayout());
-		SceneTreeTree sceneTreeTree = new SceneTreeTree();
-		sceneTreePanel.add(BorderLayout.CENTER, new JScrollPane(sceneTreeTree));
-		pane.addTab("Scene tree", sceneTreePanel);
-		this.editorCanvas = new EditorCanvas(sceneTreeTree);
-		// File system panel
-		JPanel fileSystemPanel = new JPanel(new BorderLayout());
-		fileSystemPanel.add(BorderLayout.CENTER, new JScrollPane(new FileSystemTree(this.editorCanvas)));
-		pane.addTab("File system", fileSystemPanel);
-		JTabbedPane pane2 = new JTabbedPane();
-		pane2.addTab("Inspector", new JPanel());
-		JTabbedPane pane3 = new JTabbedPane();
-		pane3.addTab("Terminal", new JPanel());
+		JTabbedPane westPane = new JTabbedPane();
+		InspectorPanel inspectorPanel = new InspectorPanel();
+		westPane.addTab("Scene", new ScenePanel(inspectorPanel));
+		westPane.addTab("File system", new FileSystemPanel());
 		JPanel canvasPanel = new JPanel(new BorderLayout());
 		canvasPanel.add(BorderLayout.CENTER, this.editorCanvas);
-		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, canvasPanel, pane3);
-		JSplitPane splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, pane, splitPane);
-		JSplitPane splitPane3 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitPane2, pane2);
-		JMenuBar menuBar = new JMenuBar();
-		JMenu fileMenu = new JMenu("File");
-		fileMenu.add(new JMenuItem("New"));
-		fileMenu.add(new JMenuItem("Open"));
-		fileMenu.add(new JMenuItem("Save"));
-		fileMenu.add(new JMenuItem("Save as"));
-		JMenu editMenu = new JMenu("Edit");
-		editMenu.add(new JMenuItem("Cut"));
-		editMenu.add(new JMenuItem("Copy"));
-		editMenu.add(new JMenuItem("Paste"));
-		menuBar.add(fileMenu);
-		menuBar.add(editMenu);
-		frame.setJMenuBar(menuBar);
-		frame.setContentPane(splitPane3);
+		JSplitPane splitPane1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, westPane, canvasPanel);
+		JSplitPane splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitPane1, inspectorPanel);
+		frame.setContentPane(splitPane2);
+		frame.setMinimumSize(new Dimension(360, 180));
 		frame.pack();
 		frame.setVisible(true);
 	}
@@ -56,7 +35,7 @@ public final class Editor implements Runnable {
 	public void run() {
 		if(!this.editorCanvas.isValid()) {
 			GL.setCapabilities(null);
-			System.out.println("Invalid");
+			System.out.println(YamlParser.serialize(Scene.getCurrent()));
 			return;
 		}
 		this.editorCanvas.render();
