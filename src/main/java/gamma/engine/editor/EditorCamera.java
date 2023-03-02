@@ -8,6 +8,7 @@ import vecmatlib.vector.Vec3f;
 public class EditorCamera extends Camera3D {
 
 	public Vec3f position = new Vec3f(0.0f, 0.0f, 5.0f);
+	public float yaw = 0.0f, pitch = 0.0f;
 	public Vec2i viewport = new Vec2i(180, 90);
 
 	@Override
@@ -30,8 +31,16 @@ public class EditorCamera extends Camera3D {
 		);
 	}
 
+	public Vec3f forwardDirection() {
+		float cosYaw = (float) Math.cos(Math.toRadians(this.yaw));
+		float sinYaw = (float) Math.sin(Math.toRadians(this.yaw));
+		float cosPitch = (float) Math.cos(Math.toRadians(this.pitch));
+		float sinPitch = (float) Math.sin(Math.toRadians(this.pitch));
+		return new Vec3f(-cosPitch * sinYaw, sinPitch, -cosPitch * cosYaw).normalized();
+	}
+
 	@Override
 	public Mat4f viewMatrix() {
-		return Mat4f.translation(this.globalPosition().negated());
+		return Mat4f.translation(this.globalPosition().negated()).multiply(Mat4f.rotation(this.yaw, this.pitch, 0.0f));
 	}
 }

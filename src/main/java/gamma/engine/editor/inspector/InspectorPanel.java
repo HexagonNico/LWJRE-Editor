@@ -5,11 +5,10 @@ import gamma.engine.core.scene.Entity;
 import vecmatlib.vector.Vec3f;
 
 import javax.swing.*;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.text.DecimalFormat;
 import java.util.HashMap;
 
 public class InspectorPanel extends JScrollPane {
@@ -18,22 +17,7 @@ public class InspectorPanel extends JScrollPane {
 
 	static {
 		COMPONENT_FUNCTIONS.put(float.class, (field, component, fieldsPanel) -> {
-			JFormattedTextField textField = new JFormattedTextField(new DecimalFormat());
-			field.setAccessible(true);
-			textField.setValue(field.get(component));
-			textField.setMaximumSize(new Dimension(textField.getPreferredSize().width, 20));
-			textField.addActionListener(actionEvent -> {
-				try {
-					// TODO: This only works when you press 'enter'
-					field.set(component, Float.parseFloat(textField.getText()));
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				}
-			});
-			fieldsPanel.add(textField);
-		});
-		COMPONENT_FUNCTIONS.put(byte.class, (field, component, fieldsPanel) -> {
-			JSpinner spinner = new JSpinner(new SpinnerNumberModel(0, Byte.MIN_VALUE, Byte.MAX_VALUE, 1));
+			JSpinner spinner = new JSpinner(new SpinnerNumberModel(0.0f, null, null, 0.01f));
 			field.setAccessible(true);
 			spinner.setValue(field.get(component));
 			spinner.setMaximumSize(new Dimension(spinner.getPreferredSize().width, 20));
@@ -46,8 +30,8 @@ public class InspectorPanel extends JScrollPane {
 			});
 			fieldsPanel.add(spinner);
 		});
-		COMPONENT_FUNCTIONS.put(short.class, (field, component, fieldsPanel) -> {
-			JSpinner spinner = new JSpinner(new SpinnerNumberModel(0, Short.MIN_VALUE, Short.MAX_VALUE, 1));
+		ComponentFunction integer = (field, component, fieldsPanel) -> {
+			JSpinner spinner = new JSpinner(new SpinnerNumberModel(0, null, null, 1));
 			field.setAccessible(true);
 			spinner.setValue(field.get(component));
 			spinner.setMaximumSize(new Dimension(spinner.getPreferredSize().width, 20));
@@ -59,35 +43,11 @@ public class InspectorPanel extends JScrollPane {
 				}
 			});
 			fieldsPanel.add(spinner);
-		});
-		COMPONENT_FUNCTIONS.put(int.class, (field, component, fieldsPanel) -> {
-			JSpinner spinner = new JSpinner(new SpinnerNumberModel(0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1));
-			field.setAccessible(true);
-			spinner.setValue(field.get(component));
-			spinner.setMaximumSize(new Dimension(spinner.getPreferredSize().width, 20));
-			spinner.addChangeListener(changeEvent -> {
-				try {
-					field.set(component, spinner.getValue());
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				}
-			});
-			fieldsPanel.add(spinner);
-		});
-		COMPONENT_FUNCTIONS.put(long.class, (field, component, fieldsPanel) -> {
-			JSpinner spinner = new JSpinner(new SpinnerNumberModel(0, Long.MIN_VALUE, Long.MAX_VALUE, 1));
-			field.setAccessible(true);
-			spinner.setValue(field.get(component));
-			spinner.setMaximumSize(new Dimension(spinner.getPreferredSize().width, 20));
-			spinner.addChangeListener(changeEvent -> {
-				try {
-					field.set(component, spinner.getValue());
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				}
-			});
-			fieldsPanel.add(spinner);
-		});
+		};
+		COMPONENT_FUNCTIONS.put(byte.class, integer);
+		COMPONENT_FUNCTIONS.put(short.class, integer);
+		COMPONENT_FUNCTIONS.put(int.class, integer);
+		COMPONENT_FUNCTIONS.put(long.class, integer);
 		COMPONENT_FUNCTIONS.put(boolean.class, (field, component, fieldsPanel) -> {
 			field.setAccessible(true);
 			JCheckBox checkBox = new JCheckBox("", field.getBoolean(component));
@@ -103,27 +63,27 @@ public class InspectorPanel extends JScrollPane {
 		COMPONENT_FUNCTIONS.put(Vec3f.class, (field, component, fieldsPanel) -> {
 			JPanel panel = new JPanel(new GridLayout(1, 3, 1, 1));
 			Vec3f vector = (Vec3f) field.get(component);
-			JFormattedTextField xTextField = new JFormattedTextField(new DecimalFormat());
-			JFormattedTextField yTextField = new JFormattedTextField(new DecimalFormat());
-			JFormattedTextField zTextField = new JFormattedTextField(new DecimalFormat());
+			JSpinner xSpinner = new JSpinner(new SpinnerNumberModel(0.0f, null, null, 0.01f));
+			JSpinner ySpinner = new JSpinner(new SpinnerNumberModel(0.0f, null, null, 0.01f));
+			JSpinner zSpinner = new JSpinner(new SpinnerNumberModel(0.0f, null, null, 0.01f));
 			field.setAccessible(true);
-			xTextField.setValue(vector.x());
-			yTextField.setValue(vector.y());
-			zTextField.setValue(vector.z());
-			panel.add(xTextField);
-			panel.add(yTextField);
-			panel.add(zTextField);
+			xSpinner.setValue(vector.x());
+			ySpinner.setValue(vector.y());
+			zSpinner.setValue(vector.z());
+			panel.add(xSpinner);
+			panel.add(ySpinner);
+			panel.add(zSpinner);
 			panel.setMaximumSize(new Dimension(panel.getPreferredSize().width, 20));
-			ActionListener actionListener = actionEvent -> {
+			ChangeListener changeListener = changeEvent -> {
 				try {
-					field.set(component, new Vec3f(Float.parseFloat(xTextField.getText()), Float.parseFloat(yTextField.getText()), Float.parseFloat(zTextField.getText())));
+					field.set(component, new Vec3f((float) xSpinner.getValue(), (float) ySpinner.getValue(), (float) zSpinner.getValue()));
 				} catch (IllegalAccessException e) {
 					throw new RuntimeException(e);
 				}
 			};
-			xTextField.addActionListener(actionListener);
-			yTextField.addActionListener(actionListener);
-			zTextField.addActionListener(actionListener);
+			xSpinner.addChangeListener(changeListener);
+			ySpinner.addChangeListener(changeListener);
+			zSpinner.addChangeListener(changeListener);
 			fieldsPanel.add(panel);
 		});
 	}
