@@ -3,6 +3,7 @@ package gamma.engine.editor;
 import gamma.engine.core.ApplicationListener;
 import gamma.engine.core.ApplicationProperties;
 import gamma.engine.core.scene.Scene;
+import gamma.engine.graphics.resources.Model;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.awt.AWTGLCanvas;
@@ -11,6 +12,7 @@ import vecmatlib.vector.Vec2i;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.util.ServiceLoader;
 
 public final class EditorCanvas extends AWTGLCanvas implements MouseListener, MouseMotionListener, MouseWheelListener {
@@ -35,6 +37,11 @@ public final class EditorCanvas extends AWTGLCanvas implements MouseListener, Mo
 		GL.createCapabilities();
 		this.camera.makeCurrent();
 		this.modules.forEach(ApplicationListener::onStart);
+		// TODO: Models can only be loaded here for some reason
+		for(File file : new File("src/main/resources").listFiles()) {
+			if(file.getName().endsWith(".obj"))
+				Model.getOrLoad("/" + file.getName());
+		}
 	}
 
 	@Override

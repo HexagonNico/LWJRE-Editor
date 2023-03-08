@@ -1,7 +1,7 @@
 package gamma.engine.editor;
 
 import gamma.engine.core.scene.Scene;
-import gamma.engine.core.utils.YamlParser;
+import gamma.engine.core.utils.YamlUtils;
 import gamma.engine.editor.filesystem.FileSystemPanel;
 import gamma.engine.editor.inspector.InspectorPanel;
 import gamma.engine.editor.scene.ScenePanel;
@@ -35,7 +35,7 @@ public final class Editor implements Runnable {
 	public void run() {
 		if(!this.editorCanvas.isValid()) {
 			GL.setCapabilities(null);
-			System.out.println(YamlParser.serialize(Scene.getCurrent()));
+			System.out.println(YamlUtils.serialize(Scene.getCurrent()));
 			return;
 		}
 		this.editorCanvas.render();

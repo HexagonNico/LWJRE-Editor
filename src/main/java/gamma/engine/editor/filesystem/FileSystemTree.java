@@ -1,7 +1,7 @@
 package gamma.engine.editor.filesystem;
 
 import gamma.engine.core.scene.Scene;
-import gamma.engine.core.utils.YamlParser;
+import gamma.engine.core.utils.YamlUtils;
 import gamma.engine.editor.TreeView;
 
 import java.awt.event.MouseEvent;
@@ -26,7 +26,7 @@ public class FileSystemTree extends TreeView implements MouseListener {
 	public void mouseClicked(MouseEvent mouseEvent) {
 		if(mouseEvent.getClickCount() == 2) {
 			String file = ((FileNode) this.getLastSelectedPathComponent()).file().getPath();
-			Scene scene = YamlParser.loadFile(file, Scene.class);
+			Scene scene = YamlUtils.parseFile(file, Scene.class);
 			Scene.changeScene(scene);
 			TreeView.refreshAll();
 		}

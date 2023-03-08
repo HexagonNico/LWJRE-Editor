@@ -25,6 +25,7 @@ root: !!gamma.engine.core.scene.Entity
               - "/test_vertex.glsl"
             fragment:
               - "/test_fragment.glsl"
+        - !!gamma.engine.core.components.TestComponent {}
     camera: !!gamma.engine.core.scene.Entity
       components:
         - !!gamma.engine.core.components.Transform3D
