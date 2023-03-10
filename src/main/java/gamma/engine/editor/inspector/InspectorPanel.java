@@ -1,10 +1,10 @@
 package gamma.engine.editor.inspector;
 
-import gamma.engine.core.annotations.EditorFilePath;
 import gamma.engine.core.annotations.EditorFloat;
 import gamma.engine.core.annotations.EditorVariable;
 import gamma.engine.core.scene.Entity;
-import gamma.engine.core.utils.EditorRepresent;
+import gamma.engine.core.utils.EditorGuiComponent;
+import gamma.engine.core.utils.EditorGuiField;
 import vecmatlib.vector.Vec3f;
 
 import javax.swing.*;
@@ -31,14 +31,19 @@ public class InspectorPanel extends JScrollPane {
 			panel.add(new JLabel(component.getClass().getSimpleName()));
 			panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, panel.getPreferredSize().height));
 			this.viewport.add(panel);
-			Component fieldsGui = guiRepresentation(component);
-			this.viewport.add(fieldsGui);
+			if(component instanceof EditorGuiComponent) {
+				JComponent jComponent = ((EditorGuiComponent) component).guiRepresentation(component);
+				this.viewport.add(jComponent);
+			} else {
+				JComponent fieldsGui = guiRepresentation(component);
+				this.viewport.add(fieldsGui);
+			}
 		});
 		this.viewport.validate();
 		this.viewport.repaint();
 	}
 
-	private static Component guiRepresentation(Object object) {
+	private static JComponent guiRepresentation(Object object) {
 		JPanel fieldsPanel = new JPanel(new GridLayout(0, 2, 4, 4));
 		fieldsPanel.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
 		for(Field field : object.getClass().getDeclaredFields()) {
@@ -50,11 +55,10 @@ public class InspectorPanel extends JScrollPane {
 					EditorFloat annotation = field.getAnnotation(EditorFloat.class);
 					NumberRepresent represent = new NumberRepresent(annotation.minValue(), annotation.minValue(), annotation.maxValue(), annotation.stepSize());
 					fieldsPanel.add(represent.represent(field, object));
-				} else if(field.isAnnotationPresent(EditorFilePath.class) && field.getType().equals(String.class)) {
-					// TODO: Handle other annotations as well
-				} else if(EditorRepresent.class.isAssignableFrom(field.getType())) {
+				} else if(EditorGuiField.class.isAssignableFrom(field.getType())) {
 					try {
-						EditorRepresent represent = (EditorRepresent) field.get(object);
+						field.setAccessible(true);
+						EditorGuiField represent = (EditorGuiField) field.get(object);
 						fieldsPanel.add(represent.guiRepresent(field, object));
 					} catch (IllegalAccessException e) {
 						e.printStackTrace();
