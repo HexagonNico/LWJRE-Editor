@@ -19,14 +19,12 @@ public class EditorCamera extends Camera3D {
 
 	@Override
 	public Mat4f projectionMatrix() {
-		float m00 = 1.0f / (float) Math.tan(fov / 2.0f);
-		float m11 = m00 * ((float) this.viewport.x() / this.viewport.y());
-		float m22 = -(farPlane + nearPlane) / (farPlane - nearPlane);
-		float m23 = -(2 * farPlane * nearPlane) / (farPlane - nearPlane);
+		float aspect = ((float) this.viewport.x() / this.viewport.y());
+		float focalLength = (float)(1.0 / Math.tan(this.fov / 2.0f));
 		return new Mat4f(
-				m00, 0.0f, 0.0f, 0.0f,
-				0.0f, m11, 0.0f, 0.0f,
-				0.0f, 0.0f, m22, m23,
+				focalLength, 0.0f, 0.0f, 0.0f,
+				0.0f, focalLength / aspect, 0.0f, 0.0f,
+				0.0f, 0.0f, -(this.farPlane + this.nearPlane) / (this.farPlane - this.nearPlane), -(2 * this.farPlane * this.nearPlane) / (this.farPlane - this.nearPlane),
 				0.0f, 0.0f, -1.0f, 0.0f
 		);
 	}
