@@ -20,10 +20,6 @@ public class EditorWindow extends Window {
 			FileSystemGui::drawGui
 	);
 
-	public EditorWindow() {
-		super("Gamma Engine - Editor", 800, 450);
-	}
-
 	@Override
 	public void makeContextCurrent() {
 		super.makeContextCurrent();

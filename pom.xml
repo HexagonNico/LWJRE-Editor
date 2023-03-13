@@ -13,15 +13,24 @@
 	</properties>
 
 	<build>
-		<resources>
-			<resource>
-				<!-- TODO: Exclude this from assembly -->
-				<directory>run/src/main/resources</directory>
-			</resource>
-		</resources>
 		<plugins>
 			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>3.1.0</version>
+				<configuration>
+					<executable>java</executable>
+					<mainClass>gamma.engine.editor.EditorApplication</mainClass>
+					<additionalClasspathElements>
+						<additionalClasspathElement>run/src/main/resources</additionalClasspathElement>
+<!--						<additionalClasspathElement>run/src/main/java</additionalClasspathElement>-->
+					</additionalClasspathElements>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.3</version>
 				<configuration>
 					<archive>
 						<manifest>

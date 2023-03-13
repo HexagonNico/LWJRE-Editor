@@ -1,7 +1,7 @@
 package gamma.engine.editor.gui;
 
-import gamma.engine.core.utils.YamlUtils;
 import gamma.engine.core.scene.Scene;
+import gamma.engine.core.utils.YamlUtils;
 import imgui.ImGui;
 import imgui.flag.ImGuiTreeNodeFlags;
 
@@ -48,6 +48,18 @@ public final class FileSystemGui {
 				ImGui.endDragDropTarget();
 			}
 			if(Files.isDirectory(path)) {
+//				try {
+//				} catch (MalformedURLException e) {
+//					throw new RuntimeException(e);
+//				}
+//				try {
+//					URLClassLoader classLoader = URLClassLoader.newInstance(new URL[0]);
+//					Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+//					method.setAccessible(true);
+//					method.invoke(classLoader, path.toUri().toURL());
+//				} catch (NoSuchMethodException | MalformedURLException | InvocationTargetException | IllegalAccessException e) {
+//					throw new RuntimeException(e);
+//				}
 				try(Stream<Path> files = Files.list(path)) {
 					files.forEach(FileSystemGui::showTreeNode);
 				} catch (IOException e) {
