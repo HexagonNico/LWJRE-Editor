@@ -2,25 +2,22 @@ package gamma.engine.editor.gui;
 
 import imgui.ImGui;
 
-public class TestGui extends EditorGui {
+public class TestGui {
 
-	private boolean showText = false;
+	private static boolean showText = false;
 
-	public TestGui() {
-		super("Test Gui");
-	}
-
-	@Override
-	protected void drawGui() {
+	public static void drawGui() {
+		ImGui.begin("Test Gui");
 		if(ImGui.button("I am a button")) {
-			this.showText = !this.showText;
+			showText = !showText;
 		}
-		if(this.showText) {
+		if(showText) {
 			ImGui.text("You clicked a button");
 			ImGui.sameLine();
 			if(ImGui.button("Stop showing text")) {
-				this.showText = false;
+				showText = false;
 			}
 		}
+		ImGui.end();
 	}
 }
