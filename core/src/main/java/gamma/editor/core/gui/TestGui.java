@@ -1,4 +1,4 @@
-package gamma.engine.editor.gui;
+package gamma.editor.core.gui;
 
 import imgui.ImGui;
 

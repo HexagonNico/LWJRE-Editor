@@ -1,8 +1,8 @@
-package gamma.engine.editor;
+package gamma.editor.core;
 
 import gamma.engine.core.window.Window;
-import gamma.engine.editor.gui.FileSystemGui;
-import gamma.engine.editor.gui.TestGui;
+import gamma.editor.core.gui.FileSystemGui;
+import gamma.editor.core.gui.TestGui;
 import imgui.ImGui;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;

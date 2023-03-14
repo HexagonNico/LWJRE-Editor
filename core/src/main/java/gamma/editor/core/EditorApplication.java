@@ -1,4 +1,4 @@
-package gamma.engine.editor;
+package gamma.editor.core;
 
 import gamma.engine.core.ApplicationListener;
 import gamma.engine.core.scene.Scene;
