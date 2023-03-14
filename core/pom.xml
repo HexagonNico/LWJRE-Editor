@@ -17,6 +17,7 @@
 	</properties>
 
 	<build>
+		<finalName>gamma-editor</finalName>
 		<plugins>
 			<!-- TODO: Find a way to run the project from maven -->
 <!--			<plugin>-->
@@ -44,6 +45,8 @@
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
+					<outputDirectory>../run</outputDirectory>
+					<appendAssemblyId>false</appendAssemblyId>
 				</configuration>
 				<executions>
 					<execution>
