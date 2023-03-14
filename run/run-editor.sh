@@ -1,1 +1,1 @@
-java -cp ./*:./src/main/resources gamma.engine.editor.EditorApplication
+java -cp ./*:./src/main/resources gamma.editor.core.EditorApplication

@@ -1,24 +1,30 @@
 package gamma.editor.core;
 
-import gamma.engine.core.window.Window;
 import gamma.editor.core.gui.FileSystemGui;
-import gamma.editor.core.gui.TestGui;
+import gamma.editor.core.gui.IEditorGui;
+import gamma.editor.core.gui.InspectorGui;
+import gamma.editor.core.gui.SceneTreeGui;
+import gamma.engine.core.window.Window;
 import imgui.ImGui;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 import org.lwjgl.opengl.GL;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class EditorWindow extends Window {
 
 	private final ImGuiImplGlfw glfw = new ImGuiImplGlfw();
 	private final ImGuiImplGl3 gl3 = new ImGuiImplGl3();
 
-	private static final List<Runnable> GUIS = List.of(
-			TestGui::drawGui,
-			FileSystemGui::drawGui
-	);
+	private final ArrayList<IEditorGui> guis = new ArrayList<>();
+
+	public EditorWindow() {
+		this.guis.add(new FileSystemGui());
+		InspectorGui inspector = new InspectorGui();
+		this.guis.add(new SceneTreeGui(inspector));
+		this.guis.add(inspector);
+	}
 
 	@Override
 	public void makeContextCurrent() {
@@ -34,7 +40,7 @@ public class EditorWindow extends Window {
 	public void update() {
 		this.glfw.newFrame();
 		ImGui.newFrame();
-		GUIS.forEach(Runnable::run);
+		this.guis.forEach(IEditorGui::draw);
 		ImGui.render();
 		this.gl3.renderDrawData(ImGui.getDrawData());
 		super.update();
