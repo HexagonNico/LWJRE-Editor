@@ -2,6 +2,8 @@ package gamma.editor.core.gui;
 
 import gamma.engine.core.annotations.EditorRange;
 import gamma.engine.core.annotations.EditorVariable;
+import gamma.engine.core.resources.Resource;
+import gamma.engine.core.resources.Resources;
 import gamma.engine.core.scene.Component;
 import gamma.engine.core.scene.Entity;
 import gamma.engine.core.window.Window;
@@ -15,6 +17,9 @@ import vecmatlib.vector.Vec4f;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.NoSuchElementException;
 
 public class InspectorGui implements IEditorGui {
 
@@ -38,6 +43,7 @@ public class InspectorGui implements IEditorGui {
 						}
 					}
 				}
+				ImGui.separator();
 			});
 		}
 		ImGui.end();
@@ -69,6 +75,8 @@ public class InspectorGui implements IEditorGui {
 				renderVecField3(component, field);
 			} else if(field.getType().equals(Vec4f.class)) {
 				renderVecField4(component, field);
+			} else if(Resource.class.isAssignableFrom(field.getType())) {
+				renderResource(component, field);
 			} else {
 				ImGui.newLine();
 			}
@@ -144,6 +152,33 @@ public class InspectorGui implements IEditorGui {
 		float max = range != null ? range.max() : Float.POSITIVE_INFINITY;
 		if(ImGui.dragFloat4("##" + field.getName(), ptr, step, min, max)) {
 			field.set(component, new Vec4f(ptr[0], ptr[1], ptr[2], ptr[3]));
+		}
+	}
+
+	private static void renderResource(Component component, Field field) throws IllegalAccessException {
+		Resource resource = (Resource) field.get(component);
+		ImString ptr = new ImString(Resources.pathOf(resource), 256);
+		if(ImGui.inputText("##" + field.getName(), ptr)) {
+			setResource(component, field, ptr.get());
+		}
+		if(ImGui.beginDragDropTarget()) {
+			Object payload = ImGui.acceptDragDropPayload("Path");
+			if(payload instanceof Path path) {
+				setResource(component, field, path.toString().substring(18));
+			}
+			ImGui.endDragDropTarget();
+		}
+	}
+
+	private static void setResource(Component component, Field field, String value) throws IllegalAccessException {
+		if(value.contains(".") && Files.exists(Path.of("src/main/resources" + value))) {
+			try {
+				Resource newResource = Resources.getOrLoad(value);
+				if(newResource.getClass().isAssignableFrom(field.getType()))
+					field.set(component, newResource);
+			} catch(NoSuchElementException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
