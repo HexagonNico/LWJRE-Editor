@@ -19,11 +19,14 @@ public class EditorWindow extends Window {
 
 	private final ArrayList<IEditorGui> guis = new ArrayList<>();
 
+	private final EditorCamera camera = new EditorCamera();
+
 	public EditorWindow() {
 		this.guis.add(new FileSystemGui());
 		InspectorGui inspector = new InspectorGui();
 		this.guis.add(new SceneTreeGui(inspector));
 		this.guis.add(inspector);
+		this.camera.makeCurrent();
 	}
 
 	@Override
@@ -39,6 +42,7 @@ public class EditorWindow extends Window {
 	@Override
 	public void update() {
 		this.glfw.newFrame();
+		this.camera.editorUpdate();
 		ImGui.newFrame();
 		this.guis.forEach(IEditorGui::draw);
 		ImGui.render();
