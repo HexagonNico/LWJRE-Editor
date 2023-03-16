@@ -1,5 +1,6 @@
 package gamma.editor.core.gui;
 
+import gamma.engine.core.resources.Resources;
 import gamma.engine.core.scene.Scene;
 import gamma.engine.core.utils.YamlUtils;
 import gamma.engine.core.window.Window;
@@ -48,6 +49,7 @@ public final class FileSystemGui implements IEditorGui {
 					Path destination = Path.of((Files.isDirectory(path) ? path : path.getParent()).toString(), pathToMove.getFileName().toString());
 					try {
 						Files.move(pathToMove, destination);
+						Resources.updatePath(pathToMove.toString().substring(18), destination.toString().substring(18));
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -56,7 +58,11 @@ public final class FileSystemGui implements IEditorGui {
 			}
 			if(Files.isDirectory(path)) {
 				try(Stream<Path> files = Files.list(path)) {
-					files.forEach(FileSystemGui::showTreeNode);
+					files.sorted((path1, path2) -> {
+						if(Files.isDirectory(path1) == Files.isDirectory(path2))
+							return path1.getFileName().toString().compareToIgnoreCase(path2.getFileName().toString());
+						return Files.isDirectory(path1) ? -1 : 1;
+					}).forEach(FileSystemGui::showTreeNode);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
