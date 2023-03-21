@@ -8,7 +8,9 @@ import gamma.engine.core.window.Window;
 import imgui.ImGui;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 
@@ -26,7 +28,11 @@ public class EditorWindow extends Window {
 		InspectorGui inspector = new InspectorGui();
 		this.guis.add(new SceneTreeGui(inspector));
 		this.guis.add(inspector);
-		this.camera.makeCurrent();
+	}
+
+	@Override
+	public void setupCallbacks() {
+		GLFW.glfwSetWindowSizeCallback(this.handle, (window, width, height) -> GL11.glViewport(0, 0, width, height));
 	}
 
 	@Override

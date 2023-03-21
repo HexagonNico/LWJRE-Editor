@@ -14,6 +14,7 @@ public class EditorApplication {
 			try {
 				System.out.println("Editor started");
 				EditorWindow window = new EditorWindow();
+				window.setupCallbacks();
 				window.makeContextCurrent();
 				window.show();
 				listeners.forEach(ApplicationListener::onStart);

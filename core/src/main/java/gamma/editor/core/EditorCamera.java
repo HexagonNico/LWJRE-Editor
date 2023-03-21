@@ -18,6 +18,7 @@ public class EditorCamera extends Camera3D {
 	@Override
 	protected void editorUpdate() {
 		super.editorUpdate();
+		this.makeCurrent();
 		ImGuiIO io = ImGui.getIO();
 		if(!io.getWantCaptureMouse()) {
 			ImVec2 nextDragPoint = ImGui.getMousePos();
