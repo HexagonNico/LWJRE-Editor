@@ -16,6 +16,49 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
+	<repositories>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+
+	<profiles>
+		<profile>
+			<id>linux</id>
+			<activation>
+				<os>
+					<family>unix</family>
+				</os>
+			</activation>
+			<properties>
+				<platform>linux</platform>
+			</properties>
+		</profile>
+		<profile>
+			<id>macos</id>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os>
+			</activation>
+			<properties>
+				<platform>macos</platform>
+			</properties>
+		</profile>
+		<profile>
+			<id>windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+			<properties>
+				<platform>windows</platform>
+			</properties>
+		</profile>
+	</profiles>
+
 	<build>
 		<finalName>gamma-editor</finalName>
 		<plugins>
@@ -63,9 +106,14 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>gamma.engine</groupId>
+			<groupId>com.github.Gamma-Engine.Gamma-Engine</groupId>
 			<artifactId>gamma-engine-core</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>main-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.Gamma-Engine.Gamma-Engine</groupId>
+			<artifactId>gamma-engine-natives-${platform}</artifactId>
+			<version>main-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>io.github.spair</groupId>

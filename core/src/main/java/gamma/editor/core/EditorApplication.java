@@ -1,27 +1,25 @@
 package gamma.editor.core;
 
-import gamma.engine.core.ApplicationListener;
+import gamma.engine.core.rendering.DebugRenderer;
+import gamma.engine.core.rendering.RenderingSystem;
+import gamma.engine.core.resources.DeletableResource;
 import gamma.engine.core.scene.Scene;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.ServiceLoader;
 
 public class EditorApplication {
 
 	public static void main(String[] args) {
 		if (GLFW.glfwInit()) {
-			ServiceLoader<ApplicationListener> listeners = ServiceLoader.load(ApplicationListener.class);
 			try {
 				System.out.println("Editor started");
 				EditorWindow window = new EditorWindow();
 				window.setupCallbacks();
 				window.makeContextCurrent();
-				window.show();
-				listeners.forEach(ApplicationListener::onStart);
 //				Scene.changeScene(ApplicationProperties.getString("startScene"));
 				while(!window.isCloseRequested()) {
-					listeners.forEach(ApplicationListener::onUpdate);
 					Scene.getCurrent().root.editorProcess();
+					RenderingSystem.render();
+					DebugRenderer.render();
 					window.update();
 					GLFW.glfwPollEvents();
 				}
@@ -31,7 +29,7 @@ public class EditorApplication {
 				e.printStackTrace();
 			} finally {
 				System.out.println("Terminating editor");
-				listeners.forEach(ApplicationListener::onTerminate);
+				DeletableResource.deleteAll();
 				GLFW.glfwTerminate();
 			}
 		} else {
