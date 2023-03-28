@@ -11,6 +11,8 @@ import imgui.flag.ImGuiCond;
 import imgui.type.ImFloat;
 import imgui.type.ImInt;
 import imgui.type.ImString;
+import vecmatlib.color.Color3f;
+import vecmatlib.color.Color4f;
 import vecmatlib.vector.Vec2f;
 import vecmatlib.vector.Vec2i;
 import vecmatlib.vector.Vec3f;
@@ -34,7 +36,13 @@ public class InspectorGui implements IEditorGui {
 		ImGui.setNextWindowSize(windowSize.x() / 8.0f, windowSize.y() / 2.0f - 10.0f, ImGuiCond.Once);
 		ImGui.begin("Inspector");
 		if(this.entity != null) {
-			this.entity.getComponents().forEach(component -> {
+			this.entity.getComponents().sorted((component1, component2) -> {
+				EditorIndex index1 = component1.getClass().getAnnotation(EditorIndex.class);
+				EditorIndex index2 = component2.getClass().getAnnotation(EditorIndex.class);
+				if(index1 != null && index2 != null)
+					return Integer.compare(index1.value(), index2.value());
+				return 0;
+			}).forEach(component -> {
 				ImGui.text(component.getClass().getSimpleName());
 				for(Field field : component.getClass().getDeclaredFields()) {
 					if(!Modifier.isStatic(field.getModifiers()) && !Modifier.isTransient(field.getModifiers())) {
@@ -77,6 +85,10 @@ public class InspectorGui implements IEditorGui {
 				renderVecField3(component, field);
 			} else if(field.getType().equals(Vec4f.class)) {
 				renderVecField4(component, field);
+			} else if(field.getType().equals(Color3f.class)) {
+				renderColorField3(component, field);
+			} else if(field.getType().equals(Color4f.class)) {
+				renderColorField4(component, field);
 			} else if(Resource.class.isAssignableFrom(field.getType())) {
 				renderResource(component, field);
 			} else {
@@ -197,6 +209,22 @@ public class InspectorGui implements IEditorGui {
 			}
 		} else if(ImGui.inputFloat4("##" + field.getName(), ptr)) {
 			field.set(component, new Vec4f(ptr[0], ptr[1], ptr[2], ptr[3]));
+		}
+	}
+
+	private static void renderColorField3(Component component, Field field) throws IllegalAccessException {
+		Color3f color = (Color3f) field.get(component);
+		float[] ptr = {color.r(), color.g(), color.b()}; // TODO: Color flags
+		if(ImGui.colorEdit3("##" + field.getName(), ptr)) {
+			field.set(component, new Color3f(ptr[0], ptr[1], ptr[2]));
+		}
+	}
+
+	private static void renderColorField4(Component component, Field field) throws IllegalAccessException {
+		Color4f color = (Color4f) field.get(component);
+		float[] ptr = {color.r(), color.g(), color.b(), color.a()}; // TODO: Color flags
+		if(ImGui.colorEdit4("##" + field.getName(), ptr)) {
+			field.set(component, new Color4f(ptr[0], ptr[1], ptr[2], ptr[3]));
 		}
 	}
 

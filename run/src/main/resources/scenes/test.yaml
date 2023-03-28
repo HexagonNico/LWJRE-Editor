@@ -3,6 +3,9 @@ root:
   children:
     dragon: !!gamma.engine.core.scene.Entity
       components:
+       - !!gamma.engine.core.components.ModelRenderer
+         model: !!gamma.engine.core.resources.Model '/models/dragon.obj'
+         shader: !!gamma.engine.core.resources.Shader '/gamma/engine/core/shaders/default_shader.glsl'
        - !!gamma.engine.core.components.KinematicBody3D
          acceleration: !!vecmatlib.vector.Vec3f [0.0, -9.81, 0.0]
          velocity: &id001 !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
@@ -10,9 +13,6 @@ root:
          position: !!vecmatlib.vector.Vec3f [0.0, 5.0, -2.5]
          rotation: *id001
          scale: &id002 !!vecmatlib.vector.Vec3f [1.0, 1.0, 1.0]
-       - !!gamma.engine.core.components.ModelRenderer
-         model: !!gamma.engine.core.resources.Model '/models/dragon.obj'
-         shader: !!gamma.engine.core.resources.Shader '/gamma/engine/core/shaders/default_shader.glsl'
        - !!gamma.engine.core.components.BoundingBox3D
          extents: !!vecmatlib.vector.Vec3f [7.25, 4.8, 2.75]
          offset: !!vecmatlib.vector.Vec3f [-0.2, 2.75, -0.25]
@@ -46,5 +46,5 @@ root:
          rotation: *id001
          scale: *id002
        - !!gamma.engine.core.components.PointLight3D
-         color: !!vecmatlib.color.Color [1.0, 1.0, 1.0, 1.0]
+         color: !!vecmatlib.color.Color3f [1.0, 1.0, 1.0]
          offset: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
