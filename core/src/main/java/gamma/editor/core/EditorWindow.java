@@ -1,9 +1,6 @@
 package gamma.editor.core;
 
-import gamma.editor.core.gui.FileSystemGui;
-import gamma.editor.core.gui.IEditorGui;
-import gamma.editor.core.gui.InspectorGui;
-import gamma.editor.core.gui.SceneTreeGui;
+import gamma.editor.core.gui.*;
 import gamma.engine.core.window.Window;
 import imgui.ImGui;
 import imgui.gl3.ImGuiImplGl3;
@@ -24,6 +21,7 @@ public class EditorWindow extends Window {
 	private final EditorCamera camera = new EditorCamera();
 
 	public EditorWindow() {
+		this.guis.add(new EditorMenuBar());
 		this.guis.add(new FileSystemGui());
 		InspectorGui inspector = new InspectorGui();
 		this.guis.add(new SceneTreeGui(inspector));

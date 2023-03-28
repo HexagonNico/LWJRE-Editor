@@ -1,5 +1,6 @@
 package gamma.editor.core.gui;
 
+import gamma.editor.core.EditorScene;
 import gamma.engine.core.resources.Resources;
 import gamma.engine.core.scene.Scene;
 import gamma.engine.core.utils.YamlUtils;
@@ -39,8 +40,7 @@ public final class FileSystemGui implements IEditorGui {
 			}
 			if(ImGui.isItemHovered() && ImGui.isMouseDoubleClicked(0)) {
 				if(fileName.endsWith(".yaml")) {
-					Scene scene = YamlUtils.parseFile(path.toString(), Scene.class);
-					Scene.changeScene(scene);
+					EditorScene.changeScene(path.toString());
 				}
 			}
 			if(ImGui.beginDragDropTarget()) {
