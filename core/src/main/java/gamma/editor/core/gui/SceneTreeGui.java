@@ -19,8 +19,8 @@ public class SceneTreeGui implements IEditorGui {
 	@Override
 	public void draw() {
 		Vec2i windowSize = Window.getCurrent().getSize();
-		ImGui.setNextWindowPos(5.0f, 5.0f, ImGuiCond.Once);
-		ImGui.setNextWindowSize(windowSize.x() / 8.0f, windowSize.y() / 2.0f - 10.0f, ImGuiCond.Once);
+		ImGui.setNextWindowPos(5.0f, 15.0f, ImGuiCond.FirstUseEver);
+		ImGui.setNextWindowSize(windowSize.x() / 8.0f, windowSize.y() / 2.0f - 10.0f, ImGuiCond.FirstUseEver);
 		ImGui.begin("Scene tree");
 		drawEntity("root", Scene.getCurrent().root);
 		ImGui.end();

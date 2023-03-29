@@ -3,6 +3,9 @@ package gamma.editor.core;
 import gamma.editor.core.gui.*;
 import gamma.engine.core.window.Window;
 import imgui.ImGui;
+import imgui.ImGuiIO;
+import imgui.flag.ImGuiConfigFlags;
+import imgui.flag.ImGuiDockNodeFlags;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 import org.lwjgl.glfw.GLFW;
@@ -38,7 +41,9 @@ public class EditorWindow extends Window {
 		super.makeContextCurrent();
 		GL.createCapabilities();
 		ImGui.createContext();
-		ImGui.getIO().setIniFilename(null);
+		ImGuiIO io = ImGui.getIO();
+		io.setIniFilename(".gamma/editorLayout.ini"); // TODO: Check if .gamma directory exists and create it if it doesn't
+		io.setConfigFlags(ImGuiConfigFlags.DockingEnable);
 		this.glfw.init(this.handle, true);
 		this.gl3.init("#version 130");
 	}
@@ -48,6 +53,8 @@ public class EditorWindow extends Window {
 		this.glfw.newFrame();
 		this.camera.editorUpdate();
 		ImGui.newFrame();
+		// TODO: Either make this invisible or use frame buffers
+		ImGui.dockSpaceOverViewport(ImGui.getMainViewport(), ImGuiDockNodeFlags.NoDockingInCentralNode);
 		this.guis.forEach(IEditorGui::draw);
 		ImGui.render();
 		this.gl3.renderDrawData(ImGui.getDrawData());

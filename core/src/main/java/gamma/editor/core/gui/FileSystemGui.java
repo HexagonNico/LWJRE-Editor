@@ -2,8 +2,6 @@ package gamma.editor.core.gui;
 
 import gamma.editor.core.EditorScene;
 import gamma.engine.core.resources.Resources;
-import gamma.engine.core.scene.Scene;
-import gamma.engine.core.utils.YamlUtils;
 import gamma.engine.core.window.Window;
 import imgui.ImGui;
 import imgui.flag.ImGuiCond;
@@ -20,8 +18,8 @@ public final class FileSystemGui implements IEditorGui {
 	@Override
 	public void draw() {
 		Vec2i windowSize = Window.getCurrent().getSize();
-		ImGui.setNextWindowPos(5.0f, windowSize.y() / 2.0f + 5.0f, ImGuiCond.Once);
-		ImGui.setNextWindowSize(windowSize.x() / 8.0f, windowSize.y() / 2.0f - 10.0f, ImGuiCond.Once);
+		ImGui.setNextWindowPos(5.0f, windowSize.y() / 2.0f + 25.0f, ImGuiCond.FirstUseEver);
+		ImGui.setNextWindowSize(windowSize.x() / 8.0f, windowSize.y() / 2.0f - 10.0f, ImGuiCond.FirstUseEver);
 		ImGui.begin("File system");
 		showTreeNode(Path.of("src/main/resources"));
 		ImGui.end();

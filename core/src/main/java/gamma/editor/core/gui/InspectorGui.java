@@ -32,8 +32,8 @@ public class InspectorGui implements IEditorGui {
 	@Override
 	public void draw() {
 		Vec2i windowSize = Window.getCurrent().getSize();
-		ImGui.setNextWindowPos(windowSize.x() - 5.0f - windowSize.x() / 8.0f, 5.0f, ImGuiCond.Once);
-		ImGui.setNextWindowSize(windowSize.x() / 8.0f, windowSize.y() / 2.0f - 10.0f, ImGuiCond.Once);
+		ImGui.setNextWindowPos(windowSize.x() - 5.0f - windowSize.x() / 8.0f, 20.0f, ImGuiCond.FirstUseEver);
+		ImGui.setNextWindowSize(windowSize.x() / 8.0f, windowSize.y() / 2.0f - 25.0f, ImGuiCond.FirstUseEver);
 		ImGui.begin("Inspector");
 		if(this.entity != null) {
 			this.entity.getComponents().sorted((component1, component2) -> {
