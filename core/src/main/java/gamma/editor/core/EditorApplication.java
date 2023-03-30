@@ -10,12 +10,13 @@ public class EditorApplication {
 
 	public static void main(String[] args) {
 		if (GLFW.glfwInit()) {
+			Thread.currentThread().setContextClassLoader(new EditorClassLoader());
 			try {
 				System.out.println("Editor started");
 				EditorWindow window = new EditorWindow();
 				window.setupCallbacks();
 				window.makeContextCurrent();
-//				Scene.changeScene(ApplicationProperties.getString("startScene"));
+				// TODO: Change to previously opened scene
 				while(!window.isCloseRequested()) {
 					Scene.getCurrent().root.editorProcess();
 					RenderingSystem.render();

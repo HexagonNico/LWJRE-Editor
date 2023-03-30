@@ -62,19 +62,27 @@
 	<build>
 		<finalName>gamma-editor</finalName>
 		<plugins>
-			<!-- TODO: Find a way to run the project from maven -->
-<!--			<plugin>-->
-<!--				<groupId>org.codehaus.mojo</groupId>-->
-<!--				<artifactId>exec-maven-plugin</artifactId>-->
-<!--				<version>3.1.0</version>-->
-<!--				<configuration>-->
-<!--					<executable>java</executable>-->
-<!--					<mainClass>gamma.editor.core.EditorApplication</mainClass>-->
-<!-- 					<additionalClasspathElements>-->
-<!-- 						<additionalClasspathElement>run/src/main/resources</additionalClasspathElement>-->
-<!-- 					</additionalClasspathElements>-->
-<!--				</configuration>-->
-<!--			</plugin>-->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<executable>java</executable>
+					<arguments>
+						<argument>-classpath</argument>
+						<classpath/>
+						<argument>gamma.editor.core.EditorApplication</argument>
+					</arguments>
+					<workingDirectory>../run</workingDirectory>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -106,14 +114,14 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.github.Gamma-Engine.Gamma-Engine</groupId>
+			<groupId>gamma.engine</groupId>
 			<artifactId>gamma-engine-core</artifactId>
-			<version>main-SNAPSHOT</version>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>com.github.Gamma-Engine.Gamma-Engine</groupId>
-			<artifactId>gamma-engine-natives-${platform}</artifactId>
-			<version>main-SNAPSHOT</version>
+			<groupId>gamma.engine</groupId>
+			<artifactId>gamma-engine-natives-linux</artifactId>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>io.github.spair</groupId>
