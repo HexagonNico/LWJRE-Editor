@@ -1,6 +1,6 @@
-package gamma.editor.core.gui;
+package gamma.editor.gui;
 
-import gamma.editor.core.EditorScene;
+import gamma.editor.EditorScene;
 import imgui.ImGui;
 
 public class EditorMenuBar implements IEditorGui {

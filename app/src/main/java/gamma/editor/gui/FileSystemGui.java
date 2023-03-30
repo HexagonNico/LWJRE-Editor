@@ -1,6 +1,6 @@
-package gamma.editor.core.gui;
+package gamma.editor.gui;
 
-import gamma.editor.core.EditorScene;
+import gamma.editor.EditorScene;
 import gamma.engine.core.resources.Resources;
 import gamma.engine.core.window.Window;
 import imgui.ImGui;

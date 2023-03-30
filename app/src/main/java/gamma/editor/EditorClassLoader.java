@@ -1,4 +1,4 @@
-package gamma.editor.core;
+package gamma.editor;
 
 import java.io.File;
 import java.net.MalformedURLException;

@@ -1,4 +1,4 @@
-package gamma.editor.core;
+package gamma.editor;
 
 import gamma.engine.core.components.Camera3D;
 import imgui.ImGui;

@@ -1,4 +1,4 @@
-package gamma.editor.core;
+package gamma.editor;
 
 import gamma.engine.core.rendering.DebugRenderer;
 import gamma.engine.core.rendering.RenderingSystem;

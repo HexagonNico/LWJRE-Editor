@@ -1,4 +1,4 @@
-package gamma.editor.core.gui;
+package gamma.editor.gui;
 
 import gamma.engine.core.scene.Entity;
 import gamma.engine.core.scene.Scene;

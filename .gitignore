@@ -1,10 +1,14 @@
-# Java
+# Compiled java
 *.class
 *.jar
-hs_err_pid*
 
-# Maven
-target/
+# Gradle project-specific cache directory
+.gradle/
+# Gradle build output directory
+build/
+
+# JVM Error files
+hs_err_pid*
 
 # IntelliJ
 .idea/
