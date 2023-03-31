@@ -1,8 +1,8 @@
 package gamma.editor.gui;
 
 import gamma.editor.EditorScene;
-import gamma.engine.core.resources.Resources;
-import gamma.engine.core.window.Window;
+import gamma.engine.resources.Resources;
+import gamma.engine.window.Window;
 import imgui.ImGui;
 import imgui.flag.ImGuiCond;
 import imgui.flag.ImGuiTreeNodeFlags;

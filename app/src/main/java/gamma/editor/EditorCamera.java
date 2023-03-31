@@ -1,6 +1,6 @@
 package gamma.editor;
 
-import gamma.engine.core.components.Camera3D;
+import gamma.engine.components.Camera3D;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.ImVec2;

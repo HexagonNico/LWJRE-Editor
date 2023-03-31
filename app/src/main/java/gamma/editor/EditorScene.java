@@ -1,7 +1,7 @@
 package gamma.editor;
 
-import gamma.engine.core.scene.Scene;
-import gamma.engine.core.utils.YamlUtils;
+import gamma.engine.scene.Scene;
+import gamma.engine.utils.YamlUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;

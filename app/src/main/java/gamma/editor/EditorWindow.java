@@ -1,7 +1,7 @@
 package gamma.editor;
 
 import gamma.editor.gui.*;
-import gamma.engine.core.window.Window;
+import gamma.engine.window.Window;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.flag.ImGuiConfigFlags;

@@ -1,9 +1,9 @@
 package gamma.editor;
 
-import gamma.engine.core.rendering.DebugRenderer;
-import gamma.engine.core.rendering.RenderingSystem;
-import gamma.engine.core.resources.DeletableResource;
-import gamma.engine.core.scene.Scene;
+import gamma.engine.rendering.DebugRenderer;
+import gamma.engine.rendering.RenderingSystem;
+import gamma.engine.resources.DeletableResource;
+import gamma.engine.scene.Scene;
 import org.lwjgl.glfw.GLFW;
 
 public class EditorApplication {

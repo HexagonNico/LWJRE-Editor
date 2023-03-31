@@ -1,11 +1,11 @@
 package gamma.editor.gui;
 
-import gamma.engine.core.annotations.*;
-import gamma.engine.core.resources.Resource;
-import gamma.engine.core.resources.Resources;
-import gamma.engine.core.scene.Component;
-import gamma.engine.core.scene.Entity;
-import gamma.engine.core.window.Window;
+import gamma.engine.annotations.*;
+import gamma.engine.resources.Resource;
+import gamma.engine.resources.Resources;
+import gamma.engine.scene.Component;
+import gamma.engine.scene.Entity;
+import gamma.engine.window.Window;
 import imgui.ImGui;
 import imgui.flag.ImGuiCond;
 import imgui.type.ImFloat;
