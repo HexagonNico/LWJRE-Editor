@@ -55,6 +55,13 @@ public class InspectorGui implements IEditorGui {
 				}
 				ImGui.separator();
 			});
+			if(ImGui.button("Add component")) {
+				ImGui.openPopup("Add component");
+			}
+			if(ImGui.beginPopupContextItem("Add component")) {
+				ImGui.text("Hello?");
+				ImGui.endPopup();
+			}
 		}
 		ImGui.end();
 	}

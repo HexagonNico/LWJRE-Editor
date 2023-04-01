@@ -4,6 +4,7 @@ import gamma.engine.scene.Entity;
 import gamma.engine.scene.Scene;
 import gamma.engine.window.Window;
 import imgui.ImGui;
+import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiCond;
 import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiTreeNodeFlags;
@@ -17,6 +18,9 @@ public class SceneTreeGui implements IEditorGui {
 	private Entity renaming;
 	private String newName;
 
+	private Entity clipboardEntity;
+	private String clipboardName;
+
 	public SceneTreeGui(InspectorGui inspector) {
 		this.inspector = inspector;
 	}
@@ -29,8 +33,15 @@ public class SceneTreeGui implements IEditorGui {
 		ImGui.begin("Scene tree");
 		this.drawEntity("root", Scene.getCurrent().root, true);
 		if(this.renaming != null && this.renaming.getParent() != null && this.newName != null) {
-			if(!this.newName.isEmpty())
-				this.renaming.getParent().renameChild(this.renaming, this.newName);
+			if(!this.newName.isEmpty()) {
+				String actualName = this.newName;
+				int i = 1;
+				while(this.renaming.getParent().hasChild(actualName)) {
+					actualName = this.newName + i;
+					i++;
+				}
+				this.renaming.getParent().renameChild(this.renaming, actualName);
+			}
 			this.renaming = null;
 			this.newName = null;
 		}
@@ -43,8 +54,12 @@ public class SceneTreeGui implements IEditorGui {
 			flags = flags | ImGuiTreeNodeFlags.Leaf;
 		if(entity == this.inspector.entity)
 			flags = flags | ImGuiTreeNodeFlags.Selected;
+		if(entity == this.clipboardEntity)
+			ImGui.pushStyleColor(ImGuiCol.Text, 0.8f, 0.8f, 0.8f, 1.0f);
 		// Draw entity as tree node
 		if(ImGui.treeNodeEx(name, flags, this.renaming != entity ? name : "")) {
+			if(entity == this.clipboardEntity)
+				ImGui.popStyleColor();
 			// Draw text input if the entity is being renamed
 			if(this.renaming == entity) {
 				ImGui.sameLine();
@@ -88,6 +103,31 @@ public class SceneTreeGui implements IEditorGui {
 			// Enable renaming when an entity is double-clicked
 			if(this.inspector.entity == entity && ImGui.isMouseDoubleClicked(0) && !isRoot) {
 				this.renaming = entity;
+			}
+			if(ImGui.beginPopupContextItem()) {
+				if(ImGui.menuItem("Add child entity", "Ctrl+A")) {
+					entity.addChild(new Entity());
+				}
+				ImGui.separator();
+				if(ImGui.menuItem("Cut", "Ctrl+X")) {
+					this.clipboardEntity = entity;
+					this.clipboardName = name;
+				}
+				if(ImGui.menuItem("Copy", "Ctrl+C")) {
+					this.clipboardEntity = entity; // TODO: Clone entity
+					this.clipboardName = name;
+				}
+				if(ImGui.menuItem("Paste", "Ctrl+V")) {
+					if(this.clipboardEntity != null) {
+						this.clipboardEntity.setParent(this.clipboardName, entity);
+//						this.clipboardEntity = this.clipboardEntity; // TODO: Clone entity
+					}
+				}
+				ImGui.separator();
+				if(ImGui.menuItem("Delete entity", "Delete")) {
+					entity.removeFromScene();
+				}
+				ImGui.endPopup();
 			}
 			// Render children
 			entity.forEachChild((key, child) -> this.drawEntity(key, child, false));
