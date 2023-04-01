@@ -27,7 +27,7 @@ import java.util.NoSuchElementException;
 
 public class InspectorGui implements IEditorGui {
 
-	private Entity entity;
+	public Entity entity;
 
 	@Override
 	public void draw() {
@@ -277,9 +277,5 @@ public class InspectorGui implements IEditorGui {
 				}
 			}
 		} catch(NoSuchElementException | UncheckedIOException ignored) {}
-	}
-
-	public void setEntity(Entity entity) {
-		this.entity = entity;
 	}
 }

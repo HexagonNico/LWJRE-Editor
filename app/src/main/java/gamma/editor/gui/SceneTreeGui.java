@@ -29,7 +29,8 @@ public class SceneTreeGui implements IEditorGui {
 		ImGui.begin("Scene tree");
 		this.drawEntity("root", Scene.getCurrent().root, true);
 		if(this.renaming != null && this.renaming.getParent() != null && this.newName != null) {
-			this.renaming.getParent().renameChild(this.renaming, this.newName);
+			if(!this.newName.isEmpty())
+				this.renaming.getParent().renameChild(this.renaming, this.newName);
 			this.renaming = null;
 			this.newName = null;
 		}
@@ -40,23 +41,30 @@ public class SceneTreeGui implements IEditorGui {
 		int flags = ImGuiTreeNodeFlags.FramePadding | ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanAvailWidth | ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.AllowItemOverlap;
 		if(entity.getChildCount() == 0)
 			flags = flags | ImGuiTreeNodeFlags.Leaf;
+		if(entity == this.inspector.entity)
+			flags = flags | ImGuiTreeNodeFlags.Selected;
+		// Draw entity as tree node
 		if(ImGui.treeNodeEx(name, flags, this.renaming != entity ? name : "")) {
+			// Draw text input if the entity is being renamed
 			if(this.renaming == entity) {
 				ImGui.sameLine();
+				ImGui.setKeyboardFocusHere();
 				ImString ptr = new ImString(name, 256);
 				if(ImGui.inputText("##" + entity, ptr, ImGuiInputTextFlags.EnterReturnsTrue)) {
 					this.newName = ptr.get();
 				}
-				name = ptr.get();
 			}
+			// Set the entity in the inspector when clicked
+			if(ImGui.isItemClicked()) {
+				this.inspector.entity = entity;
+			}
+			// Drag and drop source
 			if(ImGui.beginDragDropSource()) {
 				ImGui.setDragDropPayload("Entity", new Object[] {entity, name});
 				ImGui.text(name);
 				ImGui.endDragDropSource();
 			}
-			if(ImGui.isItemClicked()) {
-				this.inspector.setEntity(entity);
-			}
+			// Drag and drop target
 			if(ImGui.beginDragDropTarget()) {
 				Object[] payload = ImGui.acceptDragDropPayload("Entity");
 				if(payload != null && payload[0] instanceof Entity entityToMove && payload[1] instanceof String key) {
@@ -73,10 +81,17 @@ public class SceneTreeGui implements IEditorGui {
 				}
 				ImGui.endDragDropTarget();
 			}
-			if(ImGui.isItemHovered() && ImGui.isMouseClicked(0) && !isRoot) {
+			// Stop renaming when another entity is clicked
+			if(ImGui.isItemHovered() && ImGui.isMouseClicked(0) && this.renaming != null) {
+				this.renaming = null;
+			}
+			// Enable renaming when an entity is double-clicked
+			if(this.inspector.entity == entity && ImGui.isMouseDoubleClicked(0) && !isRoot) {
 				this.renaming = entity;
 			}
+			// Render children
 			entity.forEachChild((key, child) -> this.drawEntity(key, child, false));
+			// End node
 			ImGui.treePop();
 		}
 	}
