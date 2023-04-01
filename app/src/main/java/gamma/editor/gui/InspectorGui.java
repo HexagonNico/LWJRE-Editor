@@ -158,7 +158,7 @@ public class InspectorGui implements IEditorGui {
 	}
 
 	private static void renderTextField(Component component, Field field) throws IllegalAccessException {
-		ImString ptr = new ImString((String) field.get(component));
+		ImString ptr = new ImString((String) field.get(component), 256);
 		if(ImGui.inputText("##" + field.getName(), ptr)) {
 			field.set(component, ptr.get());
 		}

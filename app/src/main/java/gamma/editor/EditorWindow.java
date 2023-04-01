@@ -24,6 +24,7 @@ public class EditorWindow extends Window {
 	private final EditorCamera camera = new EditorCamera();
 
 	public EditorWindow() {
+		super("Gamma Engine - Editor", 1280, 720); // TODO: Use proper window size
 		this.guis.add(new EditorMenuBar());
 		this.guis.add(new FileSystemGui());
 		InspectorGui inspector = new InspectorGui();
@@ -33,6 +34,7 @@ public class EditorWindow extends Window {
 
 	@Override
 	public void setupCallbacks() {
+		// TODO: Proper editor viewport
 		GLFW.glfwSetWindowSizeCallback(this.handle, (window, width, height) -> GL11.glViewport(0, 0, width, height));
 	}
 
