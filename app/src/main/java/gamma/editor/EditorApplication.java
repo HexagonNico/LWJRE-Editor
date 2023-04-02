@@ -1,7 +1,6 @@
 package gamma.editor;
 
-import gamma.engine.rendering.DebugRenderer;
-import gamma.engine.rendering.RenderingSystem;
+import gamma.editor.gui.EditorGui;
 import gamma.engine.resources.DeletableResource;
 import gamma.engine.scene.Scene;
 import org.lwjgl.glfw.GLFW;
@@ -16,11 +15,11 @@ public class EditorApplication {
 				EditorWindow window = new EditorWindow();
 				window.setupCallbacks();
 				window.makeContextCurrent();
+				EditorGui editorGui = new EditorGui();
 				// TODO: Change to previously opened scene
 				while(!window.isCloseRequested()) {
 					Scene.editorProcess();
-					RenderingSystem.render();
-					DebugRenderer.render();
+					window.renderGui(editorGui);
 					window.update();
 					GLFW.glfwPollEvents();
 				}

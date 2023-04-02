@@ -1,16 +1,17 @@
 package gamma.editor;
 
+import gamma.editor.gui.EditorGui;
 import gamma.engine.window.Window;
 import imgui.ImGui;
+import imgui.ImGuiIO;
+import imgui.flag.ImGuiConfigFlags;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 
 public class EditorWindow extends Window {
 
-	private final ImGuiImplGlfw glfw = new ImGuiImplGlfw();
-	private final ImGuiImplGl3 gl3 = new ImGuiImplGl3();
-
-	private final EditorGui editorGui = new EditorGui();
+	private final ImGuiImplGlfw imGuiGlfw = new ImGuiImplGlfw();
+	private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
 
 	public EditorWindow() {
 		super("Gamma Engine - Editor", 1280, 720);
@@ -19,23 +20,27 @@ public class EditorWindow extends Window {
 	@Override
 	public void makeContextCurrent() {
 		super.makeContextCurrent();
-		this.glfw.init(this.handle, true);
-		this.gl3.init("#version 130");
+		ImGui.createContext();
+		ImGuiIO io = ImGui.getIO(); // TODO: Move this into EditorProperties class
+		io.setIniFilename(".gamma/editorLayout.ini"); // TODO: Check if .gamma directory exists and create it if it doesn't
+		io.setConfigFlags(ImGuiConfigFlags.DockingEnable);
+		this.imGuiGlfw.init(this.handle, true);
+		this.imGuiGl3.init("#version 130");
 	}
 
-	@Override
-	public void update() {
-		this.glfw.newFrame();
-		this.editorGui.render();
-		this.gl3.renderDrawData(ImGui.getDrawData());
-		super.update();
+	public void renderGui(EditorGui editorGui) {
+		this.imGuiGlfw.newFrame();
+		ImGui.newFrame();
+		editorGui.renderAll();
+		ImGui.render();
+		this.imGuiGl3.renderDrawData(ImGui.getDrawData());
 	}
 
 	@Override
 	public void destroy() {
-		this.gl3.dispose();
-		this.glfw.dispose();
-		this.editorGui.destroy();
+		this.imGuiGl3.dispose();
+		this.imGuiGlfw.dispose();
+		ImGui.destroyContext();
 		super.destroy();
 	}
 }

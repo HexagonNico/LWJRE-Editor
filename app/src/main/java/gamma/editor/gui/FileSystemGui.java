@@ -1,6 +1,5 @@
 package gamma.editor.gui;
 
-import gamma.editor.IEditorGui;
 import gamma.editor.controls.EditorScene;
 import gamma.engine.resources.Resources;
 import gamma.engine.window.Window;
@@ -14,7 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
-public final class FileSystemGui implements IEditorGui {
+public class FileSystemGui implements IGui {
 
 	@Override
 	public void draw() {

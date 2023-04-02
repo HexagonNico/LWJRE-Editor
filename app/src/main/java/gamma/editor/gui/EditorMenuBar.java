@@ -1,10 +1,9 @@
 package gamma.editor.gui;
 
-import gamma.editor.IEditorGui;
 import gamma.editor.controls.EditorScene;
 import imgui.ImGui;
 
-public class EditorMenuBar implements IEditorGui {
+public class EditorMenuBar implements IGui {
 
 	@Override
 	public void draw() {

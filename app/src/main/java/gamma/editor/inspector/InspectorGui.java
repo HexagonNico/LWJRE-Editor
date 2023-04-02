@@ -1,6 +1,6 @@
 package gamma.editor.inspector;
 
-import gamma.editor.IEditorGui;
+import gamma.editor.gui.IGui;
 import gamma.engine.annotations.EditorIndex;
 import gamma.engine.scene.Component;
 import gamma.engine.scene.Entity;
@@ -14,7 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.Set;
 
-public class InspectorGui implements IEditorGui {
+public class InspectorGui implements IGui {
 
 	private static final Set<String> COMPONENTS = Set.of(
 			"gamma.engine.components.BoundingBox3D",

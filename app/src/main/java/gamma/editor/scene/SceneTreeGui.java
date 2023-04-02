@@ -1,9 +1,10 @@
 package gamma.editor.scene;
 
 import gamma.editor.EditorUtils;
-import gamma.editor.IEditorGui;
+import gamma.editor.gui.IGui;
 import gamma.editor.inspector.InspectorGui;
 import gamma.engine.scene.Entity;
+import gamma.engine.scene.Scene;
 import gamma.engine.window.Window;
 import imgui.ImGui;
 import imgui.flag.ImGuiCol;
@@ -14,7 +15,7 @@ import imgui.type.ImString;
 import org.lwjgl.glfw.GLFW;
 import vecmatlib.vector.Vec2i;
 
-public class SceneTreeGui implements IEditorGui {
+public class SceneTreeGui implements IGui {
 
 	private final InspectorGui inspector;
 
@@ -47,7 +48,7 @@ public class SceneTreeGui implements IEditorGui {
 			}
 		}
 		ImGui.begin("Scene tree");
-//		this.drawEntity("root", Scene.getCurrent().root, true); // TODO: This broken
+		this.drawEntity("root", Scene.getRoot(), true);
 		if(this.renaming != null && this.renaming.getParent() != null && this.newName != null) {
 			if(!this.newName.isEmpty()) {
 				String actualName = EditorUtils.findUnusedName(this.newName, this.renaming.getParent());
