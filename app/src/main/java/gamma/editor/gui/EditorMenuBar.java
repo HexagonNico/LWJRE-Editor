@@ -1,6 +1,6 @@
 package gamma.editor.gui;
 
-import gamma.editor.EditorScene;
+import gamma.editor.controls.EditorScene;
 import imgui.ImGui;
 
 public class EditorMenuBar implements IEditorGui {

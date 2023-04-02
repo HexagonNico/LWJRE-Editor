@@ -1,4 +1,4 @@
-package gamma.editor;
+package gamma.editor.controls;
 
 import gamma.engine.scene.Scene;
 import gamma.engine.utils.YamlUtils;
