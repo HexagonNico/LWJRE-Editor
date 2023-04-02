@@ -1,6 +1,8 @@
 package gamma.editor;
 
 import gamma.editor.gui.*;
+import gamma.editor.inspector.InspectorGui;
+import gamma.editor.scene.SceneTreeGui;
 import gamma.engine.window.Window;
 import imgui.ImGui;
 import imgui.ImGuiIO;

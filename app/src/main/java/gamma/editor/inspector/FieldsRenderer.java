@@ -1,72 +1,28 @@
-package gamma.editor.gui;
+package gamma.editor.inspector;
 
 import gamma.engine.annotations.*;
 import gamma.engine.resources.Resource;
 import gamma.engine.resources.Resources;
 import gamma.engine.scene.Component;
-import gamma.engine.scene.Entity;
-import gamma.engine.window.Window;
 import imgui.ImGui;
-import imgui.flag.ImGuiCond;
 import imgui.type.ImFloat;
 import imgui.type.ImInt;
 import imgui.type.ImString;
 import vecmatlib.color.Color3f;
 import vecmatlib.color.Color4f;
 import vecmatlib.vector.Vec2f;
-import vecmatlib.vector.Vec2i;
 import vecmatlib.vector.Vec3f;
 import vecmatlib.vector.Vec4f;
 
 import java.io.UncheckedIOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
 
-public class InspectorGui implements IEditorGui {
+public final class FieldsRenderer {
 
-	public Entity entity;
-
-	@Override
-	public void draw() {
-		Vec2i windowSize = Window.getCurrent().getSize();
-		ImGui.setNextWindowPos(windowSize.x() - 5.0f - windowSize.x() / 8.0f, 20.0f, ImGuiCond.FirstUseEver);
-		ImGui.setNextWindowSize(windowSize.x() / 8.0f, windowSize.y() / 2.0f - 25.0f, ImGuiCond.FirstUseEver);
-		ImGui.begin("Inspector");
-		if(this.entity != null) {
-			this.entity.getComponents().sorted((component1, component2) -> {
-				EditorIndex index1 = component1.getClass().getAnnotation(EditorIndex.class);
-				EditorIndex index2 = component2.getClass().getAnnotation(EditorIndex.class);
-				if(index1 != null && index2 != null)
-					return Integer.compare(index1.value(), index2.value());
-				return 0;
-			}).forEach(component -> {
-				ImGui.text(component.getClass().getSimpleName());
-				for(Field field : component.getClass().getDeclaredFields()) {
-					if(!Modifier.isStatic(field.getModifiers()) && !Modifier.isTransient(field.getModifiers())) {
-						try {
-							renderField(component, field);
-						} catch (IllegalAccessException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-				ImGui.separator();
-			});
-			if(ImGui.button("Add component")) {
-				ImGui.openPopup("Add component");
-			}
-			if(ImGui.beginPopupContextItem("Add component")) {
-				ImGui.text("Hello?");
-				ImGui.endPopup();
-			}
-		}
-		ImGui.end();
-	}
-
-	private static void renderField(Component component, Field field) throws IllegalAccessException {
+	public static void renderField(Component component, Field field) throws IllegalAccessException {
 		if(field.isAnnotationPresent(EditorVariable.class)) {
 			field.setAccessible(true);
 			EditorVariable annotation = field.getAnnotation(EditorVariable.class);
@@ -112,7 +68,7 @@ public class InspectorGui implements IEditorGui {
 			float step = range != null ? range.step() : 0.001f;
 			float min = range != null ? range.min() : Float.NEGATIVE_INFINITY;
 			float max = range != null ? range.max() : Float.POSITIVE_INFINITY;
-			if(ImGui.dragFloat("##" + field.getName(), ptr, step, min, max)) {
+			if(ImGui.dragFloat("##" + component.getClass() + ":" + field.getName(), ptr, step, min, max)) {
 				field.set(component, field.isAnnotationPresent(EditorDegrees.class) ? (float) Math.toRadians(ptr[0]) : ptr[0]);
 			}
 		} else if(field.isAnnotationPresent(EditorSlider.class)) {
@@ -120,12 +76,12 @@ public class InspectorGui implements IEditorGui {
 			float[] ptr = {(float) field.getDouble(component)};
 			float min = slider != null ? slider.min() : Float.NEGATIVE_INFINITY;
 			float max = slider != null ? slider.max() : Float.POSITIVE_INFINITY;
-			if(ImGui.sliderFloat("##" + field.getName(), ptr, min, max)) {
+			if(ImGui.sliderFloat("##" + component.getClass() + ":" + field.getName(), ptr, min, max)) {
 				field.set(component, ptr[0]);
 			}
 		} else {
 			ImFloat ptr = new ImFloat((float) field.getDouble(component));
-			if(ImGui.inputFloat("##" + field.getName(), ptr)) {
+			if(ImGui.inputFloat("##" + component.getClass() + ":" + field.getName(), ptr)) {
 				field.set(component, ptr.get());
 			}
 		}
@@ -138,7 +94,7 @@ public class InspectorGui implements IEditorGui {
 			float step = range != null ? range.step() : 0.001f;
 			float min = range != null ? range.min() : defaultMin;
 			float max = range != null ? range.max() : defaultMax;
-			if(ImGui.dragInt("##" + field.getName(), ptr, step, min, max)) {
+			if(ImGui.dragInt("##" + component.getClass() + ":" + field.getName(), ptr, step, min, max)) {
 				field.set(component, ptr[0]);
 			}
 		} else if(field.isAnnotationPresent(EditorSlider.class)) {
@@ -146,12 +102,12 @@ public class InspectorGui implements IEditorGui {
 			int[] ptr = {(int) field.getLong(component)};
 			int min = (int) (slider != null ? slider.min() : defaultMin);
 			int max = (int) (slider != null ? slider.max() : defaultMax);
-			if(ImGui.sliderInt("##" + field.getName(), ptr, min, max)) {
+			if(ImGui.sliderInt("##" + component.getClass() + ":" + field.getName(), ptr, min, max)) {
 				field.set(component, ptr[0]);
 			}
 		} else {
 			ImInt ptr = new ImInt((int) field.getLong(component));
-			if(ImGui.inputInt("##" + field.getName(), ptr)) {
+			if(ImGui.inputInt("##" + component.getClass() + ":" + field.getName(), ptr)) {
 				field.set(component, ptr.get());
 			}
 		}
@@ -159,14 +115,14 @@ public class InspectorGui implements IEditorGui {
 
 	private static void renderBooleanField(Component component, Field field) throws IllegalAccessException {
 		boolean current = field.getBoolean(component);
-		if(ImGui.checkbox("##" + field.getName(), current)) {
+		if(ImGui.checkbox("##" + component.getClass() + ":" + field.getName(), current)) {
 			field.set(component, !current);
 		}
 	}
 
 	private static void renderTextField(Component component, Field field) throws IllegalAccessException {
 		ImString ptr = new ImString((String) field.get(component), 256);
-		if(ImGui.inputText("##" + field.getName(), ptr)) {
+		if(ImGui.inputText("##" + component.getClass() + ":" + field.getName(), ptr)) {
 			field.set(component, ptr.get());
 		}
 	}
@@ -179,10 +135,10 @@ public class InspectorGui implements IEditorGui {
 			float step = range != null ? range.step() : 0.001f;
 			float min = range != null ? range.min() : Float.NEGATIVE_INFINITY;
 			float max = range != null ? range.max() : Float.POSITIVE_INFINITY;
-			if(ImGui.dragFloat2("##" + field.getName(), ptr, step, min, max)) {
+			if(ImGui.dragFloat2("##" + component.getClass() + ":" + field.getName(), ptr, step, min, max)) {
 				field.set(component, new Vec2f(ptr[0], ptr[1]));
 			}
-		} else if(ImGui.inputFloat2("##" + field.getName(), ptr)) {
+		} else if(ImGui.inputFloat2("##" + component.getClass() + ":" + field.getName(), ptr)) {
 			field.set(component, new Vec2f(ptr[0], ptr[1]));
 		}
 	}
@@ -195,10 +151,10 @@ public class InspectorGui implements IEditorGui {
 			float step = range != null ? range.step() : 0.001f;
 			float min = range != null ? range.min() : Float.NEGATIVE_INFINITY;
 			float max = range != null ? range.max() : Float.POSITIVE_INFINITY;
-			if(ImGui.dragFloat3("##" + field.getName(), ptr, step, min, max)) {
+			if(ImGui.dragFloat3("##" + component.getClass() + ":" + field.getName(), ptr, step, min, max)) {
 				field.set(component, new Vec3f(ptr[0], ptr[1], ptr[2]));
 			}
-		} else if(ImGui.inputFloat3("##" + field.getName(), ptr)) {
+		} else if(ImGui.inputFloat3("##" + component.getClass() + ":" + field.getName(), ptr)) {
 			field.set(component, new Vec3f(ptr[0], ptr[1], ptr[2]));
 		}
 	}
@@ -211,10 +167,10 @@ public class InspectorGui implements IEditorGui {
 			float step = range != null ? range.step() : 0.001f;
 			float min = range != null ? range.min() : Float.NEGATIVE_INFINITY;
 			float max = range != null ? range.max() : Float.POSITIVE_INFINITY;
-			if(ImGui.dragFloat4("##" + field.getName(), ptr, step, min, max)) {
+			if(ImGui.dragFloat4("##" + component.getClass() + ":" + field.getName(), ptr, step, min, max)) {
 				field.set(component, new Vec4f(ptr[0], ptr[1], ptr[2], ptr[3]));
 			}
-		} else if(ImGui.inputFloat4("##" + field.getName(), ptr)) {
+		} else if(ImGui.inputFloat4("##" + component.getClass() + ":" + field.getName(), ptr)) {
 			field.set(component, new Vec4f(ptr[0], ptr[1], ptr[2], ptr[3]));
 		}
 	}
@@ -222,7 +178,7 @@ public class InspectorGui implements IEditorGui {
 	private static void renderColorField3(Component component, Field field) throws IllegalAccessException {
 		Color3f color = (Color3f) field.get(component);
 		float[] ptr = {color.r(), color.g(), color.b()}; // TODO: Color flags
-		if(ImGui.colorEdit3("##" + field.getName(), ptr)) {
+		if(ImGui.colorEdit3("##" + component.getClass() + ":" + field.getName(), ptr)) {
 			field.set(component, new Color3f(ptr[0], ptr[1], ptr[2]));
 		}
 	}
@@ -230,7 +186,7 @@ public class InspectorGui implements IEditorGui {
 	private static void renderColorField4(Component component, Field field) throws IllegalAccessException {
 		Color4f color = (Color4f) field.get(component);
 		float[] ptr = {color.r(), color.g(), color.b(), color.a()}; // TODO: Color flags
-		if(ImGui.colorEdit4("##" + field.getName(), ptr)) {
+		if(ImGui.colorEdit4("##" + component.getClass() + ":" + field.getName(), ptr)) {
 			field.set(component, new Color4f(ptr[0], ptr[1], ptr[2], ptr[3]));
 		}
 	}
@@ -242,12 +198,12 @@ public class InspectorGui implements IEditorGui {
 			DefaultValueString defaultValue = field.getAnnotation(DefaultValueString.class);
 			if(str.equals(defaultValue.value()) && defaultValue.hide()) {
 				ImString ptr = new ImString("", 256);
-				if(ImGui.inputText("##" + field.getName(), ptr)) {
+				if(ImGui.inputText("##" + component.getClass() + ":" + field.getName(), ptr)) {
 					setResource(component, field, ptr.get());
 				}
 			} else {
 				ImString ptr = new ImString(str, 256);
-				if(ImGui.inputText("##" + field.getName(), ptr)) {
+				if(ImGui.inputText("##" + component.getClass() + ":" + field.getName(), ptr)) {
 					String val = ptr.get();;
 					setResource(component, field, val.isEmpty() ? defaultValue.value() : val);
 				}
@@ -255,7 +211,7 @@ public class InspectorGui implements IEditorGui {
 			// TODO: Add button to reset to default value
 		} else {
 			ImString ptr = new ImString(str, 256);
-			if(ImGui.inputText("##" + field.getName(), ptr)) {
+			if(ImGui.inputText("##" + component.getClass() + ":" + field.getName(), ptr)) {
 				setResource(component, field, ptr.get());
 			}
 		}

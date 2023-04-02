@@ -1,7 +1,8 @@
-package gamma.editor.gui;
+package gamma.editor.scene;
 
 import gamma.editor.EditorUtils;
-import gamma.editor.controls.EntityClipboard;
+import gamma.editor.IEditorGui;
+import gamma.editor.inspector.InspectorGui;
 import gamma.engine.scene.Entity;
 import gamma.engine.scene.Scene;
 import gamma.engine.window.Window;

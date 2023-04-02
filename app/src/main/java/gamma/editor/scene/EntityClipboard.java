@@ -1,4 +1,4 @@
-package gamma.editor.controls;
+package gamma.editor.scene;
 
 import gamma.editor.EditorUtils;
 import gamma.engine.scene.Component;

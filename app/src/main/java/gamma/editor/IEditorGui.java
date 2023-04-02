@@ -1,4 +1,4 @@
-package gamma.editor.gui;
+package gamma.editor;
 
 public interface IEditorGui {
 

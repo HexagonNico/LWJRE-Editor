@@ -1,5 +1,6 @@
 package gamma.editor.gui;
 
+import gamma.editor.IEditorGui;
 import gamma.editor.controls.EditorScene;
 import gamma.engine.resources.Resources;
 import gamma.engine.window.Window;
