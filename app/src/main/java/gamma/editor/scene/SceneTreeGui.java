@@ -4,7 +4,6 @@ import gamma.editor.EditorUtils;
 import gamma.editor.IEditorGui;
 import gamma.editor.inspector.InspectorGui;
 import gamma.engine.scene.Entity;
-import gamma.engine.scene.Scene;
 import gamma.engine.window.Window;
 import imgui.ImGui;
 import imgui.flag.ImGuiCol;
@@ -48,7 +47,7 @@ public class SceneTreeGui implements IEditorGui {
 			}
 		}
 		ImGui.begin("Scene tree");
-		this.drawEntity("root", Scene.getCurrent().root, true);
+//		this.drawEntity("root", Scene.getCurrent().root, true); // TODO: This broken
 		if(this.renaming != null && this.renaming.getParent() != null && this.newName != null) {
 			if(!this.newName.isEmpty()) {
 				String actualName = EditorUtils.findUnusedName(this.newName, this.renaming.getParent());

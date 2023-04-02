@@ -18,7 +18,7 @@ public class EditorApplication {
 				window.makeContextCurrent();
 				// TODO: Change to previously opened scene
 				while(!window.isCloseRequested()) {
-					Scene.getCurrent().root.editorProcess();
+					Scene.editorProcess();
 					RenderingSystem.render();
 					DebugRenderer.render();
 					window.update();
