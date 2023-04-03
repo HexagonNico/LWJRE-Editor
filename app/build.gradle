@@ -7,8 +7,6 @@ repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
 
-    mavenLocal()
-
     // Use Jitpack for Gamma Engine dependencies.
     maven {
         url 'https://jitpack.io'
@@ -17,8 +15,7 @@ repositories {
 
 dependencies {
     // Gamma engine dependency.
-//    implementation 'com.github.Gamma-Engine.Engine:core:main-SNAPSHOT'
-    implementation 'gamma.engine:core:1.0-SNAPSHOT'
+    implementation 'com.github.Gamma-Engine.Engine:core:main-SNAPSHOT'
 
     // Use ImGui for editor gui.
     implementation 'io.github.spair:imgui-java-app:1.86.10'
