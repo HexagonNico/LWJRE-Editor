@@ -13,7 +13,6 @@ public class EditorApplication {
 			try {
 				System.out.println("Editor started");
 				EditorWindow window = new EditorWindow();
-				window.setupCallbacks();
 				window.makeContextCurrent();
 				EditorGui editorGui = new EditorGui();
 				// TODO: Change to previously opened scene

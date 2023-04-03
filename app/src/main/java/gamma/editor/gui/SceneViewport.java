@@ -1,5 +1,6 @@
 package gamma.editor.gui;
 
+import gamma.editor.EditorCamera;
 import gamma.engine.rendering.DebugRenderer;
 import gamma.engine.rendering.RenderingSystem;
 import gamma.engine.resources.FrameBuffer;
@@ -8,10 +9,12 @@ import imgui.ImVec2;
 import imgui.flag.ImGuiWindowFlags;
 import org.lwjgl.opengl.GL11;
 
-public class GameViewport implements IGui {
+public class SceneViewport implements IGui {
 
 	// TODO: Get proper size
 	private final FrameBuffer frameBuffer = new FrameBuffer(1920, 1080);
+
+	private final EditorCamera editorCamera = new EditorCamera();
 
 	@Override
 	public void draw() {
@@ -31,6 +34,7 @@ public class GameViewport implements IGui {
 
 	private void renderViewport() {
 		ImGui.begin("Game Viewport", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+		this.editorCamera.update();
 		ImVec2 windowSize = getLargestSizeForViewport();
 		ImVec2 windowPos = getCenteredPositionForViewport(windowSize);
 		ImGui.setCursorPos(windowPos.x, windowPos.y);

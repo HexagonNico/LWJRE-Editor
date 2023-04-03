@@ -1,30 +1,32 @@
 package gamma.editor;
 
-import gamma.engine.components.Camera3D;
+import gamma.engine.resources.Shader;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.ImVec2;
 import vecmatlib.matrix.Mat4f;
+import vecmatlib.vector.Vec2i;
 import vecmatlib.vector.Vec3f;
 
-public class EditorCamera extends Camera3D {
+public final class EditorCamera {
 
 	public Vec3f position = Vec3f.Zero();
 	public float yaw = 0.0f;
 	public float pitch = 0.0f;
 
+	public float fov = 1.22173f;
+	public float nearPlane = 0.1f;
+	public float farPlane = 1000.0f;
+
 	private ImVec2 mouseDragPoint = new ImVec2();
 
-	@Override
-	protected void editorUpdate() {
-		super.editorUpdate();
-		this.makeCurrent();
+	public void update() {
 		ImGuiIO io = ImGui.getIO();
-		if(!io.getWantCaptureMouse()) {
-			ImVec2 nextDragPoint = ImGui.getMousePos();
+		ImVec2 nextDragPoint = ImGui.getMousePos();
+		if(ImGui.isWindowFocused()) {
 			float dragX = (this.mouseDragPoint.x - nextDragPoint.x);
 			float dragY = (nextDragPoint.y - this.mouseDragPoint.y);
-			if(ImGui.isMouseDown(0)) {
+			if(io.getMouseDown(0)) {
 				this.position = this.position.plus(dragX * 0.0075f, dragY * 0.0075f, 0.0f);
 			} else if(ImGui.isMouseDown(1)) {
 				this.pitch += dragX * 0.001f;
@@ -39,17 +41,25 @@ public class EditorCamera extends Camera3D {
 				Vec3f forward = new Vec3f(-cosPitch * sinYaw, sinPitch, -cosPitch * cosYaw).normalized();
 				this.position = this.position.plus(forward.multipliedBy(scroll));
 			}
-			this.mouseDragPoint = nextDragPoint;
 		}
+		this.mouseDragPoint = nextDragPoint;
+		Shader.setUniformStatic("projection_matrix", this.projectionMatrix());
+		Shader.setUniformStatic("view_matrix", this.viewMatrix());
 	}
 
-	@Override
-	public Vec3f globalPosition() {
-		return position;
+	public Mat4f projectionMatrix() {
+		float focalLength = (float) (1.0f / Math.tan(this.fov / 2.0f));
+		Vec2i windowSize = new Vec2i(1920, 1080); // TODO: Proper viewport size
+		float aspect = (float) windowSize.x() / windowSize.y();
+		return new Mat4f(
+				focalLength, 0.0f, 0.0f, 0.0f,
+				0.0f, focalLength * aspect, 0.0f, 0.0f,
+				0.0f, 0.0f, -(this.farPlane + this.nearPlane) / (this.farPlane - this.nearPlane), -(2 * this.farPlane * this.nearPlane) / (this.farPlane - this.nearPlane),
+				0.0f, 0.0f, -1.0f, 0.0f
+		);
 	}
 
-	@Override
 	public Mat4f viewMatrix() {
-		return Mat4f.translation(this.globalPosition().negated()).multiply(Mat4f.rotation(this.yaw, this.pitch, 0.0f));
+		return Mat4f.translation(this.position.negated()).multiply(Mat4f.rotation(this.yaw, this.pitch, 0.0f));
 	}
 }

@@ -11,7 +11,7 @@ public final class EditorGui {
 
 	public EditorGui() {
 		this.guis.add(new EditorDockSpace());
-		this.guis.add(new GameViewport());
+		this.guis.add(new SceneViewport());
 		InspectorGui inspectorGui = new InspectorGui();
 		this.guis.add(inspectorGui);
 		this.guis.add(new SceneTreeGui(inspectorGui));

@@ -24,6 +24,7 @@ public class EditorWindow extends Window {
 		ImGuiIO io = ImGui.getIO(); // TODO: Move this into EditorProperties class
 		io.setIniFilename(".gamma/editorLayout.ini"); // TODO: Check if .gamma directory exists and create it if it doesn't
 		io.setConfigFlags(ImGuiConfigFlags.DockingEnable);
+		io.setConfigWindowsMoveFromTitleBarOnly(true);
 		this.imGuiGlfw.init(this.handle, true);
 		this.imGuiGl3.init("#version 130");
 	}
