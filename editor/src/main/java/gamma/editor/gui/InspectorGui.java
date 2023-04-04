@@ -1,6 +1,6 @@
-package gamma.editor.inspector;
+package gamma.editor.gui;
 
-import gamma.editor.gui.IGui;
+import gamma.editor.gui.inspector.FieldsRenderer;
 import gamma.engine.annotations.EditorIndex;
 import gamma.engine.scene.Component;
 import gamma.engine.scene.Entity;

@@ -1,6 +1,5 @@
 package gamma.editor.gui;
 
-import gamma.editor.inspector.InspectorGui;
 import gamma.editor.scene.SceneTreeGui;
 
 import java.util.ArrayList;

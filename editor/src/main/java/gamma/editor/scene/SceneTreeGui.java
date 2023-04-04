@@ -2,7 +2,7 @@ package gamma.editor.scene;
 
 import gamma.editor.EditorUtils;
 import gamma.editor.gui.IGui;
-import gamma.editor.inspector.InspectorGui;
+import gamma.editor.gui.InspectorGui;
 import gamma.engine.scene.Entity;
 import gamma.engine.scene.Scene;
 import gamma.engine.window.Window;
