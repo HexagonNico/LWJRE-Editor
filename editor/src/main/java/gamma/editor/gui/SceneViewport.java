@@ -1,6 +1,7 @@
 package gamma.editor.gui;
 
 import gamma.editor.EditorCamera;
+import gamma.engine.ApplicationProperties;
 import gamma.engine.rendering.DebugRenderer;
 import gamma.engine.rendering.RenderingSystem;
 import gamma.engine.resources.FrameBuffer;
@@ -48,10 +49,10 @@ public class SceneViewport implements IGui {
 		windowSize.x -= ImGui.getScrollX();
 		windowSize.y -= ImGui.getScrollY();
 		float aspectWidth = windowSize.x;
-		float aspectHeight = aspectWidth / (16.0f / 9.0f);
+		float aspectHeight = aspectWidth / (ApplicationProperties.get("window/viewport/width", 0.0f) / ApplicationProperties.get("window/viewport/height", 1.0f));
 		if(aspectHeight > windowSize.y) {
 			aspectHeight = windowSize.y;
-			aspectWidth = aspectHeight * (16.0f / 9.0f);
+			aspectWidth = aspectHeight * (ApplicationProperties.get("window/viewport/width", 0.0f) / ApplicationProperties.get("window/viewport/height", 1.0f));
 		}
 		return new ImVec2(aspectWidth, aspectHeight);
 	}

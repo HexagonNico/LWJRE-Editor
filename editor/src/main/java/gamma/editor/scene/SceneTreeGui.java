@@ -114,11 +114,13 @@ public class SceneTreeGui implements IGui {
 	}
 
 	private void doClickToRename(Entity entity, boolean isRoot) {
-		if(ImGui.isItemHovered() && ImGui.isMouseClicked(0) && this.renaming != null) {
-			this.renaming = null;
-		}
-		if(this.inspector.entity == entity && ImGui.isMouseDoubleClicked(0) && !isRoot) {
-			this.renaming = entity;
+		if(ImGui.isWindowFocused()) {
+			if(ImGui.isItemHovered() && ImGui.isMouseClicked(0) && this.renaming != null) {
+				this.renaming = null;
+			}
+			if(this.inspector.entity == entity && ImGui.isMouseDoubleClicked(0) && !isRoot) {
+				this.renaming = entity;
+			}
 		}
 	}
 

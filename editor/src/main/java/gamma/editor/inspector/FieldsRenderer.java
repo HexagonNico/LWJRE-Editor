@@ -218,7 +218,7 @@ public final class FieldsRenderer {
 		if(ImGui.beginDragDropTarget()) {
 			Object payload = ImGui.acceptDragDropPayload("Path");
 			if(payload instanceof Path path) {
-				setResource(component, field, path.toString().substring(18));
+				setResource(component, field, path.toString().substring(19));
 			}
 			ImGui.endDragDropTarget();
 		}
