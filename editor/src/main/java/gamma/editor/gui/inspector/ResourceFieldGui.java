@@ -12,14 +12,13 @@ import java.io.UncheckedIOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
-import java.util.NoSuchElementException;
 
 public class ResourceFieldGui implements IFieldGui {
 
 	@Override
 	public void drawGui(Component component, Field field) throws IllegalAccessException {
 		Resource resource = (Resource) field.get(component);
-		String str = Resources.pathOf(resource);
+		String str = resource != null ? Resources.pathOf(resource) : "";
 		if(field.isAnnotationPresent(DefaultValueString.class)) {
 			DefaultValueString defaultValue = field.getAnnotation(DefaultValueString.class);
 			if(str.equals(defaultValue.value()) && defaultValue.hide()) {
@@ -51,20 +50,29 @@ public class ResourceFieldGui implements IFieldGui {
 	}
 
 	private static void setResource(Component component, Field field, String value) throws IllegalAccessException {
-		try {
-			Resource newResource = Resources.getOrLoad(value);
-			if(newResource.getClass().isAssignableFrom(field.getType())) {
-				EditorVariable annotation = field.getAnnotation(EditorVariable.class);
-				if(!annotation.setter().isEmpty()) {
-					try {
-						component.getClass().getDeclaredMethod(annotation.setter(), newResource.getClass()).invoke(component, newResource);
-					} catch (InvocationTargetException | NoSuchMethodException e) {
-						e.printStackTrace();
-					}
-				} else {
-					field.set(component, newResource);
+		if(value.isEmpty() || value.isBlank()) {
+			setValue(component, field, null);
+		} else if(Resources.hasLoader(value)) {
+			try {
+				Resource newResource = Resources.getOrLoad(value);
+				if(newResource.getClass().isAssignableFrom(field.getType())) {
+					setValue(component, field, newResource);
 				}
+				// TODO: Better serialization of resources
+			} catch (UncheckedIOException ignored) {}
+		}
+	}
+
+	private static void setValue(Component component, Field field, Resource value) throws IllegalAccessException {
+		EditorVariable annotation = field.getAnnotation(EditorVariable.class);
+		if(!annotation.setter().isEmpty()) {
+			try {
+				component.getClass().getDeclaredMethod(annotation.setter(), field.getType()).invoke(component, value);
+			} catch (InvocationTargetException | NoSuchMethodException e) {
+				e.printStackTrace();
 			}
-		} catch(NoSuchElementException | UncheckedIOException ignored) {}
+		} else {
+			field.set(component, value);
+		}
 	}
 }
