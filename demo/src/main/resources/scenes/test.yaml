@@ -1,6 +1,5 @@
 !!gamma.engine.scene.Entity
 components:
-  - !!gamma.demo.components.TestComponent {}
   - !!gamma.engine.components.Transform3D
     position: &id001 !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
     rotation: *id001
@@ -35,21 +34,21 @@ children:
         offset: *id002
   camera: !!gamma.engine.scene.Entity
     components:
+      - !!gamma.engine.components.Transform3D
+        position: !!vecmatlib.vector.Vec3f [0.0, 3.0, 7.5]
+        rotation: *id002
+        scale: *id003
       - !!gamma.engine.components.Camera3D
         current: true
         farPlane: 1000.0
         fov: 1.2217305
         nearPlane: 0.1
-      - !!gamma.engine.components.Transform3D
-        position: !!vecmatlib.vector.Vec3f [0.0, 3.0, 7.5]
-        rotation: *id002
-        scale: *id003
   light: !!gamma.engine.scene.Entity
     components:
-      - !!gamma.engine.components.PointLight3D
-        color: !!vecmatlib.color.Color3f [1.0, 1.0, 1.0]
-        offset: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
       - !!gamma.engine.components.Transform3D
         position: !!vecmatlib.vector.Vec3f [10.0, 10.0, 10.0]
         rotation: *id002
         scale: *id003
+      - !!gamma.engine.components.PointLight3D
+        color: !!vecmatlib.color.Color3f [1.0, 1.0, 1.0]
+        offset: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]

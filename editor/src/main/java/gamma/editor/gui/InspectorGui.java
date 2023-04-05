@@ -52,6 +52,16 @@ public class InspectorGui implements IGui {
 				return 1;
 			}).forEach(component -> {
 				ImGui.text(component.getClass().getSimpleName());
+				ImGui.sameLine(ImGui.getWindowWidth() - 25);
+				if(ImGui.smallButton("X##" + component.getClass())) {
+					System.out.println("???");
+					entity.removeComponent(component);
+				}
+				if(ImGui.isItemHovered()) {
+					ImGui.beginTooltip();
+					ImGui.text("Remove component");
+					ImGui.endTooltip();
+				}
 				for(Field field : component.getClass().getDeclaredFields()) {
 					if(!Modifier.isStatic(field.getModifiers()) && !Modifier.isTransient(field.getModifiers())) {
 						try {
