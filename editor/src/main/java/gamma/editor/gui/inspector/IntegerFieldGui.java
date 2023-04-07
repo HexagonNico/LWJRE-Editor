@@ -1,7 +1,6 @@
 package gamma.editor.gui.inspector;
 
 import gamma.engine.annotations.EditorRange;
-import gamma.engine.annotations.EditorSlider;
 import gamma.engine.scene.Component;
 import imgui.ImGui;
 import imgui.type.ImInt;
@@ -26,15 +25,11 @@ public class IntegerFieldGui implements IFieldGui {
 			float step = range != null ? range.step() : 0.001f;
 			float min = range != null ? range.min() : defaultMin;
 			float max = range != null ? range.max() : defaultMax;
-			if(ImGui.dragInt("##" + component.getClass() + ":" + field.getName(), ptr, step, min, max)) {
-				field.set(component, ptr[0]);
-			}
-		} else if(field.isAnnotationPresent(EditorSlider.class)) {
-			EditorSlider slider = field.getAnnotation(EditorSlider.class);
-			int[] ptr = {(int) field.getLong(component)};
-			int min = (int) (slider != null ? slider.min() : defaultMin);
-			int max = (int) (slider != null ? slider.max() : defaultMax);
-			if(ImGui.sliderInt("##" + component.getClass() + ":" + field.getName(), ptr, min, max)) {
+			if(range != null && range.slider()) {
+				if(ImGui.sliderInt("##" + component.getClass() + ":" + field.getName(), ptr, (int) min, (int) max)) {
+					field.set(component, ptr[0]);
+				}
+			} else if (ImGui.dragInt("##" + component.getClass() + ":" + field.getName(), ptr, step, min, max)) {
 				field.set(component, ptr[0]);
 			}
 		} else {

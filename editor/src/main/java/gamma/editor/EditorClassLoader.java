@@ -28,7 +28,8 @@ public class EditorClassLoader extends ClassLoader {
 	public URL findResource(String name) {
 		try {
 			// TODO: Change to "build/resources/main/"?
-			return new File("src/main/resources/" + name).toURI().toURL();
+			File file = new File("src/main/resources/" + name);
+			return file.exists() ? file.toURI().toURL() : null;
 		} catch (MalformedURLException e) {
 			return null;
 		}

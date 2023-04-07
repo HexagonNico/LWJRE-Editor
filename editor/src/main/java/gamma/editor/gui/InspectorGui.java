@@ -11,9 +11,7 @@ import vecmatlib.vector.Vec2i;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
@@ -54,7 +52,6 @@ public class InspectorGui implements IGui {
 				ImGui.text(component.getClass().getSimpleName());
 				ImGui.sameLine(ImGui.getWindowWidth() - 25);
 				if(ImGui.smallButton("X##" + component.getClass())) {
-					System.out.println("???");
 					entity.removeComponent(component);
 				}
 				if(ImGui.isItemHovered()) {
@@ -62,15 +59,7 @@ public class InspectorGui implements IGui {
 					ImGui.text("Remove component");
 					ImGui.endTooltip();
 				}
-				for(Field field : component.getClass().getDeclaredFields()) {
-					if(!Modifier.isStatic(field.getModifiers()) && !Modifier.isTransient(field.getModifiers())) {
-						try {
-							FieldsRenderer.renderField(component, field);
-						} catch (IllegalAccessException e) {
-							e.printStackTrace();
-						}
-					}
-				}
+				FieldsRenderer.renderFields(component);
 				ImGui.separator();
 			});
 			if(ImGui.button("Add component")) {
