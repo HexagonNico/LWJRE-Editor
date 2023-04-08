@@ -1,30 +1,49 @@
 !!gamma.engine.scene.Entity
 children:
-  bunny: !!gamma.engine.scene.Entity
-    components:
-      - !!gamma.engine.components.Transform3D
-        position: !!vecmatlib.vector.Vec3f [0.0, 10.0, -5.0]
-      - !!gamma.engine.components.ModelRenderer
-        modelPath: "models/bunny.obj"
-        shaderPath: "gamma/engine/shaders/default_shader.glsl"
-      - !!gamma.engine.components.KinematicBody3D {}
-      - !!gamma.engine.components.BoundingBox3D {}
   camera: !!gamma.engine.scene.Entity
     components:
-      - !!gamma.engine.components.Transform3D
-        position: !!vecmatlib.vector.Vec3f [0.0, 3.0, 5.0]
       - !!gamma.engine.components.Camera3D
         current: true
+        farPlane: 1000.0
+        fov: 1.22173
+        nearPlane: 0.1
+      - !!gamma.engine.components.Transform3D
+        position: !!vecmatlib.vector.Vec3f [0.0, 3.0, 5.0]
+        rotation: &id001 !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
+        scale: &id002 !!vecmatlib.vector.Vec3f [1.0, 1.0, 1.0]
   floor: !!gamma.engine.scene.Entity
     components:
-      - !!gamma.engine.components.Transform3D
-        scale: !!vecmatlib.vector.Vec3f [10.0, 1.0, 10.0]
       - !!gamma.engine.components.KinematicBody3D
         acceleration: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
-      - !!gamma.engine.components.BoundingBox3D {}
+        velocity: *id001
+      - !!gamma.engine.components.Transform3D
+        position: *id001
+        rotation: *id001
+        scale: !!vecmatlib.vector.Vec3f [10.0, 1.0, 10.0]
+      - !!gamma.engine.components.BoundingBox3D
+        extents: *id002
+        offset: *id001
   light: !!gamma.engine.scene.Entity
     components:
-      - !!gamma.engine.components.Transform3D
-        position: !!vecmatlib.vector.Vec3f [10.0, 10.0, 0.0]
       - !!gamma.engine.components.PointLight3D
         color: !!vecmatlib.color.Color3f [1.0, 1.0, 1.0]
+        offset: *id001
+      - !!gamma.engine.components.Transform3D
+        position: !!vecmatlib.vector.Vec3f [10.0, 10.0, 0.0]
+        rotation: *id001
+        scale: *id002
+  bunny: !!gamma.engine.scene.Entity
+    components:
+      - !!gamma.engine.components.ModelRenderer
+        modelPath: models/bunny.obj
+        shaderPath: gamma/engine/shaders/default_shader.glsl
+      - !!gamma.engine.components.KinematicBody3D
+        acceleration: !!vecmatlib.vector.Vec3f [0.0, -9.81, 0.0]
+        velocity: *id001
+      - !!gamma.engine.components.Transform3D
+        position: !!vecmatlib.vector.Vec3f [0.0, 10.0, -5.0]
+        rotation: *id001
+        scale: *id002
+      - !!gamma.engine.components.BoundingBox3D
+        extents: !!vecmatlib.vector.Vec3f [2.5, 3.0, 2.0]
+        offset: !!vecmatlib.vector.Vec3f [-0.25, 1.2, 0.1]

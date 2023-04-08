@@ -39,6 +39,7 @@ public class FileSystemGui implements IGui {
 				ImGui.endDragDropSource();
 			}
 			if(ImGui.isItemHovered() && ImGui.isMouseDoubleClicked(0)) {
+				// TODO: Open different types of file
 				if(fileName.endsWith(".yaml")) {
 					EditorScene.changeScene(path.toString());
 				}
@@ -48,8 +49,11 @@ public class FileSystemGui implements IGui {
 				if(payload instanceof Path pathToMove) {
 					Path destination = Path.of((Files.isDirectory(path) ? path : path.getParent()).toString(), pathToMove.getFileName().toString());
 					try {
-						Files.move(pathToMove, destination); // TODO: Hardcoded 18
-						Resources.updatePath(pathToMove.toString().substring(18), destination.toString().substring(18));
+						Files.move(pathToMove, destination);
+						pathToMove = Path.of(EditorApplication.currentPath() + "/src/main/resources").relativize(pathToMove);
+						destination = Path.of(EditorApplication.currentPath() + "/src/main/resources").relativize(destination);
+						// TODO: The editor cashes if a file is moved while it is used somewhere else
+						Resources.updatePath(pathToMove.toString(), destination.toString());
 					} catch (IOException e) {
 						e.printStackTrace();
 					}

@@ -68,9 +68,11 @@ public class InspectorGui implements IGui {
 				}
 				if(ImGui.beginPopupContextItem("Add component")) {
 					COMPONENTS.forEach(name -> doComponentMenuItem(name, entity, () -> Class.forName(name).asSubclass(Component.class)));
-					Path classes = Path.of(EditorApplication.currentPath() + "/target/classes"); // TODO: Detect maven or gradle
-					try(URLClassLoader classLoader = new URLClassLoader(new URL[]{classes.toUri().toURL()})) {
-						findComponentClasses(classes).forEach(name -> doComponentMenuItem(name, entity, () -> classLoader.loadClass(name).asSubclass(Component.class)));
+					Path mavenClasses = Path.of(EditorApplication.currentPath() + "/target/classes");
+					Path gradleClasses = Path.of(EditorApplication.currentPath() + "/build/classes/java/main");
+					try(URLClassLoader classLoader = new URLClassLoader(new URL[]{mavenClasses.toUri().toURL(), gradleClasses.toUri().toURL()})) {
+						doMenuItems(classLoader, mavenClasses, entity);
+						doMenuItems(classLoader, gradleClasses, entity);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -94,15 +96,35 @@ public class InspectorGui implements IGui {
 		}
 	}
 
+	private static void doMenuItems(ClassLoader classLoader, Path classesPath, Entity entity) {
+		findComponentClasses(classesPath).forEach(name -> {
+			try {
+				Class<?> cls = classLoader.loadClass(name);
+				if(Component.class.isAssignableFrom(cls) && ImGui.menuItem(name)) {
+					Class<? extends Component> componentClass = cls.asSubclass(Component.class);
+					if(entity.getComponent(componentClass).isEmpty()) {
+						entity.addComponent(componentClass.getConstructor().newInstance());
+					}
+				}
+			} catch (ClassNotFoundException | InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
+				throw new RuntimeException(e);
+			}
+		});
+	}
+
 	private static ArrayList<String> findComponentClasses(Path fromPath) {
+		return findComponentClasses(fromPath, fromPath);
+	}
+
+	private static ArrayList<String> findComponentClasses(Path originalPath, Path fromPath) {
 		ArrayList<String> result = new ArrayList<>();
-		try(Stream<Path> directory = Files.list(fromPath)) {
+		if(Files.exists(fromPath)) try(Stream<Path> directory = Files.list(fromPath)) {
 			directory.forEach(path -> {
 				if(Files.isDirectory(path)) {
-					result.addAll(findComponentClasses(path));
+					result.addAll(findComponentClasses(originalPath, path));
 				} else if(path.toString().endsWith(".class")) {
-					String pathStr = path.toString(); // TODO: Hardcoded '16'
-					String className = pathStr.substring(EditorApplication.currentPath().length() + 16, pathStr.lastIndexOf('.')).replace(File.separatorChar, '.');
+					path = originalPath.relativize(path);
+					String className = path.toString().replace(".class", "").replace(File.separatorChar, '.');
 					result.add(className);
 				}
 			});
