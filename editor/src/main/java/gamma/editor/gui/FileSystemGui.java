@@ -48,7 +48,7 @@ public class FileSystemGui implements IGui {
 				if(payload instanceof Path pathToMove) {
 					Path destination = Path.of((Files.isDirectory(path) ? path : path.getParent()).toString(), pathToMove.getFileName().toString());
 					try {
-						Files.move(pathToMove, destination);
+						Files.move(pathToMove, destination); // TODO: Hardcoded 18
 						Resources.updatePath(pathToMove.toString().substring(18), destination.toString().substring(18));
 					} catch (IOException e) {
 						e.printStackTrace();

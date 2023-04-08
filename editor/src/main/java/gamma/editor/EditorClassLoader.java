@@ -15,9 +15,11 @@ import java.net.URLClassLoader;
  */
 public class EditorClassLoader extends ClassLoader {
 
+	// TODO: Detect if the project uses maven or gradle
+
 	@Override
 	protected Class<?> findClass(String name) throws ClassNotFoundException {
-		try(URLClassLoader classLoader = new URLClassLoader(new URL[]{new File(EditorApplication.currentPath() + "/build/classes/java/main").toURI().toURL()})) {
+		try(URLClassLoader classLoader = new URLClassLoader(new URL[]{new File(EditorApplication.currentPath() + "/target/classes").toURI().toURL()})) {
 			return classLoader.loadClass(name);
 		} catch (IOException e) {
 			return null;
@@ -27,7 +29,6 @@ public class EditorClassLoader extends ClassLoader {
 	@Override
 	public URL findResource(String name) {
 		try {
-			// TODO: Change to "build/resources/main/"?
 			File file = new File(EditorApplication.currentPath() + "/src/main/resources/" + name);
 			return file.exists() ? file.toURI().toURL() : null;
 		} catch (MalformedURLException e) {

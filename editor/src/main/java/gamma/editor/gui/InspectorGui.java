@@ -68,7 +68,7 @@ public class InspectorGui implements IGui {
 				}
 				if(ImGui.beginPopupContextItem("Add component")) {
 					COMPONENTS.forEach(name -> doComponentMenuItem(name, entity, () -> Class.forName(name).asSubclass(Component.class)));
-					Path classes = Path.of(EditorApplication.currentPath() + "/build/classes/java/main");
+					Path classes = Path.of(EditorApplication.currentPath() + "/target/classes"); // TODO: Detect maven or gradle
 					try(URLClassLoader classLoader = new URLClassLoader(new URL[]{classes.toUri().toURL()})) {
 						findComponentClasses(classes).forEach(name -> doComponentMenuItem(name, entity, () -> classLoader.loadClass(name).asSubclass(Component.class)));
 					} catch (IOException e) {
@@ -101,8 +101,8 @@ public class InspectorGui implements IGui {
 				if(Files.isDirectory(path)) {
 					result.addAll(findComponentClasses(path));
 				} else if(path.toString().endsWith(".class")) {
-					String pathStr = path.toString();
-					String className = pathStr.substring(EditorApplication.currentPath().length() + 25, pathStr.lastIndexOf('.')).replace(File.separatorChar, '.');
+					String pathStr = path.toString(); // TODO: Hardcoded '16'
+					String className = pathStr.substring(EditorApplication.currentPath().length() + 16, pathStr.lastIndexOf('.')).replace(File.separatorChar, '.');
 					result.add(className);
 				}
 			});
