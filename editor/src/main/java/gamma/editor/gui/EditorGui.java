@@ -4,7 +4,7 @@ import gamma.editor.scene.SceneTreeGui;
 
 import java.util.ArrayList;
 
-public final class EditorGui {
+public final class EditorGui implements IGui {
 
 	private final ArrayList<IGui> guis = new ArrayList<>();
 
@@ -18,7 +18,8 @@ public final class EditorGui {
 		this.guis.add(new EditorMenuBar());
 	}
 
-	public void renderAll() {
+	@Override
+	public void draw() {
 		this.guis.forEach(IGui::draw);
 	}
 }

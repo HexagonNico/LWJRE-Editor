@@ -18,10 +18,11 @@ public class FileSystemGui implements IGui {
 	@Override
 	public void draw() {
 		Vec2i windowSize = Window.getCurrent().getSize();
-		ImGui.setNextWindowPos(5.0f, windowSize.y() / 2.0f + 25.0f, ImGuiCond.FirstUseEver);
-		ImGui.setNextWindowSize(windowSize.x() / 8.0f, windowSize.y() / 2.0f - 10.0f, ImGuiCond.FirstUseEver);
-		ImGui.begin("File system");
-		showTreeNode(Path.of("src/main/resources"));
+		ImGui.setNextWindowPos(5.0f, windowSize.y() / 2.0f + 20.0f, ImGuiCond.FirstUseEver);
+		ImGui.setNextWindowSize(windowSize.x() / 8.0f, windowSize.y() / 2.0f - 25.0f, ImGuiCond.FirstUseEver);
+		if(ImGui.begin("File system")) {
+			showTreeNode(Path.of("src/main/resources"));
+		}
 		ImGui.end();
 	}
 

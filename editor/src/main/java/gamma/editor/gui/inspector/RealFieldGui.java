@@ -20,11 +20,11 @@ public class RealFieldGui implements IFieldGui {
 			float min = range != null ? range.min() : Float.NEGATIVE_INFINITY;
 			float max = range != null ? range.max() : Float.POSITIVE_INFINITY;
 			if(range != null && range.slider()) {
-				if(ImGui.dragFloat("##" + component.getClass() + ":" + field.getName(), ptr, step, min, max)) {
-					field.set(component, field.isAnnotationPresent(EditorDegrees.class) ? (float) Math.toRadians(ptr[0]) : ptr[0]);
+				if(ImGui.sliderFloat("##" + component.getClass() + ":" + field.getName(), ptr, min, max)) {
+					field.set(component, ptr[0]);
 				}
-			} else if(ImGui.sliderFloat("##" + component.getClass() + ":" + field.getName(), ptr, min, max)) {
-				field.set(component, ptr[0]);
+			} else if(ImGui.dragFloat("##" + component.getClass() + ":" + field.getName(), ptr, step, min, max)) {
+				field.set(component, field.isAnnotationPresent(EditorDegrees.class) ? (float) Math.toRadians(ptr[0]) : ptr[0]);
 			}
 		} else {
 			ImFloat ptr = new ImFloat((float) field.getDouble(component));

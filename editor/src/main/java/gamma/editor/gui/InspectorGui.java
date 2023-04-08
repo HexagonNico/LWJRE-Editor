@@ -38,42 +38,43 @@ public class InspectorGui implements IGui {
 	@Override
 	public void draw() {
 		Vec2i windowSize = Window.getCurrent().getSize();
-		ImGui.setNextWindowPos(windowSize.x() - 5.0f - windowSize.x() / 8.0f, 20.0f, ImGuiCond.FirstUseEver);
-		ImGui.setNextWindowSize(windowSize.x() / 8.0f, windowSize.y() / 2.0f - 25.0f, ImGuiCond.FirstUseEver);
-		ImGui.begin("Inspector");
-		if(this.entity != null) {
-			this.entity.getComponents().sorted((component1, component2) -> {
-				EditorIndex index1 = component1.getClass().getAnnotation(EditorIndex.class);
-				EditorIndex index2 = component2.getClass().getAnnotation(EditorIndex.class);
-				if(index1 != null && index2 != null)
-					return Integer.compare(index1.value(), index2.value());
-				return 1;
-			}).forEach(component -> {
-				ImGui.text(component.getClass().getSimpleName());
-				ImGui.sameLine(ImGui.getWindowWidth() - 25);
-				if(ImGui.smallButton("X##" + component.getClass())) {
-					entity.removeComponent(component);
+		ImGui.setNextWindowPos(windowSize.x() - 5.0f - windowSize.x() / 8.0f, 25.0f, ImGuiCond.FirstUseEver);
+		ImGui.setNextWindowSize(windowSize.x() / 8.0f, windowSize.y() - 30.0f, ImGuiCond.FirstUseEver);
+		if(ImGui.begin("Inspector")) {
+			if(this.entity != null) {
+				this.entity.getComponents().sorted((component1, component2) -> {
+					EditorIndex index1 = component1.getClass().getAnnotation(EditorIndex.class);
+					EditorIndex index2 = component2.getClass().getAnnotation(EditorIndex.class);
+					if(index1 != null && index2 != null)
+						return Integer.compare(index1.value(), index2.value());
+					return 1;
+				}).forEach(component -> {
+					ImGui.text(component.getClass().getSimpleName());
+					ImGui.sameLine(ImGui.getWindowWidth() - 25);
+					if(ImGui.smallButton("X##" + component.getClass())) {
+						entity.removeComponent(component);
+					}
+					if(ImGui.isItemHovered()) {
+						ImGui.beginTooltip();
+						ImGui.text("Remove component");
+						ImGui.endTooltip();
+					}
+					FieldsRenderer.renderFields(component);
+					ImGui.separator();
+				});
+				if(ImGui.button("Add component")) {
+					ImGui.openPopup("Add component");
 				}
-				if(ImGui.isItemHovered()) {
-					ImGui.beginTooltip();
-					ImGui.text("Remove component");
-					ImGui.endTooltip();
+				if(ImGui.beginPopupContextItem("Add component")) {
+					COMPONENTS.forEach(name -> doComponentMenuItem(name, entity, () -> Class.forName(name).asSubclass(Component.class)));
+					Path classes = Path.of("build/classes/java/main");
+					try(URLClassLoader classLoader = new URLClassLoader(new URL[]{classes.toUri().toURL()})) {
+						findComponentClasses(classes).forEach(name -> doComponentMenuItem(name, entity, () -> classLoader.loadClass(name).asSubclass(Component.class)));
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					ImGui.endPopup();
 				}
-				FieldsRenderer.renderFields(component);
-				ImGui.separator();
-			});
-			if(ImGui.button("Add component")) {
-				ImGui.openPopup("Add component");
-			}
-			if(ImGui.beginPopupContextItem("Add component")) {
-				COMPONENTS.forEach(name -> doComponentMenuItem(name, entity, () -> Class.forName(name).asSubclass(Component.class)));
-				Path classes = Path.of("build/classes/java/main");
-				try(URLClassLoader classLoader = new URLClassLoader(new URL[]{classes.toUri().toURL()})) {
-					findComponentClasses(classes).forEach(name -> doComponentMenuItem(name, entity, () -> classLoader.loadClass(name).asSubclass(Component.class)));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				ImGui.endPopup();
 			}
 		}
 		ImGui.end();

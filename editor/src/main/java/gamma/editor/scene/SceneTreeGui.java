@@ -34,28 +34,29 @@ public class SceneTreeGui implements IGui {
 	@Override
 	public void draw() {
 		Vec2i windowSize = Window.getCurrent().getSize();
-		ImGui.setNextWindowPos(5.0f, 15.0f, ImGuiCond.FirstUseEver);
+		ImGui.setNextWindowPos(5.0f, 25.0f, ImGuiCond.FirstUseEver);
 		ImGui.setNextWindowSize(windowSize.x() / 8.0f, windowSize.y() / 2.0f - 10.0f, ImGuiCond.FirstUseEver);
 		if((ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_CONTROL)) && this.selectedEntity != null) {
 			if(ImGui.isKeyPressed(GLFW.GLFW_KEY_A, false)) {
 				this.selectedEntity.addChild(new Entity());
 			}
 		}
-		ImGui.begin("Scene tree");
-		if(this.selectedEntity != null && this.selectedEntity.getParent() != null) {
-			this.entityClipboard.listenForKeyBinds(this.selectedEntity, this.selectedName);
-			if(ImGui.isKeyPressed(GLFW.GLFW_KEY_DELETE, false) && ImGui.isWindowFocused()) {
-				this.selectedEntity.removeFromScene();
+		if(ImGui.begin("Scene tree")) {
+			if(this.selectedEntity != null && this.selectedEntity.getParent() != null) {
+				this.entityClipboard.listenForKeyBinds(this.selectedEntity, this.selectedName);
+				if(ImGui.isKeyPressed(GLFW.GLFW_KEY_DELETE, false) && ImGui.isWindowFocused()) {
+					this.selectedEntity.removeFromScene();
+				}
 			}
-		}
-		this.drawEntity("root", Scene.getRoot(), true);
-		if(this.renaming != null && this.renaming.getParent() != null && this.newName != null) {
-			if(!this.newName.isEmpty()) {
-				String actualName = EditorUtils.findUnusedName(this.newName, this.renaming.getParent());
-				this.renaming.getParent().renameChild(this.renaming, actualName);
+			this.drawEntity("root", Scene.getRoot(), true);
+			if(this.renaming != null && this.renaming.getParent() != null && this.newName != null) {
+				if(!this.newName.isEmpty()) {
+					String actualName = EditorUtils.findUnusedName(this.newName, this.renaming.getParent());
+					this.renaming.getParent().renameChild(this.renaming, actualName);
+				}
+				this.renaming = null;
+				this.newName = null;
 			}
-			this.renaming = null;
-			this.newName = null;
 		}
 		ImGui.end();
 	}

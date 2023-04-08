@@ -1,6 +1,6 @@
 package gamma.editor;
 
-import gamma.editor.gui.EditorGui;
+import gamma.editor.gui.IGui;
 import gamma.engine.window.Window;
 import imgui.ImGui;
 import imgui.ImGuiIO;
@@ -29,10 +29,10 @@ public class EditorWindow extends Window {
 		this.imGuiGl3.init("#version 130");
 	}
 
-	public void renderGui(EditorGui editorGui) {
+	public void renderGui(IGui rootGui) {
 		this.imGuiGlfw.newFrame();
 		ImGui.newFrame();
-		editorGui.renderAll();
+		rootGui.draw();
 		ImGui.render();
 		this.imGuiGl3.renderDrawData(ImGui.getDrawData());
 	}

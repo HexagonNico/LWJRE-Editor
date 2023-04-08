@@ -5,10 +5,13 @@ import gamma.engine.ApplicationProperties;
 import gamma.engine.rendering.DebugRenderer;
 import gamma.engine.rendering.RenderingSystem;
 import gamma.engine.resources.FrameBuffer;
+import gamma.engine.window.Window;
 import imgui.ImGui;
 import imgui.ImVec2;
+import imgui.flag.ImGuiCond;
 import imgui.flag.ImGuiWindowFlags;
 import org.lwjgl.opengl.GL11;
+import vecmatlib.vector.Vec2i;
 
 public class SceneViewport implements IGui {
 
@@ -34,12 +37,16 @@ public class SceneViewport implements IGui {
 	}
 
 	private void renderViewport() {
-		ImGui.begin("Game Viewport", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
-		this.editorCamera.update();
-		ImVec2 windowSize = getLargestSizeForViewport();
-		ImVec2 windowPos = getCenteredPositionForViewport(windowSize);
-		ImGui.setCursorPos(windowPos.x, windowPos.y);
-		ImGui.image(this.frameBuffer.texture, windowSize.x, windowSize.y, 0, 1, 1, 0);
+		Vec2i windowSize = Window.getCurrent().getSize();
+		ImGui.setNextWindowPos(10.0f + windowSize.x() / 8.0f, 25.0f, ImGuiCond.FirstUseEver);
+		ImGui.setNextWindowSize(windowSize.x() - windowSize.x() / 4.0f - 20.0f, windowSize.y() - 30.0f, ImGuiCond.FirstUseEver);
+		if(ImGui.begin("Scene Viewport", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)) {
+			this.editorCamera.update();
+			ImVec2 viewportSize = getLargestSizeForViewport();
+			ImVec2 viewportPos = getCenteredPositionForViewport(viewportSize);
+			ImGui.setCursorPos(viewportPos.x, viewportPos.y);
+			ImGui.image(this.frameBuffer.texture, viewportSize.x, viewportSize.y, 0, 1, 1, 0);
+		}
 		ImGui.end();
 	}
 
