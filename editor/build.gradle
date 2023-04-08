@@ -34,10 +34,10 @@ application {
     mainClass = 'gamma.editor.EditorApplication'
 }
 
-run {
-    // Define working directory when running the editor.
-    workingDir = file('../demo')
-}
+//run {
+//    // Define working directory when running the editor.
+//    workingDir = file('../demo')
+//}
 
 jar {
     // Define manifest attributes for the JAR file.

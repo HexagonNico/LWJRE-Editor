@@ -7,6 +7,9 @@
 # Gradle build output directory
 build/
 
+# Gamma Editor / ImGui
+editorLayout.ini
+
 # JVM Error files
 hs_err_pid*
 

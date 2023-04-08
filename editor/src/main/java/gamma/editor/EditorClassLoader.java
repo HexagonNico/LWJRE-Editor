@@ -17,7 +17,7 @@ public class EditorClassLoader extends ClassLoader {
 
 	@Override
 	protected Class<?> findClass(String name) throws ClassNotFoundException {
-		try(URLClassLoader classLoader = new URLClassLoader(new URL[]{new File("build/classes/java/main").toURI().toURL()})) {
+		try(URLClassLoader classLoader = new URLClassLoader(new URL[]{new File(EditorApplication.currentPath() + "/build/classes/java/main").toURI().toURL()})) {
 			return classLoader.loadClass(name);
 		} catch (IOException e) {
 			return null;
@@ -28,7 +28,7 @@ public class EditorClassLoader extends ClassLoader {
 	public URL findResource(String name) {
 		try {
 			// TODO: Change to "build/resources/main/"?
-			File file = new File("src/main/resources/" + name);
+			File file = new File(EditorApplication.currentPath() + "/src/main/resources/" + name);
 			return file.exists() ? file.toURI().toURL() : null;
 		} catch (MalformedURLException e) {
 			return null;

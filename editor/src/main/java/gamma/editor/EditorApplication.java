@@ -16,8 +16,20 @@ public final class EditorApplication implements Runnable {
 		}
 	}
 
+	public static void setCurrentPath(String path) {
+		if(instance != null && path != null) {
+			instance.currentPath = path;
+		}
+	}
+
+	public static String currentPath() {
+		return instance != null ? instance.currentPath : "";
+	}
+
 	private final EditorWindow window;
 	private IGui rootGui;
+
+	private String currentPath = "";
 
 	private EditorApplication() {
 		this.window = new EditorWindow();

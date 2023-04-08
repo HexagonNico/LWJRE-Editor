@@ -1,5 +1,6 @@
 package gamma.editor.gui;
 
+import gamma.editor.EditorApplication;
 import gamma.editor.gui.inspector.FieldsRenderer;
 import gamma.engine.annotations.EditorIndex;
 import gamma.engine.scene.Component;
@@ -67,7 +68,7 @@ public class InspectorGui implements IGui {
 				}
 				if(ImGui.beginPopupContextItem("Add component")) {
 					COMPONENTS.forEach(name -> doComponentMenuItem(name, entity, () -> Class.forName(name).asSubclass(Component.class)));
-					Path classes = Path.of("build/classes/java/main");
+					Path classes = Path.of(EditorApplication.currentPath() + "/build/classes/java/main");
 					try(URLClassLoader classLoader = new URLClassLoader(new URL[]{classes.toUri().toURL()})) {
 						findComponentClasses(classes).forEach(name -> doComponentMenuItem(name, entity, () -> classLoader.loadClass(name).asSubclass(Component.class)));
 					} catch (IOException e) {
@@ -101,7 +102,7 @@ public class InspectorGui implements IGui {
 					result.addAll(findComponentClasses(path));
 				} else if(path.toString().endsWith(".class")) {
 					String pathStr = path.toString();
-					String className = pathStr.substring(24, pathStr.lastIndexOf('.')).replace(File.separatorChar, '.');
+					String className = pathStr.substring(EditorApplication.currentPath().length() + 25, pathStr.lastIndexOf('.')).replace(File.separatorChar, '.');
 					result.add(className);
 				}
 			});

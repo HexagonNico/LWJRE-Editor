@@ -21,8 +21,8 @@ public class EditorWindow extends Window {
 	public void makeContextCurrent() {
 		super.makeContextCurrent();
 		ImGui.createContext();
-		ImGuiIO io = ImGui.getIO(); // TODO: Move this into EditorProperties class
-		io.setIniFilename(".gamma/editorLayout.ini"); // TODO: Check if .gamma directory exists and create it if it doesn't
+		ImGuiIO io = ImGui.getIO();
+		io.setIniFilename("editorLayout.ini"); // TODO: This might go in another class
 		io.setConfigFlags(ImGuiConfigFlags.DockingEnable);
 		io.setConfigWindowsMoveFromTitleBarOnly(true);
 		this.imGuiGlfw.init(this.handle, true);

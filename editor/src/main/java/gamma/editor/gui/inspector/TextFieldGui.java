@@ -1,5 +1,6 @@
 package gamma.editor.gui.inspector;
 
+import gamma.editor.EditorApplication;
 import gamma.engine.annotations.EditorResource;
 import gamma.engine.resources.Resources;
 import gamma.engine.scene.Component;
@@ -22,7 +23,7 @@ public class TextFieldGui implements IFieldGui {
 			}
 			if(ImGui.beginDragDropTarget()) {
 				if(ImGui.acceptDragDropPayload("Path") instanceof Path path) {
-					setResource(component, field, path.toString().substring(19));
+					setResource(component, field, path.toString().substring(EditorApplication.currentPath().length() + 20));
 				}
 				ImGui.endDragDropTarget();
 			}

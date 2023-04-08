@@ -1,5 +1,6 @@
 package gamma.editor.gui;
 
+import gamma.editor.EditorApplication;
 import gamma.editor.controls.EditorScene;
 import gamma.engine.resources.Resources;
 import gamma.engine.window.Window;
@@ -21,7 +22,7 @@ public class FileSystemGui implements IGui {
 		ImGui.setNextWindowPos(5.0f, windowSize.y() / 2.0f + 20.0f, ImGuiCond.FirstUseEver);
 		ImGui.setNextWindowSize(windowSize.x() / 8.0f, windowSize.y() / 2.0f - 25.0f, ImGuiCond.FirstUseEver);
 		if(ImGui.begin("File system")) {
-			showTreeNode(Path.of("src/main/resources"));
+			showTreeNode(Path.of(EditorApplication.currentPath() + "/src/main/resources"));
 		}
 		ImGui.end();
 	}
