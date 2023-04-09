@@ -10,6 +10,11 @@ import imgui.type.ImString;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 
+/**
+ * Gui component to represent a String field as a {@link ImGui#inputText(String, ImString)}.
+ *
+ * @author Nico
+ */
 public class TextFieldGui implements IFieldGui {
 
 	@Override
@@ -36,6 +41,14 @@ public class TextFieldGui implements IFieldGui {
 		}
 	}
 
+	/**
+	 * Loads a resource to check if it is correct, then sets the field to its path.
+	 *
+	 * @param component The component that holds the field
+	 * @param field The string field
+	 * @param path Path to the resource
+	 * @throws IllegalAccessException If the field could not be accessed
+	 */
 	private static void setResource(Component component, Field field, String path) throws IllegalAccessException {
 		EditorResource resourceAnnotation = field.getAnnotation(EditorResource.class);
 		if(path.isEmpty() || path.isBlank()) {

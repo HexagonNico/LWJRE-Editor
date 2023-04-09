@@ -5,6 +5,11 @@ import imgui.ImGui;
 
 import java.lang.reflect.Field;
 
+/**
+ * Gui component to render a boolean field as a checkbox.
+ *
+ * @author Nico
+ */
 public class CheckboxFieldGui implements IFieldGui {
 
 	@Override

@@ -7,29 +7,25 @@ import imgui.type.ImInt;
 
 import java.lang.reflect.Field;
 
+/**
+ * Gui component to render a byte, short, int, or long field as a {@link ImGui#inputInt(String, ImInt)} or {@link ImGui#dragInt(String, int[])} or {@link ImGui#sliderInt(String, int[], int, int)}.
+ *
+ * @author Nico
+ */
 public class IntegerFieldGui implements IFieldGui {
 
-	private final float defaultMin;
-	private final float defaultMax;
-
-	public IntegerFieldGui(float defaultMin, float defaultMax) {
-		this.defaultMin = defaultMin;
-		this.defaultMax = defaultMax;
-	}
+	// TODO: Make sure this works with byte/short/long
 
 	@Override
 	public void drawGui(Component component, Field field) throws IllegalAccessException {
-		if(field.isAnnotationPresent(EditorRange.class)) {
-			EditorRange range = field.getAnnotation(EditorRange.class);
+		EditorRange range = field.getAnnotation(EditorRange.class);
+		if(range != null) {
 			int[] ptr = {(int) field.getLong(component)};
-			float step = range != null ? range.step() : 0.001f;
-			float min = range != null ? range.min() : defaultMin;
-			float max = range != null ? range.max() : defaultMax;
-			if(range != null && range.slider()) {
-				if(ImGui.sliderInt("##" + component.getClass() + ":" + field.getName(), ptr, (int) min, (int) max)) {
+			if(range.slider()) {
+				if(ImGui.sliderInt("##" + component.getClass() + ":" + field.getName(), ptr, (int) range.min(), (int) range.max())) {
 					field.set(component, ptr[0]);
 				}
-			} else if (ImGui.dragInt("##" + component.getClass() + ":" + field.getName(), ptr, step, min, max)) {
+			} else if (ImGui.dragInt("##" + component.getClass() + ":" + field.getName(), ptr, range.step(), range.min(), range.max())) {
 				field.set(component, ptr[0]);
 			}
 		} else {

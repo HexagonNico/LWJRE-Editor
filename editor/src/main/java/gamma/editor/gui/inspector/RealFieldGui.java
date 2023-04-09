@@ -8,22 +8,25 @@ import imgui.type.ImFloat;
 
 import java.lang.reflect.Field;
 
+/**
+ * Gui component to render a float or double field as {@link ImGui#inputFloat(String, ImFloat)} or {@link ImGui#dragFloat(String, float[])} or {@link ImGui#sliderFloat(String, float[], float, float)}.
+ *
+ * @author Nico
+ */
 public class RealFieldGui implements IFieldGui {
 
 	@Override
 	public void drawGui(Component component, Field field) throws IllegalAccessException {
-		if(field.isAnnotationPresent(EditorRange.class)) {
-			EditorRange range = field.getAnnotation(EditorRange.class);
+		EditorRange range = field.getAnnotation(EditorRange.class);
+		if(range != null) {
 			float value = (float) field.getDouble(component);
+			// TODO: There is also inputAngle
 			float[] ptr = {field.isAnnotationPresent(EditorDegrees.class) ? (float) Math.toDegrees(value) : value};
-			float step = range != null ? range.step() : 0.001f;
-			float min = range != null ? range.min() : Float.NEGATIVE_INFINITY;
-			float max = range != null ? range.max() : Float.POSITIVE_INFINITY;
-			if(range != null && range.slider()) {
-				if(ImGui.sliderFloat("##" + component.getClass() + ":" + field.getName(), ptr, min, max)) {
+			if(range.slider()) {
+				if(ImGui.sliderFloat("##" + component.getClass() + ":" + field.getName(), ptr, range.min(), range.max())) {
 					field.set(component, ptr[0]);
 				}
-			} else if(ImGui.dragFloat("##" + component.getClass() + ":" + field.getName(), ptr, step, min, max)) {
+			} else if(ImGui.dragFloat("##" + component.getClass() + ":" + field.getName(), ptr, range.step(), range.min(), range.max())) {
 				field.set(component, field.isAnnotationPresent(EditorDegrees.class) ? (float) Math.toRadians(ptr[0]) : ptr[0]);
 			}
 		} else {

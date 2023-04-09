@@ -1,16 +1,33 @@
 package gamma.editor.gui;
 
-import gamma.editor.scene.SceneTreeGui;
+import gamma.editor.EditorWindow;
 
 import java.util.ArrayList;
 
+/**
+ * Groups all the gui components to show in the editor.
+ *
+ * @see EditorDockSpace
+ * @see SceneViewportGui
+ * @see InspectorGui
+ * @see SceneTreeGui
+ * @see FileSystemGui
+ * @see EditorMenuBar
+ *
+ * @author Nico
+ */
 public final class EditorGui implements IGui {
 
+	/** List of {@code IGui}s */
 	private final ArrayList<IGui> guis = new ArrayList<>();
 
+	/**
+	 * Constructs the editor gui.
+	 * Needs to be called after {@link EditorWindow#makeContextCurrent()} because of {@link SceneViewportGui}.
+	 */
 	public EditorGui() {
 		this.guis.add(new EditorDockSpace());
-		this.guis.add(new SceneViewport());
+		this.guis.add(new SceneViewportGui());
 		InspectorGui inspectorGui = new InspectorGui();
 		this.guis.add(inspectorGui);
 		this.guis.add(new SceneTreeGui(inspectorGui));

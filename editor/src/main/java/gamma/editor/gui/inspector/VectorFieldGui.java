@@ -7,21 +7,33 @@ import vecmatlib.vector.*;
 
 import java.lang.reflect.Field;
 
+/**
+ * Gui component to render a {@link VecAbstract} into an input field.
+ *
+ * @author Nico
+ */
 public class VectorFieldGui implements IFieldGui {
 	
 	@Override
 	public void drawGui(Component component, Field field) throws IllegalAccessException {
-		if(field.isAnnotationPresent(EditorRange.class)) {
-			EditorRange range = field.getAnnotation(EditorRange.class);
-			float step = range != null ? range.step() : 0.001f;
-			float min = range != null ? range.min() : Float.NEGATIVE_INFINITY;
-			float max = range != null ? range.max() : Float.POSITIVE_INFINITY;
-			this.dragGui(component, field, step, min, max);
+		EditorRange range = field.getAnnotation(EditorRange.class);
+		if(range != null) {
+			this.dragGui(component, field, range.step(), range.min(), range.max());
 		} else {
 			this.inputGui(component, field);
 		}
 	}
 
+	/**
+	 * Draws the correct drag gui according to the type of vector.
+	 *
+	 * @param component The component to which the field belongs
+	 * @param field The field to set
+	 * @param step Drag step
+	 * @param min Drag min
+	 * @param max Drag max
+	 * @throws IllegalAccessException If the field could not be accessed
+	 */
 	private void dragGui(Component component, Field field, float step, float min, float max) throws IllegalAccessException {
 		Object obj = field.get(component);
 		if(obj instanceof Vec2f vector) {
@@ -57,6 +69,13 @@ public class VectorFieldGui implements IFieldGui {
 		}
 	}
 
+	/**
+	 * Draws the correct input gui according to the type of vector.
+	 *
+	 * @param component The component to which the field belongs
+	 * @param field The field to set
+	 * @throws IllegalAccessException If the field could not be accessed
+	 */
 	private void inputGui(Component component, Field field) throws IllegalAccessException {
 		Object obj = field.get(component);
 		if(obj instanceof Vec2f vector) {

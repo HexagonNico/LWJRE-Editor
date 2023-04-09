@@ -8,11 +8,23 @@ import imgui.flag.ImGuiConfigFlags;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 
+/**
+ * Represent the editor's window. Uses {@link Window} to use GLFW.
+ *
+ * @author Nico
+ */
 public class EditorWindow extends Window {
 
+	/** ImGui GLFW handle */
 	private final ImGuiImplGlfw imGuiGlfw = new ImGuiImplGlfw();
+	/** ImGui OpenGL handle */
 	private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
 
+	/**
+	 * Creates the editor window.
+	 *
+	 * @see Window#Window()
+	 */
 	public EditorWindow() {
 		super("Gamma Engine - Editor", 1280, 720);
 	}
@@ -29,6 +41,11 @@ public class EditorWindow extends Window {
 		this.imGuiGl3.init("#version 130");
 	}
 
+	/**
+	 * Renders the given root gui.
+	 *
+	 * @param rootGui {@link IGui} that contains all others
+	 */
 	public void renderGui(IGui rootGui) {
 		this.imGuiGlfw.newFrame();
 		ImGui.newFrame();

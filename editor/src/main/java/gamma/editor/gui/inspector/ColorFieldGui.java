@@ -7,6 +7,11 @@ import vecmatlib.color.Color4f;
 
 import java.lang.reflect.Field;
 
+/**
+ * Gui component to render a {@link Color3f} or {@link Color4f} field as a {@link ImGui#colorEdit3(String, float[])} or {@link ImGui#colorEdit4(String, float[])} gui.
+ *
+ * @author Nico
+ */
 public class ColorFieldGui implements IFieldGui {
 
 	@Override
