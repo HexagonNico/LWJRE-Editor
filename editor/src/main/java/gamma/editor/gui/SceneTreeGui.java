@@ -168,7 +168,7 @@ public class SceneTreeGui implements IGui {
 	 * Detect when an entity is clicked to start renaming it.
 	 *
 	 * @param entity The entity to start renaming
-	 * @param isRoot The root cannot be renamed // TODO: Might change
+	 * @param isRoot The root cannot be renamed
 	 */
 	private void doClickToRename(Entity entity, boolean isRoot) {
 		if(ImGui.isWindowFocused()) {
@@ -207,9 +207,15 @@ public class SceneTreeGui implements IGui {
 			if(ImGui.menuItem("Paste", "Ctrl+V")) {
 				this.entityClipboard.paste(entity);
 			}
-			ImGui.separator();
-			if(!isRoot && ImGui.menuItem("Delete entity", "Delete")) {
-				entity.removeFromScene();
+			if(!isRoot) {
+				ImGui.separator();
+				if(ImGui.menuItem("Rename", "F2")) {
+					this.renaming = entity;
+				}
+				ImGui.separator();
+				if(ImGui.menuItem("Delete entity", "Delete")) {
+					entity.removeFromScene();
+				}
 			}
 			ImGui.endPopup();
 		}

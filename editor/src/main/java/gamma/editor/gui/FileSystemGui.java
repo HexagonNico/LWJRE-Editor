@@ -2,11 +2,15 @@ package gamma.editor.gui;
 
 import gamma.editor.EditorApplication;
 import gamma.editor.controls.EditorScene;
+import gamma.editor.controls.FileClipboard;
 import gamma.engine.resources.Resources;
 import gamma.engine.window.Window;
 import imgui.ImGui;
+import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiCond;
+import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiTreeNodeFlags;
+import imgui.type.ImString;
 import vecmatlib.vector.Vec2i;
 
 import java.io.IOException;
@@ -24,6 +28,10 @@ public class FileSystemGui implements IGui {
 	// TODO: Implement Ctrl+X, Ctrl+C, Ctrl+V
 	// TODO: Implement right-click menu
 
+	private Path renaming;
+
+	private final FileClipboard clipboard = new FileClipboard();
+
 	@Override
 	public void draw() {
 		// Window size and position
@@ -33,7 +41,7 @@ public class FileSystemGui implements IGui {
 		// Show window
 		if(ImGui.begin("File system")) {
 			// Show tree recursively
-			showTreeNode(Path.of(EditorApplication.currentPath() + "/src/main/resources"));
+			this.showTreeNode(Path.of(EditorApplication.currentPath() + "/src/main/resources"));
 		}
 		ImGui.end();
 	}
@@ -43,15 +51,21 @@ public class FileSystemGui implements IGui {
 	 *
 	 * @param path Path of the file or directory that represents this node
 	 */
-	private static void showTreeNode(Path path) {
+	private void showTreeNode(Path path) {
 		// Default node flags
 		int flags = ImGuiTreeNodeFlags.FramePadding | ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanAvailWidth | ImGuiTreeNodeFlags.DefaultOpen;
 		// Hide the arrow if this is a file and not a directory
 		if(!Files.isDirectory(path)) flags = flags | ImGuiTreeNodeFlags.Leaf;
 		String fileName = path.getFileName().toString();
-		if(ImGui.treeNodeEx(fileName, flags, fileName)) {
+		if(this.clipboard.isInClipboard(path))
+			ImGui.pushStyleColor(ImGuiCol.Text, 0.8f, 0.8f, 0.8f, 1.0f);
+		if(ImGui.treeNodeEx(fileName, flags, path.equals(this.renaming) ? "" : fileName)) {
+			if(this.clipboard.isInClipboard(path))
+				ImGui.popStyleColor();
 			doDragAndDrop(fileName, path);
 			doOpenNode(fileName, path);
+			this.doRightClickMenu(path);
+			this.doRenamingInput(path);
 			// Recursively show all contained files if this is a directory
 			if(Files.isDirectory(path)) {
 				try(Stream<Path> files = Files.list(path)) {
@@ -59,7 +73,7 @@ public class FileSystemGui implements IGui {
 						if(Files.isDirectory(path1) == Files.isDirectory(path2))
 							return path1.getFileName().toString().compareToIgnoreCase(path2.getFileName().toString());
 						return Files.isDirectory(path1) ? -1 : 1;
-					}).forEach(FileSystemGui::showTreeNode);
+					}).forEach(this::showTreeNode);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -115,6 +129,53 @@ public class FileSystemGui implements IGui {
 			// TODO: Open different types of file
 			if(fileName.endsWith(".yaml")) {
 				EditorScene.changeScene(path.toString());
+			}
+		}
+	}
+
+	private void doRightClickMenu(Path path) {
+		if(ImGui.beginPopupContextItem()) {
+			if(ImGui.menuItem("New folder", "Ctrl+A")) {
+				Path directoryPath = Path.of(path.toString(), "newFolder");
+				if(!Files.exists(directoryPath)) try {
+					Files.createDirectories(directoryPath);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			ImGui.separator();
+			if(ImGui.menuItem("Cut", "Ctrl+X")) {
+				this.clipboard.cut(path);
+			}
+			if(ImGui.menuItem("Copy", "Ctrl+C")) {
+				this.clipboard.copy(path);
+			}
+			if(ImGui.menuItem("Paste", "Ctrl+V")) {
+				this.clipboard.paste(path);
+			}
+			ImGui.separator();
+			if(ImGui.menuItem("Delete file", "Delete")) try {
+				Files.delete(path);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			if(ImGui.menuItem("Rename file", "F2")) {
+				this.renaming = path;
+			}
+			ImGui.endPopup();
+		}
+	}
+
+	private void doRenamingInput(Path path) {
+		if(path.equals(this.renaming)) {
+			ImGui.sameLine();
+			ImGui.setKeyboardFocusHere();
+			ImString ptr = new ImString(path.getFileName().toString(), 256);
+			if(ImGui.inputText("##" + path, ptr, ImGuiInputTextFlags.EnterReturnsTrue)) try {
+				Files.move(path, Path.of(path.getParent().toString(), ptr.get()));
+				this.renaming = null;
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}
