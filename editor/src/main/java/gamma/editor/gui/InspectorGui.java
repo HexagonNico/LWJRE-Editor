@@ -8,17 +8,17 @@ import gamma.engine.scene.Entity;
 import gamma.engine.window.Window;
 import imgui.ImGui;
 import imgui.flag.ImGuiCond;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ScanResult;
 import vecmatlib.vector.Vec2i;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -28,20 +28,20 @@ import java.util.stream.Stream;
  */
 public class InspectorGui implements IGui {
 
-	// TODO: Find a way to get the components from the engine's jar file
-	private static final Set<String> COMPONENTS = Set.of(
-			"gamma.engine.components.BoundingBox3D",
-			"gamma.engine.components.Camera3D",
-			"gamma.engine.components.CollisionObject3D",
-			"gamma.engine.components.KinematicBody3D",
-			"gamma.engine.components.MeshRenderer",
-			"gamma.engine.components.ModelRenderer",
-			"gamma.engine.components.PointLight3D",
-			"gamma.engine.components.Transform3D"
-	);
+	/** List of built-in component classes in classpath */
+	private final List<Class<?>> components;
 
 	/** The entity that is currently being inspected */
 	public Entity entity;
+
+	/**
+	 * Constructs the inspector gui and loads all component classes.
+	 */
+	public InspectorGui() {
+		try(ScanResult result = new ClassGraph().enableClassInfo().scan()) {
+			this.components = result.getSubclasses(Component.class).loadClasses();
+		}
+	}
 
 	@Override
 	public void draw() {
@@ -84,63 +84,45 @@ public class InspectorGui implements IGui {
 			// Show popup when "Add component" is pressed
 			if(ImGui.beginPopupContextItem("Add component")) {
 				// Show base component classes
-				doMenuItems(entity);
+				doMenuItems(this.components, entity);
 				// Look for components in the project's compiled classes
 				Path mavenClasses = Path.of(EditorApplication.currentPath() + "/target/classes");
 				Path gradleClasses = Path.of(EditorApplication.currentPath() + "/build/classes/java/main");
-				try (URLClassLoader classLoader = new URLClassLoader(new URL[]{mavenClasses.toUri().toURL(), gradleClasses.toUri().toURL()})) {
-					doMenuItems(classLoader, mavenClasses, entity);
-					doMenuItems(classLoader, gradleClasses, entity);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				doMenuItems(mavenClasses, entity);
+				doMenuItems(gradleClasses, entity);
 				ImGui.endPopup();
 			}
 		}
 		ImGui.end();
 	}
 
-	// TODO: Find a way to unify the two doMenuItems
-
 	/**
-	 * Shows all the classes {@link InspectorGui#COMPONENTS} in the popup menu.
+	 * Renders the given list of classes as menu items for the "Add component" button.
 	 *
-	 * @param entity Needed to add the component when an item is pressed
+	 * @param classes List of classes
+	 * @param entity Needed to add the component when the menu item is clicked
 	 */
-	private static void doMenuItems(Entity entity) {
-		COMPONENTS.forEach(name -> {
-			if(ImGui.menuItem(name)) try {
-				Class<? extends Component> componentClass = Class.forName(name).asSubclass(Component.class);
-				if(entity.getComponent(componentClass).isEmpty()) {
+	private static void doMenuItems(List<Class<?>> classes, Entity entity) {
+		classes.forEach(classObject -> {
+			if(ImGui.menuItem(classObject.getSimpleName())) {
+				Class<? extends Component> componentClass = classObject.asSubclass(Component.class);
+				if(entity.getComponent(componentClass).isEmpty()) try {
 					entity.addComponent(componentClass.getConstructor().newInstance());
+				} catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
+					e.printStackTrace();
 				}
-			} catch (ClassNotFoundException | InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
-				e.printStackTrace();
 			}
 		});
 	}
 
 	/**
-	 * Looks for component classes in the given path using the given class loader.
+	 * Looks for components in compiled {@code .class} files and renders them as menu items.
 	 *
-	 * @param classLoader The class loader to load the classes
-	 * @param classesPath Path at which to look for {@code .class} files
-	 * @param entity Needed to add the component when an item is pressed
+	 * @param classesPath Path where to look for classes
+	 * @param entity Needed to add the component when the menu item is clicked
 	 */
-	private static void doMenuItems(ClassLoader classLoader, Path classesPath, Entity entity) {
-		findComponentClasses(classesPath).forEach(name -> {
-			try {
-				Class<?> cls = classLoader.loadClass(name);
-				if(Component.class.isAssignableFrom(cls) && ImGui.menuItem(name)) {
-					Class<? extends Component> componentClass = cls.asSubclass(Component.class);
-					if(entity.getComponent(componentClass).isEmpty()) {
-						entity.addComponent(componentClass.getConstructor().newInstance());
-					}
-				}
-			} catch (ClassNotFoundException | InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
-				throw new RuntimeException(e);
-			}
-		});
+	private static void doMenuItems(Path classesPath, Entity entity) {
+		doMenuItems(findComponentClasses(classesPath), entity);
 	}
 
 	/**
@@ -149,7 +131,7 @@ public class InspectorGui implements IGui {
 	 * @param fromPath Path to start from
 	 * @return A list containing the names of all component classes
 	 */
-	private static ArrayList<String> findComponentClasses(Path fromPath) {
+	private static ArrayList<Class<?>> findComponentClasses(Path fromPath) {
 		return findComponentClasses(fromPath, fromPath);
 	}
 
@@ -160,16 +142,18 @@ public class InspectorGui implements IGui {
 	 * @param fromPath Path to look in
 	 * @return A list containing the names of all component classes
 	 */
-	private static ArrayList<String> findComponentClasses(Path originalPath, Path fromPath) {
-		ArrayList<String> result = new ArrayList<>();
+	private static ArrayList<Class<?>> findComponentClasses(Path originalPath, Path fromPath) {
+		ArrayList<Class<?>> result = new ArrayList<>();
 		if(Files.exists(fromPath)) try(Stream<Path> directory = Files.list(fromPath)) {
 			directory.forEach(path -> {
 				if(Files.isDirectory(path)) {
 					result.addAll(findComponentClasses(originalPath, path));
-				} else if(path.toString().endsWith(".class")) {
+				} else if(path.toString().endsWith(".class")) try {
 					path = originalPath.relativize(path);
 					String className = path.toString().replace(".class", "").replace(File.separatorChar, '.');
-					result.add(className);
+					result.add(Thread.currentThread().getContextClassLoader().loadClass(className));
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
 				}
 			});
 		} catch (IOException e) {
