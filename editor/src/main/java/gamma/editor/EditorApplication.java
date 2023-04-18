@@ -2,7 +2,7 @@ package gamma.editor;
 
 import gamma.editor.gui.IGui;
 import gamma.editor.gui.ProjectsGui;
-import gamma.engine.resources.DeletableResource;
+import gamma.engine.rendering.DeletableResource;
 import gamma.engine.scene.Scene;
 import org.lwjgl.glfw.GLFW;
 

@@ -17,22 +17,26 @@ public class IntegerFieldGui implements IFieldGui {
 	// TODO: Make sure this works with byte/short/long
 
 	@Override
-	public void drawGui(Component component, Field field) throws IllegalAccessException {
+	public boolean drawGui(Component component, Field field) throws IllegalAccessException {
 		EditorRange range = field.getAnnotation(EditorRange.class);
 		if(range != null) {
 			int[] ptr = {(int) field.getLong(component)};
 			if(range.slider()) {
 				if(ImGui.sliderInt("##" + component.getClass() + ":" + field.getName(), ptr, (int) range.min(), (int) range.max())) {
 					field.set(component, ptr[0]);
+					return true;
 				}
 			} else if (ImGui.dragInt("##" + component.getClass() + ":" + field.getName(), ptr, range.step(), range.min(), range.max())) {
 				field.set(component, ptr[0]);
+				return true;
 			}
 		} else {
 			ImInt ptr = new ImInt((int) field.getLong(component));
 			if(ImGui.inputInt("##" + component.getClass() + ":" + field.getName(), ptr)) {
 				field.set(component, ptr.get());
+				return true;
 			}
 		}
+		return false;
 	}
 }

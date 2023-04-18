@@ -16,7 +16,7 @@ import java.lang.reflect.Field;
 public class RealFieldGui implements IFieldGui {
 
 	@Override
-	public void drawGui(Component component, Field field) throws IllegalAccessException {
+	public boolean drawGui(Component component, Field field) throws IllegalAccessException {
 		EditorRange range = field.getAnnotation(EditorRange.class);
 		if(range != null) {
 			float value = (float) field.getDouble(component);
@@ -25,16 +25,20 @@ public class RealFieldGui implements IFieldGui {
 			if(range.slider()) {
 				if(ImGui.sliderFloat("##" + component.getClass() + ":" + field.getName(), ptr, range.min(), range.max())) {
 					field.set(component, ptr[0]);
+					return true;
 				}
 			} else if(ImGui.dragFloat("##" + component.getClass() + ":" + field.getName(), ptr, range.step(), range.min(), range.max())) {
 				field.set(component, field.isAnnotationPresent(EditorDegrees.class) ? (float) Math.toRadians(ptr[0]) : ptr[0]);
+				return true;
 			}
 		} else {
 			ImFloat ptr = new ImFloat((float) field.getDouble(component));
 			// TODO: There is also ImGui#inputDouble
 			if(ImGui.inputFloat("##" + component.getClass() + ":" + field.getName(), ptr)) {
 				field.set(component, ptr.get());
+				return true;
 			}
 		}
+		return false;
 	}
 }

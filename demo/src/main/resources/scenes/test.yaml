@@ -1,73 +1,44 @@
-!!gamma.engine.scene.Entity
-components:
-  - !!gamma.engine.components.Transform3D
-    position: &id001 !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
-    rotation: *id001
-    scale: !!vecmatlib.vector.Vec3f [1.0, 1.0, 1.0]
+!!gamma.engine.scene.EntityResource
 children:
-  dragon2: !!gamma.engine.scene.Entity
-    components:
-      - !!gamma.engine.components.DynamicBody3D
-        acceleration: &id002 !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
-        mass: 100.0
-        restitution: 0.0
-        velocity: !!vecmatlib.vector.Vec3f [-10.0, 0.0, 0.0]
-      - !!gamma.engine.components.Transform3D
-        position: !!vecmatlib.vector.Vec3f [15.0, 5.0, 0.0]
-        rotation: &id003 !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
-        scale: &id004 !!vecmatlib.vector.Vec3f [1.0, 1.0, 1.0]
-      - !!gamma.engine.components.BoundingBox3D
-        extents: &id005 !!vecmatlib.vector.Vec3f [7.25, 4.8, 2.75]
-        offset: &id006 !!vecmatlib.vector.Vec3f [-0.2, 2.75, -0.25]
-      - !!gamma.engine.components.ModelRenderer
-        modelPath: models/dragon.obj
-        shaderPath: gamma/engine/shaders/default_shader.glsl
-  dragon1: !!gamma.engine.scene.Entity
-    components:
-      - !!gamma.engine.components.DynamicBody3D
-        acceleration: *id002
-        mass: 100.0
-        restitution: 1.0
-        velocity: !!vecmatlib.vector.Vec3f [10.0, 0.0, 0.0]
-      - !!gamma.engine.components.Transform3D
-        position: !!vecmatlib.vector.Vec3f [-15.0, 5.0, 0.0]
-        rotation: *id003
-        scale: *id004
-      - !!gamma.engine.components.BoundingBox3D
-        extents: *id005
-        offset: *id006
-      - !!gamma.engine.components.ModelRenderer
-        modelPath: models/dragon.obj
-        shaderPath: gamma/engine/shaders/default_shader.glsl
-  floor: !!gamma.engine.scene.Entity
-    components:
-      - !!gamma.engine.components.KinematicBody3D
-        acceleration: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
-        velocity: &id007 !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
-      - !!gamma.engine.components.Transform3D
-        position: *id007
-        rotation: *id007
-        scale: !!vecmatlib.vector.Vec3f [10.0, 1.0, 10.0]
-      - !!gamma.engine.components.BoundingBox3D
-        extents: *id004
-        offset: *id007
-  camera: !!gamma.engine.scene.Entity
+  light: !!gamma.engine.scene.EntityResource
     components:
       - !!gamma.engine.components.Transform3D
-        position: !!vecmatlib.vector.Vec3f [0.0, 7.5, 15.0]
-        rotation: *id007
-        scale: *id004
-      - !!gamma.engine.components.Camera3D
-        current: true
-        farPlane: 1000.0
-        fov: 1.2217305
-        nearPlane: 0.1
-  light: !!gamma.engine.scene.Entity
-    components:
-      - !!gamma.engine.components.Transform3D
-        position: !!vecmatlib.vector.Vec3f [10.0, 10.0, 10.0]
-        rotation: *id007
-        scale: *id004
+        position: !!vecmatlib.vector.Vec3f [-5.0, 10.0, 10.0]
+        rotation: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
+        scale: !!vecmatlib.vector.Vec3f [1.0, 1.0, 1.0]
       - !!gamma.engine.components.PointLight3D
         color: !!vecmatlib.color.Color3f [1.0, 1.0, 1.0]
         offset: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
+  dragon: !!gamma.engine.scene.EntityResource
+    components:
+      - !!gamma.engine.components.Transform3D
+        position: !!vecmatlib.vector.Vec3f [0.0, 5.0, 0.0]
+        rotation: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
+        scale: !!vecmatlib.vector.Vec3f [1.0, 1.0, 1.0]
+    base: scenes/dragon.yaml
+  floor: !!gamma.engine.scene.EntityResource
+    components:
+      - !!gamma.engine.components.Transform3D
+        position: !!vecmatlib.vector.Vec3f [0.0, -2.0, 0.0]
+        rotation: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
+        scale: !!vecmatlib.vector.Vec3f [10.0, 1.0, 10.0]
+      - !!gamma.engine.components.DynamicBody3D
+        acceleration: !!vecmatlib.vector.Vec3f [0.0, -9.81, 0.0]
+        immovable: true
+        mass: !!float 'Infinity'
+        restitution: 1.0
+        velocity: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
+      - !!gamma.engine.components.BoundingBox3D
+        extents: !!vecmatlib.vector.Vec3f [1.0, 1.0, 1.0]
+        offset: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
+  camera: !!gamma.engine.scene.EntityResource
+    components:
+      - !!gamma.engine.components.Transform3D
+        position: !!vecmatlib.vector.Vec3f [0.0, 3.0, 5.0]
+        rotation: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
+        scale: !!vecmatlib.vector.Vec3f [1.0, 1.0, 1.0]
+      - !!gamma.engine.components.Camera3D
+        current: true
+        farPlane: 1000.0
+        fov: 1.22173
+        nearPlane: 0.1

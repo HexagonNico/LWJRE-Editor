@@ -16,7 +16,8 @@ public interface IFieldGui {
 	 *
 	 * @param component The component that holds the field
 	 * @param field The field to represent
+	 * @return True if the field has been changed, otherwise false
 	 * @throws IllegalAccessException If the field could not be accessed
 	 */
-	void drawGui(Component component, Field field) throws IllegalAccessException;
+	boolean drawGui(Component component, Field field) throws IllegalAccessException;
 }

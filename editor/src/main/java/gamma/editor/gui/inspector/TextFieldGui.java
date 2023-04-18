@@ -18,17 +18,19 @@ import java.nio.file.Path;
 public class TextFieldGui implements IFieldGui {
 
 	@Override
-	public void drawGui(Component component, Field field) throws IllegalAccessException {
+	public boolean drawGui(Component component, Field field) throws IllegalAccessException {
 		if(field.isAnnotationPresent(EditorResource.class)) {
 			EditorResource resourceAnnotation = field.getAnnotation(EditorResource.class);
 			String value = (String) field.get(component);
 			ImString ptr = new ImString(value.equals(resourceAnnotation.defaultValue()) ? "" : value, 256);
 			if(ImGui.inputText("##" + component.getClass() + ":" + field.getName(), ptr)) {
 				setResource(component, field, ptr.get());
+				return true;
 			}
 			if(ImGui.beginDragDropTarget()) {
 				if(ImGui.acceptDragDropPayload("Path") instanceof Path path) {
 					setResource(component, field, path.toString().substring(EditorApplication.currentPath().length() + 20));
+					return true;
 				}
 				ImGui.endDragDropTarget();
 			}
@@ -37,8 +39,10 @@ public class TextFieldGui implements IFieldGui {
 			ImString ptr = new ImString((String) field.get(component), 256);
 			if(ImGui.inputText("##" + component.getClass() + ":" + field.getName(), ptr)) {
 				field.set(component, ptr.get());
+				return true;
 			}
 		}
+		return false;
 	}
 
 	/**

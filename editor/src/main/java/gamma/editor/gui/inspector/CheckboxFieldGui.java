@@ -13,10 +13,12 @@ import java.lang.reflect.Field;
 public class CheckboxFieldGui implements IFieldGui {
 
 	@Override
-	public void drawGui(Component component, Field field) throws IllegalAccessException {
+	public boolean drawGui(Component component, Field field) throws IllegalAccessException {
 		boolean current = field.getBoolean(component);
 		if(ImGui.checkbox("##" + component.getClass() + ":" + field.getName(), current)) {
 			field.set(component, !current);
+			return true;
 		}
+		return false;
 	}
 }

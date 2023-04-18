@@ -1,8 +1,8 @@
 package gamma.editor.controls;
 
-import gamma.engine.scene.Entity;
+import gamma.engine.resources.YamlUtils;
+import gamma.engine.scene.EntityResource;
 import gamma.engine.scene.Scene;
-import gamma.engine.utils.YamlUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,8 +20,8 @@ public final class EditorScene {
 
 	/** Path to the file representing the scene */
 	private static String currentFile;
-	/** Root of the current scene */
-	private static Entity current;
+	/** The resource representing the current scene */
+	private static EntityResource current;
 
 	/**
 	 * Changes the scene in {@link Scene} and saves its file's path.
@@ -29,9 +29,18 @@ public final class EditorScene {
 	 * @param filePath Path to the scene's file
 	 */
 	public static void changeScene(String filePath) {
-		current = YamlUtils.parseFile(filePath, Entity.class);
+		current = YamlUtils.parseFile(filePath, EntityResource.class);
 		Scene.changeSceneTo(current);
 		currentFile = filePath;
+	}
+
+	/**
+	 * Gets the current scene or null if there is no scene.
+	 *
+	 * @return The current scene or null if there is no scene.
+	 */
+	public static EntityResource current() {
+		return current;
 	}
 
 	/**

@@ -15,18 +15,21 @@ import java.lang.reflect.Field;
 public class ColorFieldGui implements IFieldGui {
 
 	@Override
-	public void drawGui(Component component, Field field) throws IllegalAccessException {
+	public boolean drawGui(Component component, Field field) throws IllegalAccessException {
 		Object obj = field.get(component);
 		if(obj instanceof Color3f color) {
 			float[] ptr = {color.r(), color.g(), color.b()}; // TODO: Color flags
 			if(ImGui.colorEdit3("##" + component.getClass() + ":" + field.getName(), ptr)) {
 				field.set(component, new Color3f(ptr[0], ptr[1], ptr[2]));
+				return true;
 			}
 		} else if(obj instanceof Color4f color) {
 			float[] ptr = {color.r(), color.g(), color.b(), color.a()}; // TODO: Color flags
 			if(ImGui.colorEdit4("##" + component.getClass() + ":" + field.getName(), ptr)) {
 				field.set(component, new Color4f(ptr[0], ptr[1], ptr[2], ptr[3]));
+				return true;
 			}
 		}
+		return false;
 	}
 }

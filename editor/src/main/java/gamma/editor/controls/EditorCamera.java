@@ -1,6 +1,6 @@
 package gamma.editor.controls;
 
-import gamma.engine.resources.Shader;
+import gamma.engine.rendering.Shader;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.ImVec2;

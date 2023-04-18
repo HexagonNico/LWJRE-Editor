@@ -45,8 +45,8 @@ public final class FieldsRenderer {
 	 *
 	 * @param component The component to render
 	 */
-	public static void renderFields(Component component) {
-		renderFields(component, component.getClass());
+	public static boolean renderFields(Component component) {
+		return renderFields(component, component.getClass());
 	}
 
 	/**
@@ -55,17 +55,21 @@ public final class FieldsRenderer {
 	 * @param component The component to render
 	 * @param fromClass The class to get the fields from
 	 */
-	private static void renderFields(Component component, Class<?> fromClass) {
-		if(!fromClass.getSuperclass().equals(Object.class)) {
-			renderFields(component, fromClass.getSuperclass());
+	private static boolean renderFields(Component component, Class<?> fromClass) {
+		boolean result = false;
+		if(!fromClass.getSuperclass().equals(Component.class)) {
+			result = renderFields(component, fromClass.getSuperclass());
 		}
 		for(Field field : fromClass.getDeclaredFields()) {
 			if(!Modifier.isStatic(field.getModifiers()) && !Modifier.isTransient(field.getModifiers())) try {
-				FieldsRenderer.renderField(component, field);
+				if(FieldsRenderer.renderField(component, field)) {
+					result = true;
+				}
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();
 			}
 		}
+		return result;
 	}
 
 	/**
@@ -75,7 +79,7 @@ public final class FieldsRenderer {
 	 * @param field The field to render
 	 * @throws IllegalAccessException If the field could not be accessed.
 	 */
-	public static void renderField(Component component, Field field) throws IllegalAccessException {
+	public static boolean renderField(Component component, Field field) throws IllegalAccessException {
 		if (field.isAnnotationPresent(EditorVariable.class)) {
 			field.setAccessible(true);
 			EditorVariable annotation = field.getAnnotation(EditorVariable.class);
@@ -83,10 +87,11 @@ public final class FieldsRenderer {
 			ImGui.sameLine();
 			Class<?> type = field.getType();
 			if(FIELD_GUIS.containsKey(type)) {
-				FIELD_GUIS.get(type).drawGui(component, field);
+				return FIELD_GUIS.get(type).drawGui(component, field);
 			} else {
 				ImGui.newLine();
 			}
 		}
+		return false;
 	}
 }
