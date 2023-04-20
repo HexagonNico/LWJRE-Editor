@@ -18,6 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -95,35 +96,32 @@ public class InspectorGui implements IGui {
 
 	// TODO: Give an order to components
 
-	/**
-	 * Renders all the components in the given entity as guis.
-	 *
-	 * @param resource The entity resource
-	 * @param entity   The actual entity
-	 */
 	private static void showComponents(EntityResource resource, Entity entity) {
-		getComponentGuis(resource).forEach(gui -> {
-			// Show the component's name
-			ImGui.text(gui.component.getClass().getSimpleName());
-			// Show the remove button next to the name if needed
-			if(gui.removeButton) {
-				ImGui.sameLine(ImGui.getWindowWidth() - 25);
-				if(ImGui.smallButton("X##" + gui.component.getClass())) {
-					entity.removeComponent(gui.component.getClass());
-					resource.components.remove(gui.component);
+		getComponentGuis(resource).forEach((className, gui) -> {
+			try {
+				Class<? extends Component> componentClass = Class.forName(className).asSubclass(Component.class);
+				ImGui.text(componentClass.getSimpleName());
+				if(gui.removeButton) {
+					ImGui.sameLine(ImGui.getWindowWidth() - 25);
+					if(ImGui.smallButton("X##" + className)) {
+						resource.components.remove(className);
+						entity.removeComponent(componentClass);
+					}
+					if(ImGui.isItemHovered()) {
+						ImGui.beginTooltip();
+						ImGui.text("Remove component");
+						ImGui.endTooltip();
+					}
 				}
-				if(ImGui.isItemHovered()) {
-					ImGui.beginTooltip();
-					ImGui.text("Remove component");
-					ImGui.endTooltip();
+				if(FieldsRenderer.renderFields(entity.requireComponent(componentClass), gui.component)) {
+					if(!gui.removeButton) {
+						resource.components.put(className, gui.component);
+					}
 				}
+				ImGui.separator();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
 			}
-			// Render all fields and update the component if one has been modified
-			if (FieldsRenderer.renderFields(gui.component) && !resource.components.contains(gui.component)) {
-				resource.components.add(gui.component);
-			}
-			// Show separator line
-			ImGui.separator();
 		});
 	}
 
@@ -133,7 +131,7 @@ public class InspectorGui implements IGui {
 	 * @param resource The entity to get the components from
 	 * @return A list of {@code ComponentGui}s to be rendered
 	 */
-	private static ArrayList<ComponentGui> getComponentGuis(EntityResource resource) {
+	private static HashMap<String, ComponentGui> getComponentGuis(EntityResource resource) {
 		return getComponentGuis(resource, false);
 	}
 
@@ -146,39 +144,31 @@ public class InspectorGui implements IGui {
 	 * @param isBase Whether this entity is a base or not
 	 * @return A list of {@code ComponentGui}s to be rendered
 	 */
-	private static ArrayList<ComponentGui> getComponentGuis(EntityResource resource, boolean isBase) {
-		ArrayList<ComponentGui> components = new ArrayList<>();
+	private static HashMap<String, ComponentGui> getComponentGuis(EntityResource resource, boolean isBase) {
+		HashMap<String, ComponentGui> components = new HashMap<>();
 		// Get the current entity's components
-		resource.components.forEach(component -> components.add(new ComponentGui(component, !isBase)));
+		resource.components.forEach((className, values) -> components.put(className, new ComponentGui(values, !isBase)));
 		// Get components from a base entity
 		if(!resource.base.isEmpty()) {
-			getComponentGuis(EntityResource.getOrLoad(resource.base), true).forEach(baseGui -> components.stream()
-					// Check if that component is an override
-					.filter(gui -> gui.component.getClass().equals(baseGui.component.getClass()))
-					.findFirst()
-					// If it is, just hide the remove button, otherwise add it to the list as normal
-					.ifPresentOrElse(gui -> gui.removeButton = false, () -> components.add(baseGui)));
+			getComponentGuis(EntityResource.getOrLoad(resource.base), true).forEach((className, gui) -> {
+				if(components.containsKey(className)) {
+					components.get(className).removeButton = false;
+				} else {
+					components.put(className, gui);
+				}
+			});
 		}
 		return components;
 	}
 
-	/**
-	 * Used to group a {@link Component} and a boolean value to determine if it should show a remove button.
-	 */
 	private static final class ComponentGui {
 
-		/** The component */
-		private final Component component;
+		private final HashMap<String, Object> component;
 		/** Show the remove button or not */
+		// TODO: Replace with 'isOverride' and invert logic
 		private boolean removeButton;
 
-		/**
-		 * Creates a component gui.
-		 *
-		 * @param component The component
-		 * @param removeButton True to show the remove button
-		 */
-		private ComponentGui(Component component, boolean removeButton) {
+		private ComponentGui(HashMap<String, Object> component, boolean removeButton) {
 			this.component = component;
 			this.removeButton = removeButton;
 		}
@@ -197,7 +187,7 @@ public class InspectorGui implements IGui {
 				Class<? extends Component> componentClass = givenClass.asSubclass(Component.class);
 				if(entity.getComponent(componentClass).isEmpty()) try {
 					Component component = componentClass.getConstructor().newInstance();
-					resource.components.add(component);
+					resource.components.put(componentClass.getName(), new HashMap<>());
 					entity.addComponent(component);
 				} catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
 					e.printStackTrace();

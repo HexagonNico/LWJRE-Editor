@@ -96,7 +96,7 @@ public class SceneTreeGui implements IGui {
 			this.doClickToRename(resource, parent);
 //			this.doRightClickMenu(name, entity, isRoot);
 			// Show children recursively
-			resource.children.forEach((key, child) -> this.drawEntity(key, child, resource, entity.getChild(key).orElse(null)));
+			resource.children.forEach((key, child) -> this.drawEntity(key, child, resource, entity.requireChild(key)));
 			ImGui.treePop();
 		}
 	}

@@ -1,5 +1,6 @@
 package gamma.editor.gui.inspector;
 
+import gamma.engine.annotations.EditorResource;
 import gamma.engine.annotations.EditorVariable;
 import gamma.engine.scene.Component;
 import imgui.ImGui;
@@ -40,29 +41,19 @@ public final class FieldsRenderer {
 		FIELD_GUIS.put(Color4f.class, new ColorFieldGui());
 	}
 
-	/**
-	 * Renders all the fields of the given component.
-	 *
-	 * @param component The component to render
-	 */
-	public static boolean renderFields(Component component) {
-		return renderFields(component, component.getClass());
+	public static boolean renderFields(Component component, HashMap<String, Object> values) {
+		return renderFields(component, values, component.getClass());
 	}
 
-	/**
-	 * Renders all the fields of the given component.
-	 *
-	 * @param component The component to render
-	 * @param fromClass The class to get the fields from
-	 */
-	private static boolean renderFields(Component component, Class<?> fromClass) {
+	private static boolean renderFields(Component component, HashMap<String, Object> values, Class<?> fromClass) {
 		boolean result = false;
 		if(!fromClass.getSuperclass().equals(Component.class)) {
-			result = renderFields(component, fromClass.getSuperclass());
+			result = renderFields(component, values, fromClass.getSuperclass());
 		}
 		for(Field field : fromClass.getDeclaredFields()) {
 			if(!Modifier.isStatic(field.getModifiers()) && !Modifier.isTransient(field.getModifiers())) try {
-				if(FieldsRenderer.renderField(component, field)) {
+				if(renderField(component, field)) {
+					values.put(field.getName(), field.get(component));
 					result = true;
 				}
 			} catch (IllegalAccessException e) {
@@ -88,6 +79,8 @@ public final class FieldsRenderer {
 			Class<?> type = field.getType();
 			if(FIELD_GUIS.containsKey(type)) {
 				return FIELD_GUIS.get(type).drawGui(component, field);
+			} else if(field.isAnnotationPresent(EditorResource.class)) {
+				return new ResourceFieldGui().drawGui(component, field);
 			} else {
 				ImGui.newLine();
 			}

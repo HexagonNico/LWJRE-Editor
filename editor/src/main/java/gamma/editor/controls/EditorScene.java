@@ -1,6 +1,7 @@
 package gamma.editor.controls;
 
-import gamma.engine.resources.YamlUtils;
+import gamma.engine.resources.YamlParser;
+import gamma.engine.resources.YamlSerializer;
 import gamma.engine.scene.EntityResource;
 import gamma.engine.scene.Scene;
 
@@ -29,7 +30,7 @@ public final class EditorScene {
 	 * @param filePath Path to the scene's file
 	 */
 	public static void changeScene(String filePath) {
-		current = YamlUtils.parseFile(filePath, EntityResource.class);
+		current = YamlParser.parseFile(filePath, EntityResource.class);
 		Scene.changeSceneTo(current);
 		currentFile = filePath;
 	}
@@ -47,7 +48,7 @@ public final class EditorScene {
 	 * Saves the current scene to its file.
 	 */
 	public static void saveCurrent() {
-		String yaml = YamlUtils.serialize(current);
+		String yaml = YamlSerializer.serialize(current);
 		try {
 			Files.write(Path.of(currentFile), yaml.getBytes());
 		} catch (IOException e) {

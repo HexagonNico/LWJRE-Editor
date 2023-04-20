@@ -2,43 +2,47 @@
 children:
   light: !!gamma.engine.scene.EntityResource
     components:
-      - !!gamma.engine.components.Transform3D
-        position: !!vecmatlib.vector.Vec3f [-5.0, 10.0, 10.0]
+      gamma.engine.components.Transform3D:
         rotation: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
         scale: !!vecmatlib.vector.Vec3f [1.0, 1.0, 1.0]
-      - !!gamma.engine.components.PointLight3D
+        position: !!vecmatlib.vector.Vec3f [-5.0, 10.0, 10.0]
+      gamma.engine.components.DynamicBody3D:
+        acceleration: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
+        restitution: 1.0
+        mass: 1.491
+      gamma.engine.components.PointLight3D:
         color: !!vecmatlib.color.Color3f [1.0, 1.0, 1.0]
         offset: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
   dragon: !!gamma.engine.scene.EntityResource
     components:
-      - !!gamma.engine.components.Transform3D
-        position: !!vecmatlib.vector.Vec3f [0.0, 5.0, 0.0]
+      gamma.engine.components.Transform3D:
         rotation: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
         scale: !!vecmatlib.vector.Vec3f [1.0, 1.0, 1.0]
+        position: !!vecmatlib.vector.Vec3f [0.0, 5.0, 0.0]
     base: scenes/dragon.yaml
   floor: !!gamma.engine.scene.EntityResource
     components:
-      - !!gamma.engine.components.Transform3D
-        position: !!vecmatlib.vector.Vec3f [0.0, -2.0, 0.0]
-        rotation: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
-        scale: !!vecmatlib.vector.Vec3f [10.0, 1.0, 10.0]
-      - !!gamma.engine.components.DynamicBody3D
-        acceleration: !!vecmatlib.vector.Vec3f [0.0, -9.81, 0.0]
-        immovable: true
-        mass: !!float 'Infinity'
-        restitution: 1.0
-        velocity: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
-      - !!gamma.engine.components.BoundingBox3D
+      gamma.engine.components.BoundingBox3D:
         extents: !!vecmatlib.vector.Vec3f [1.0, 1.0, 1.0]
         offset: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
+      gamma.engine.components.Transform3D:
+        rotation: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
+        scale: !!vecmatlib.vector.Vec3f [10.0, 1.0, 10.0]
+        position: !!vecmatlib.vector.Vec3f [0.0, -2.0, 0.0]
+      gamma.engine.components.DynamicBody3D:
+        acceleration: !!vecmatlib.vector.Vec3f [0.0, -9.81, 0.0]
+        restitution: 1.0
+        immovable: true
+        mass: .inf
+        velocity: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
   camera: !!gamma.engine.scene.EntityResource
     components:
-      - !!gamma.engine.components.Transform3D
-        position: !!vecmatlib.vector.Vec3f [0.0, 3.0, 5.0]
+      gamma.engine.components.Transform3D:
         rotation: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
         scale: !!vecmatlib.vector.Vec3f [1.0, 1.0, 1.0]
-      - !!gamma.engine.components.Camera3D
+        position: !!vecmatlib.vector.Vec3f [0.0, 3.0, 5.0]
+      gamma.engine.components.Camera3D:
         current: true
         farPlane: 1000.0
-        fov: 1.22173
         nearPlane: 0.1
+        fov: 1.22173

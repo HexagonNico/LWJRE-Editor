@@ -53,6 +53,7 @@ public class SceneViewportGui implements IGui {
 		RenderingSystem.render();
 		DebugRenderer.render();
 		FrameBuffer.unbind();
+		RenderingSystem.clearRenderer();
 	}
 
 	/**

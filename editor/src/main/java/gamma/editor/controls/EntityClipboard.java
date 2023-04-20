@@ -95,16 +95,16 @@ public class EntityClipboard {
 	 */
 	private static Entity deepCopy(Entity from) {
 		Entity entity = new Entity();
-		from.getComponents().forEach(component -> {
-			try {
-				entity.addComponent(deepCopy(component));
-			} catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
-				e.printStackTrace();
-			}
-		});
-		from.forEachChild((key, child) -> {
-			entity.addChild(key, deepCopy(child));
-		});
+//		from.getComponents().forEach(component -> {
+//			try {
+//				entity.addComponent(deepCopy(component));
+//			} catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+//				e.printStackTrace();
+//			}
+//		});
+//		from.forEachChild((key, child) -> {
+//			entity.addChild(key, deepCopy(child));
+//		});
 		return entity;
 	}
 
