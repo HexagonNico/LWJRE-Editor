@@ -128,7 +128,7 @@ public class FileSystemGui implements IGui {
 		if(ImGui.isItemHovered() && ImGui.isMouseDoubleClicked(0)) {
 			// TODO: Open different types of file
 			if(fileName.endsWith(".yaml")) {
-				EditorScene.changeScene(path.toString());
+				EditorScene.changeScene(Path.of(EditorApplication.currentPath(), "src/main/resources").relativize(path).toString());
 			}
 		}
 	}

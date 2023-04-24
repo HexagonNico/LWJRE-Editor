@@ -3,6 +3,7 @@ package gamma.editor.gui.inspector;
 import gamma.engine.scene.Component;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 
 /**
  * Interface used to represent a class' field as an ImGui component.
@@ -11,13 +12,5 @@ import java.lang.reflect.Field;
  */
 public interface IFieldGui {
 
-	/**
-	 * Draws the given field as an ImGui gui.
-	 *
-	 * @param component The component that holds the field
-	 * @param field The field to represent
-	 * @return True if the field has been changed, otherwise false
-	 * @throws IllegalAccessException If the field could not be accessed
-	 */
-	boolean drawGui(Component component, Field field) throws IllegalAccessException;
+	void drawGui(Component component, Field field, HashMap<String, Object> values) throws IllegalAccessException;
 }
