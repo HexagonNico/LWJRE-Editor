@@ -41,14 +41,13 @@ public final class FieldsRenderer {
 		FIELD_GUIS.put(Shader.class, new ResourceFieldGui(Shader::getOrLoad));
 	}
 
-	public static boolean renderFields(Component component, HashMap<String, Object> values) {
-		return renderFields(component, values, component.getClass());
+	public static void renderFields(Component component, HashMap<String, Object> values) {
+		renderFields(component, values, component.getClass());
 	}
 
-	private static boolean renderFields(Component component, HashMap<String, Object> values, Class<?> fromClass) {
-		boolean result = false;
+	private static void renderFields(Component component, HashMap<String, Object> values, Class<?> fromClass) {
 		if(!fromClass.getSuperclass().equals(Component.class)) {
-			result = renderFields(component, values, fromClass.getSuperclass());
+			renderFields(component, values, fromClass.getSuperclass());
 		}
 		for(Field field : fromClass.getDeclaredFields()) {
 			if(!Modifier.isStatic(field.getModifiers()) && !Modifier.isTransient(field.getModifiers())) try {
@@ -68,6 +67,5 @@ public final class FieldsRenderer {
 				e.printStackTrace();
 			}
 		}
-		return result;
 	}
 }

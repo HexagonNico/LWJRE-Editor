@@ -50,7 +50,7 @@ public final class EditorScene {
 	public static void saveCurrent() {
 		String yaml = YamlSerializer.serialize(current);
 		try {
-			Files.write(Path.of(EditorApplication.currentPath() + currentFile), yaml.getBytes());
+			Files.write(Path.of(EditorApplication.currentPath() + "/src/main/resources/" + currentFile), yaml.getBytes());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

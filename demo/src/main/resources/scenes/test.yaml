@@ -41,8 +41,4 @@ children:
         rotation: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
         scale: !!vecmatlib.vector.Vec3f [1.0, 1.0, 1.0]
         position: !!vecmatlib.vector.Vec3f [0.0, 3.0, 5.0]
-      gamma.engine.components.Camera3D:
-        current: true
-        farPlane: 1000.0
-        nearPlane: 0.1
-        fov: 1.22173
+      gamma.engine.components.Camera3D: {current: true, farPlane: 1000.0, nearPlane: 0.1, fov: 1.2217306}

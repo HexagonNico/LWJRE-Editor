@@ -97,81 +97,35 @@ public class InspectorGui implements IGui {
 	// TODO: Give an order to components
 
 	private static void showComponents(EntityResource resource, Entity entity) {
-		getComponentGuis(resource).forEach((className, gui) -> {
-			try {
-				Class<? extends Component> componentClass = Class.forName(className).asSubclass(Component.class);
-				ImGui.text(componentClass.getSimpleName());
-				if(gui.removeButton) {
-					ImGui.sameLine(ImGui.getWindowWidth() - 25);
-					if(ImGui.smallButton("X##" + className)) {
-						resource.components.remove(className);
-						entity.removeComponent(componentClass);
-					}
-					if(ImGui.isItemHovered()) {
-						ImGui.beginTooltip();
-						ImGui.text("Remove component");
-						ImGui.endTooltip();
-					}
+		entity.getComponents().forEach(component -> {
+			String simpleName = component.getClass().getSimpleName();
+			String fullName = component.getClass().getName();
+			ImGui.text(simpleName);
+			// TODO: Show a "Reset" button next to all fields
+			if(!EntityResource.getOrLoad(resource.base).components.containsKey(fullName)) {
+				ImGui.sameLine(ImGui.getWindowWidth() - 35);
+				if(ImGui.smallButton("X##" + simpleName)) {
+					resource.components.remove(fullName);
+					entity.removeComponent(component);
 				}
-				if(FieldsRenderer.renderFields(entity.requireComponent(componentClass), gui.component)) {
-					if(!gui.removeButton) {
-						resource.components.put(className, gui.component);
-					}
+				if(ImGui.isItemHovered()) {
+					ImGui.beginTooltip();
+					ImGui.text("Remove component");
+					ImGui.endTooltip();
 				}
-				ImGui.separator();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
 			}
-		});
-	}
-
-	/**
-	 * Gets a list of {@link ComponentGui}s from the given {@link EntityResource} and its base if it has one.
-	 *
-	 * @param resource The entity to get the components from
-	 * @return A list of {@code ComponentGui}s to be rendered
-	 */
-	private static HashMap<String, ComponentGui> getComponentGuis(EntityResource resource) {
-		return getComponentGuis(resource, false);
-	}
-
-	// TODO: Show a "Reset" button next to components that have been modified from the base entity
-
-	/**
-	 * Gets a list of {@link ComponentGui}s from the given {@link EntityResource} and its base if it has one.
-	 *
-	 * @param resource The entity to get the components from
-	 * @param isBase Whether this entity is a base or not
-	 * @return A list of {@code ComponentGui}s to be rendered
-	 */
-	private static HashMap<String, ComponentGui> getComponentGuis(EntityResource resource, boolean isBase) {
-		HashMap<String, ComponentGui> components = new HashMap<>();
-		// Get the current entity's components
-		resource.components.forEach((className, values) -> components.put(className, new ComponentGui(values, !isBase)));
-		// Get components from a base entity
-		if(!resource.base.isEmpty()) {
-			getComponentGuis(EntityResource.getOrLoad(resource.base), true).forEach((className, gui) -> {
-				if(components.containsKey(className)) {
-					components.get(className).removeButton = false;
-				} else {
-					components.put(className, gui);
+			// TODO: Remove elements if they are the same as the base
+			if(resource.components.containsKey(fullName)) {
+				FieldsRenderer.renderFields(component, resource.components.get(fullName));
+			} else {
+				HashMap<String, Object> data = new HashMap<>();
+				FieldsRenderer.renderFields(component, data);
+				if(!data.isEmpty()) {
+					resource.components.put(fullName, data);
 				}
-			});
-		}
-		return components;
-	}
-
-	private static final class ComponentGui {
-
-		private final HashMap<String, Object> component;
-		/** Show the remove button or not */
-		// TODO: Replace with 'isOverride' and invert logic
-		private boolean removeButton;
-
-		private ComponentGui(HashMap<String, Object> component, boolean removeButton) {
-			this.component = component;
-			this.removeButton = removeButton;
-		}
+			}
+			ImGui.separator();
+		});
 	}
 
 	/**
