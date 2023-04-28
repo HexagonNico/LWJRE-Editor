@@ -2,9 +2,12 @@ package gamma.editor;
 
 import gamma.editor.gui.IGui;
 import gamma.editor.gui.ProjectsGui;
-import gamma.engine.rendering.DeletableResource;
-import gamma.engine.scene.Scene;
+import gamma.engine.EditorListener;
+import gamma.engine.rendering.FrameBuffer;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL11;
+
+import java.util.ServiceLoader;
 
 public final class EditorApplication implements Runnable {
 
@@ -26,26 +29,39 @@ public final class EditorApplication implements Runnable {
 		return instance != null ? instance.currentPath : "";
 	}
 
+	public static FrameBuffer sceneFrameBuffer() {
+		return instance.sceneFrameBuffer;
+	}
+
 	private final EditorWindow window;
 	private IGui rootGui;
+
+	public final FrameBuffer sceneFrameBuffer;
 
 	private String currentPath = "";
 
 	private EditorApplication() {
 		this.window = new EditorWindow();
+		this.window.makeContextCurrent();
+		this.rootGui = new ProjectsGui();
+		this.sceneFrameBuffer = new FrameBuffer(1920, 1080);
 	}
 
 	@Override
 	public void run() {
-		this.window.makeContextCurrent();
-		this.rootGui = new ProjectsGui();
+		ServiceLoader<EditorListener> services = ServiceLoader.load(EditorListener.class);
+		services.forEach(EditorListener::onEditorInit);
 		while(!this.window.isCloseRequested()) {
-			Scene.editorProcess();
+			FrameBuffer.bind(this.sceneFrameBuffer);
+			services.forEach(EditorListener::onEditorProcess);
+			FrameBuffer.unbind(); // TODO: Clean up this code
+			GL11.glViewport(0, 0, 1920, 1080);
 			this.window.renderGui(this.rootGui);
 			this.window.update();
 			GLFW.glfwPollEvents();
 		}
 		this.window.destroy();
+		services.forEach(EditorListener::onEditorTerminate);
 	}
 
 	public static void main(String[] args) {
@@ -59,7 +75,6 @@ public final class EditorApplication implements Runnable {
 			any.printStackTrace();
 		} finally {
 			System.out.println("Terminating editor");
-			DeletableResource.deleteAll(); // TODO: Move in another class
 			GLFW.glfwTerminate();
 		} else {
 			System.err.println("Unable to initialize GLFW");

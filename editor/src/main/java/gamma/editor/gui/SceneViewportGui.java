@@ -1,16 +1,14 @@
 package gamma.editor.gui;
 
+import gamma.editor.EditorApplication;
 import gamma.editor.controls.EditorCamera;
 import gamma.engine.ApplicationProperties;
-import gamma.engine.rendering.DebugRenderer;
 import gamma.engine.rendering.FrameBuffer;
-import gamma.engine.rendering.RenderingSystem;
 import gamma.engine.window.Window;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiCond;
 import imgui.flag.ImGuiWindowFlags;
-import org.lwjgl.opengl.GL11;
 import vecmatlib.vector.Vec2i;
 
 /**
@@ -20,9 +18,6 @@ import vecmatlib.vector.Vec2i;
  */
 public class SceneViewportGui implements IGui {
 
-	/** Used to render the scene to a texture before rendering it to the window */
-	private final FrameBuffer frameBuffer;
-
 	/** The editor camera is updated when rendering the viewport */
 	private final EditorCamera editorCamera;
 
@@ -31,35 +26,11 @@ public class SceneViewportGui implements IGui {
 	 * Must be called after {@link Window#makeContextCurrent()} because of the {@link FrameBuffer}.
 	 */
 	public SceneViewportGui() {
-		// TODO: Get proper size
-		this.frameBuffer = new FrameBuffer(1920, 1080);
 		this.editorCamera = new EditorCamera();
 	}
 
 	@Override
 	public void draw() {
-		this.renderScene();
-		// TODO: Proper viewport scaling
-		GL11.glViewport(0, 0, 1920, 1080);
-		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-		this.renderViewport();
-	}
-
-	/**
-	 * Renders the whole scene to the viewport's frame butter.
-	 */
-	private void renderScene() {
-		FrameBuffer.bind(this.frameBuffer);
-		RenderingSystem.render();
-		DebugRenderer.render();
-		FrameBuffer.unbind();
-		RenderingSystem.clearRenderer();
-	}
-
-	/**
-	 * Renders the viewport in an ImGui window.
-	 */
-	private void renderViewport() {
 		// Initial window size
 		Vec2i windowSize = Window.getCurrent().getSize();
 		ImGui.setNextWindowPos(10.0f + windowSize.x() / 8.0f, 25.0f, ImGuiCond.FirstUseEver);
@@ -73,7 +44,7 @@ public class SceneViewportGui implements IGui {
 			ImVec2 viewportPos = getCenteredPositionForViewport(viewportSize);
 			ImGui.setCursorPos(viewportPos.x, viewportPos.y);
 			// Render the frame buffer
-			ImGui.image(this.frameBuffer.texture, viewportSize.x, viewportSize.y, 0, 1, 1, 0);
+			ImGui.image(EditorApplication.sceneFrameBuffer().texture, viewportSize.x, viewportSize.y, 0, 1, 1, 0);
 		}
 		ImGui.end();
 	}

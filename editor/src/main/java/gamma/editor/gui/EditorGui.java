@@ -1,7 +1,5 @@
 package gamma.editor.gui;
 
-import gamma.editor.EditorWindow;
-
 import java.util.ArrayList;
 
 /**
@@ -21,10 +19,6 @@ public final class EditorGui implements IGui {
 	/** List of {@code IGui}s */
 	private final ArrayList<IGui> guis = new ArrayList<>();
 
-	/**
-	 * Constructs the editor gui.
-	 * Needs to be called after {@link EditorWindow#makeContextCurrent()} because of {@link SceneViewportGui}.
-	 */
 	public EditorGui() {
 		this.guis.add(new EditorDockSpace());
 		this.guis.add(new SceneViewportGui());
