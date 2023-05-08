@@ -8,33 +8,18 @@ import vecmatlib.matrix.Mat4f;
 import vecmatlib.vector.Vec2i;
 import vecmatlib.vector.Vec3f;
 
-/**
- * Represents the editor's camera.
- *
- * @author Nico
- */
 public final class EditorCamera {
 
-	/** Camera position in the 3D world */
-	public Vec3f position = Vec3f.Zero();
-	/** Camera x rotation */
+	public Vec3f position = new Vec3f(0.0f, 7.5f, 15.0f);
 	public float yaw = 0.0f;
-	/** Camera y rotation */
 	public float pitch = 0.0f;
 
-	/** Field of view */
 	public float fov = 1.22173f;
-	/** Near plane distance */
 	public float nearPlane = 0.1f;
-	/** Far plane distance */
 	public float farPlane = 1000.0f;
 
-	/** Position of the mouse cursor */
 	private ImVec2 mouseDragPoint = new ImVec2();
 
-	/**
-	 * Detects user mouse input and updates the camera.
-	 */
 	public void update() {
 		ImGuiIO io = ImGui.getIO();
 		ImVec2 nextDragPoint = ImGui.getMousePos();
@@ -62,11 +47,6 @@ public final class EditorCamera {
 		Shader.setUniformStatic("view_matrix", this.viewMatrix());
 	}
 
-	/**
-	 * Computes the camera's projection matrix.
-	 *
-	 * @return Editor projection matrix
-	 */
 	public Mat4f projectionMatrix() {
 		float focalLength = (float) (1.0f / Math.tan(this.fov / 2.0f));
 		Vec2i windowSize = new Vec2i(1920, 1080); // TODO: Proper viewport size
@@ -79,11 +59,6 @@ public final class EditorCamera {
 		);
 	}
 
-	/**
-	 * Computes the camera's view matrix.
-	 *
-	 * @return Editor view matrix
-	 */
 	public Mat4f viewMatrix() {
 		return Mat4f.translation(this.position.negated()).multiply(Mat4f.rotation(this.yaw, this.pitch, 0.0f));
 	}

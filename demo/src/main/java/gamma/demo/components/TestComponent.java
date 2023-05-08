@@ -1,8 +1,6 @@
 package gamma.demo.components;
 
 import gamma.engine.annotations.*;
-import gamma.engine.components.Transform3D;
-import gamma.engine.rendering.DebugRenderer;
 import gamma.engine.scene.Component;
 import vecmatlib.vector.Vec2f;
 import vecmatlib.vector.Vec2i;
@@ -80,12 +78,6 @@ public class TestComponent extends Component {
 	protected void onStart() {
 		super.onStart();
 		System.out.println("[" + this.entity() + "]: Test component start");
-	}
-
-	@Override
-	protected void editorUpdate() {
-		super.editorUpdate();
-		this.getComponent(Transform3D.class).ifPresent(transform -> DebugRenderer.addToBatch(this, transform.globalTransformation()));
 	}
 
 	@Override

@@ -1,36 +1,35 @@
 package gamma.editor.gui;
 
-import java.util.ArrayList;
+import imgui.ImGui;
 
-/**
- * Groups all the gui components to show in the editor.
- *
- * @see EditorDockSpace
- * @see SceneViewportGui
- * @see InspectorGui
- * @see SceneTreeGui
- * @see FileSystemGui
- * @see EditorMenuBar
- *
- * @author Nico
- */
-public final class EditorGui implements IGui {
+import java.util.HashSet;
 
-	/** List of {@code IGui}s */
-	private final ArrayList<IGui> guis = new ArrayList<>();
+public abstract class EditorGui {
 
-	public EditorGui() {
-		this.guis.add(new EditorDockSpace());
-		this.guis.add(new SceneViewportGui());
-		InspectorGui inspectorGui = new InspectorGui();
-		this.guis.add(inspectorGui);
-		this.guis.add(new SceneTreeGui(inspectorGui));
-		this.guis.add(new FileSystemGui());
-		this.guis.add(new EditorMenuBar());
+	private static final HashSet<EditorGui> GUI = new HashSet<>();
+
+	public static void add(EditorGui gui) {
+		GUI.add(gui);
 	}
 
-	@Override
-	public void draw() {
-		this.guis.forEach(IGui::draw);
+	public static void clear() {
+		GUI.clear();
 	}
+
+	public static void drawGui() {
+		GUI.forEach(gui -> {
+			if(ImGui.begin(gui.title(), gui.flags())) {
+				gui.onDraw();
+			}
+			ImGui.end();
+		});
+	}
+
+	protected abstract String title();
+
+	protected int flags() {
+		return 0;
+	}
+
+	protected abstract void onDraw();
 }

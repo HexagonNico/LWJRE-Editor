@@ -15,9 +15,22 @@ import java.net.URLClassLoader;
  */
 public class EditorClassLoader extends ClassLoader {
 
+	private final URL[] urls;
+
+	public EditorClassLoader() {
+		try {
+			this.urls = new URL[] {
+					new File("demo/target/classes").toURI().toURL(),
+					new File("demo/build/classes/java/main").toURI().toURL()
+			};
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	@Override
 	protected Class<?> findClass(String name) throws ClassNotFoundException {
-		try(URLClassLoader classLoader = new URLClassLoader(new URL[]{new File(EditorApplication.currentPath() + "/target/classes").toURI().toURL(), new File(EditorApplication.currentPath() + "/build/classes/java/main").toURI().toURL()})) {
+		try(URLClassLoader classLoader = new URLClassLoader(this.urls)) {
 			return classLoader.loadClass(name);
 		} catch (IOException e) {
 			return null;
@@ -27,7 +40,7 @@ public class EditorClassLoader extends ClassLoader {
 	@Override
 	public URL findResource(String name) {
 		try {
-			File file = new File(EditorApplication.currentPath() + "/src/main/resources/" + name);
+			File file = new File("demo/src/main/resources/" + name);
 			return file.exists() ? file.toURI().toURL() : null;
 		} catch (MalformedURLException e) {
 			return null;

@@ -2,21 +2,21 @@ package gamma.editor.gui.inspector;
 
 import gamma.engine.annotations.EditorRange;
 import gamma.engine.annotations.EditorSlider;
-import gamma.engine.scene.Component;
+import gamma.engine.tree.Node;
 import vecmatlib.vector.VecFloat;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.function.Function;
 
-public class FloatVectorFieldGui implements IFieldGui {
+public class FloatVectorField implements InspectorField {
 
 	private final InputFunction inputFunction;
 	private final DragFunction dragFunction;
 	private final SliderFunction sliderFunction;
 	private final Function<float[], VecFloat<?>> constructorFunction;
 
-	public FloatVectorFieldGui(InputFunction inputFunction, DragFunction dragFunction, SliderFunction sliderFunction, Function<float[], VecFloat<?>> constructorFunction) {
+	public FloatVectorField(InputFunction inputFunction, DragFunction dragFunction, SliderFunction sliderFunction, Function<float[], VecFloat<?>> constructorFunction) {
 		this.inputFunction = inputFunction;
 		this.dragFunction = dragFunction;
 		this.sliderFunction = sliderFunction;
@@ -24,26 +24,27 @@ public class FloatVectorFieldGui implements IFieldGui {
 	}
 
 	@Override
-	public void drawGui(Component component, Field field, HashMap<String, Object> values) throws IllegalAccessException {
+	public void inputGui(Field field, Node node, HashMap<String, Object> values) throws IllegalAccessException {
 		EditorSlider slider = field.getAnnotation(EditorSlider.class);
 		EditorRange range = field.getAnnotation(EditorRange.class);
-		VecFloat<?> vector = (VecFloat<?>) field.get(component);
+		VecFloat<?> vector = (VecFloat<?>) field.get(node);
 		float[] ptr = vector.toArray();
+		String label = "##" + node.getClass() + ":" + field.getName();
 		if(slider != null) {
-			if(this.sliderFunction.apply("##" + component.getClass() + ":" + field.getName(), ptr, slider.min(), slider.max())) {
+			if(this.sliderFunction.apply(label, ptr, slider.min(), slider.max())) {
 				vector = this.constructorFunction.apply(ptr);
-				field.set(component, vector);
+				field.set(node, vector);
 				values.put(field.getName(), vector);
 			}
 		} else if(range != null) {
-			if(this.dragFunction.apply("##" + component.getClass() + ":" + field.getName(), ptr, range.step(), range.min(), range.max())) {
+			if(this.dragFunction.apply(label, ptr, range.step(), range.min(), range.max())) {
 				vector = this.constructorFunction.apply(ptr);
-				field.set(component, vector);
+				field.set(node, vector);
 				values.put(field.getName(), vector);
 			}
-		} else if(this.inputFunction.apply("##" + component.getClass() + ":" + field.getName(), ptr)) {
+		} else if(this.inputFunction.apply(label, ptr)) {
 			vector = this.constructorFunction.apply(ptr);
-			field.set(component, vector);
+			field.set(node, vector);
 			values.put(field.getName(), vector);
 		}
 	}
