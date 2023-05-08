@@ -41,4 +41,30 @@ public class EditorScene {
 	public static Node getNode(NodeResource resource) {
 		return NODES_IN_SCENE.get(resource);
 	}
+
+	public static Node removeNode(NodeResource resource) {
+		Node node = NODES_IN_SCENE.remove(resource);
+		node.getParent().removeChild(node);
+		return node;
+	}
+
+	public static void putNode(NodeResource parentResource, NodeResource resource, String key, Node node) {
+		Node parentNode = getNode(parentResource);
+		parentNode.addChild(key, node);
+		parentResource.children.put(key, resource);
+		NODES_IN_SCENE.put(resource, node);
+	}
+
+	public static void putNode(NodeResource parentResource, NodeResource resource, Node node) {
+		Node parentNode = getNode(parentResource);
+		String key = node.getClass().getSimpleName();
+		if(parentNode.hasChild(key)) {
+			int index = 2;
+			while(parentNode.hasChild(key + index)) {
+				index++;
+			}
+			key = key + index;
+		}
+		putNode(parentResource, resource, key, node);
+	}
 }

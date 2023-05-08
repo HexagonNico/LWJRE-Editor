@@ -31,21 +31,25 @@ public abstract class TreeGui<N> extends EditorGui {
 		}
 		String label = parent != null ? this.getLabel(node, parent) : "root";
 		if(ImGui.treeNodeEx(this.renaming && this.isSelected(node) ? "##" + label : label, flags)) {
-			this.dragDrop(label, node);
-			if(parent != null) {
-				this.inputRenameNode(label, node, parent);
-			}
-			if(ImGui.isItemClicked()) {
-				this.onSelect(node);
-				this.selected = node;
-			}
-			if(ImGui.isItemHovered() && ImGui.isMouseDoubleClicked(ImGuiMouseButton.Left)) {
-				this.onDoubleClick(node);
-			}
+			this.onDrawNode(node, label, parent);
 			if(!this.isLeaf(node)) {
 				this.getChildren(node).sorted(this::sortNodes).forEach(child -> this.drawNode(child, node));
 			}
 			ImGui.treePop();
+		}
+	}
+
+	protected void onDrawNode(N node, String label, N parent) {
+		this.dragDrop(label, node);
+		if(parent != null) {
+			this.inputRenameNode(label, node, parent);
+		}
+		if(ImGui.isItemClicked()) {
+			this.onSelect(node);
+			this.selected = node;
+		}
+		if(ImGui.isItemHovered() && ImGui.isMouseDoubleClicked(ImGuiMouseButton.Left)) {
+			this.onDoubleClick(node);
 		}
 	}
 

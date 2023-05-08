@@ -1,8 +1,12 @@
 package gamma.editor.gui;
 
+import gamma.editor.EditorClassLoader;
 import gamma.editor.controls.DragDropPayload;
 import gamma.editor.controls.EditorScene;
+import gamma.engine.tree.Node;
 import gamma.engine.tree.NodeResource;
+import gamma.engine.utils.Reflection;
+import imgui.ImGui;
 
 import java.util.Map;
 import java.util.stream.Stream;
@@ -18,6 +22,20 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 	@Override
 	protected String title() {
 		return "Scene tree";
+	}
+
+	@Override
+	protected void onDrawNode(NodeResource node, String label, NodeResource parent) {
+		super.onDrawNode(node, label, parent);
+		if(ImGui.beginPopupContextItem()) {
+			EditorClassLoader.getNodeClasses().forEach(nodeClass -> {
+				if(ImGui.menuItem(nodeClass.getSimpleName())) {
+					NodeResource addedNodeResource = new NodeResource(nodeClass.getName());
+					EditorScene.putNode(node, addedNodeResource, (Node) Reflection.instantiate(nodeClass));
+				}
+			});
+			ImGui.endPopup();
+		}
 	}
 
 	@Override
@@ -51,10 +69,11 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 
 	@Override
 	protected void onDragDropTarget(NodeResource target, DragDropPayload payload) {
-		if(payload.object() instanceof NodeResource node) {
-			if(!isDescendant(node, target)) {
-				removeFromParent(this.getRoot(), node);
-				target.children.put(payload.label(), node);
+		if(payload.object() instanceof NodeResource resource) {
+			if(!isDescendant(resource, target)) {
+				removeFromParent(this.getRoot(), resource);
+				Node node = EditorScene.removeNode(resource);
+				EditorScene.putNode(target, resource, payload.label(), node);
 			}
 		}
 	}

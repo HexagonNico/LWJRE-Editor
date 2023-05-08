@@ -1,10 +1,15 @@
 package gamma.editor;
 
+import gamma.engine.tree.Node;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * EditorClassLoader is set as the context class loader as soon as the editor starts with {@code Thread.currentThread().setContextClassLoader(new EditorClassLoader())}.
@@ -44,6 +49,25 @@ public class EditorClassLoader extends ClassLoader {
 			return file.exists() ? file.toURI().toURL() : null;
 		} catch (MalformedURLException e) {
 			return null;
+		}
+	}
+
+	public static List<? extends Class<?>> getNodeClasses() {
+		try(JarFile engineJar = new JarFile(new File(System.getProperty("user.home") + "/.m2/repository/gamma/engine/gamma-engine-core/1.0-SNAPSHOT/gamma-engine-core-1.0-SNAPSHOT.jar"))) {
+			return engineJar.stream()
+					.map(JarEntry::getName)
+					.filter(name -> name.endsWith(".class"))
+					.map(name -> {
+						try {
+							return Class.forName(name.replace('/', '.').replace(".class", ""));
+						} catch (ClassNotFoundException e) {
+							e.printStackTrace();
+							return Object.class;
+						}
+					}).filter(Node.class::isAssignableFrom).toList();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return List.of();
 		}
 	}
 }
