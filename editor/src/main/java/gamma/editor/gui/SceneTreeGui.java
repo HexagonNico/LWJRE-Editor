@@ -7,9 +7,9 @@ import gamma.engine.tree.Node;
 import gamma.engine.tree.NodeResource;
 import gamma.engine.utils.Reflection;
 import imgui.ImGui;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.Map;
-import java.util.stream.Stream;
 
 public class SceneTreeGui extends TreeGui<NodeResource> {
 
@@ -25,16 +25,55 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 	}
 
 	@Override
+	protected void onDraw() {
+		super.onDraw();
+		if(ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_CONTROL)) {
+
+		}
+	}
+
+	@Override
 	protected void onDrawNode(NodeResource node, String label, NodeResource parent) {
 		super.onDrawNode(node, label, parent);
 		if(ImGui.beginPopupContextItem()) {
-			EditorClassLoader.getNodeClasses().forEach(nodeClass -> {
-				if(ImGui.menuItem(nodeClass.getSimpleName())) {
-					NodeResource addedNodeResource = new NodeResource(nodeClass.getName());
-					EditorScene.putNode(node, addedNodeResource, (Node) Reflection.instantiate(nodeClass));
-				}
-			});
+			this.onSelect(node);
+			if(ImGui.beginMenu("Add node")) {
+				EditorClassLoader.getNodeClasses().forEach(nodeClass -> {
+					if(ImGui.menuItem(nodeClass.getSimpleName())) {
+						NodeResource addedNodeResource = new NodeResource(nodeClass.getName());
+						EditorScene.putNode(node, addedNodeResource, (Node) Reflection.instantiate(nodeClass));
+					}
+				});
+				ImGui.endMenu();
+			}
+			ImGui.separator();
+			if(ImGui.menuItem("Cut", "Ctrl+X")) {
+
+			}
+			if(ImGui.menuItem("Copy", "Ctrl+C")) {
+
+			}
+			if(ImGui.menuItem("Paste", "Ctrl+V")) {
+
+			}
+			ImGui.separator();
+			if(ImGui.menuItem("Delete node", "Del")) {
+				this.deleteNode(node, parent);
+			}
 			ImGui.endPopup();
+		}
+		if(node.equals(this.getSelected())) {
+			if(ImGui.isKeyPressed(GLFW.GLFW_KEY_DELETE)) {
+				this.deleteNode(node, parent);
+			}
+		}
+	}
+
+	private void deleteNode(NodeResource node, NodeResource parent) {
+		if(!node.equals(this.getRoot())) {
+			EditorScene.removeNode(node);
+			parent.children.values().remove(node);
+			this.inspector.nodeResource = null;
 		}
 	}
 
@@ -58,8 +97,11 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 	}
 
 	@Override
-	protected Stream<NodeResource> getChildren(NodeResource resource) {
-		return resource.children.values().stream();
+	protected Iterable<NodeResource> getChildren(NodeResource resource) {
+		return resource.children.entrySet().stream()
+				.sorted(Map.Entry.comparingByKey())
+				.map(Map.Entry::getValue)
+				.toList();
 	}
 
 	@Override
@@ -95,12 +137,14 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 	@Override
 	protected void onSelect(NodeResource node) {
 		this.inspector.nodeResource = node;
+		super.onSelect(node);
 	}
 
 	@Override
-	protected void onRename(NodeResource node, String name, NodeResource parent) {
-		String oldName = this.getLabel(node, parent);
-		parent.children.remove(oldName);
-		parent.children.put(name, node);
+	protected void onRename(NodeResource resource, String name, NodeResource parent) {
+		Node node = EditorScene.removeNode(resource);
+		parent.children.values().remove(resource);
+		name = EditorScene.putNode(parent, resource, name, node);
+		parent.children.put(name, resource);
 	}
 }

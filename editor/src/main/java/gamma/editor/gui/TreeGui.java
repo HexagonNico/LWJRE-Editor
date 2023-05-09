@@ -7,8 +7,6 @@ import imgui.flag.ImGuiMouseButton;
 import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.type.ImString;
 
-import java.util.stream.Stream;
-
 public abstract class TreeGui<N> extends EditorGui {
 
 	private N selected;
@@ -33,7 +31,7 @@ public abstract class TreeGui<N> extends EditorGui {
 		if(ImGui.treeNodeEx(this.renaming && this.isSelected(node) ? "##" + label : label, flags)) {
 			this.onDrawNode(node, label, parent);
 			if(!this.isLeaf(node)) {
-				this.getChildren(node).sorted(this::sortNodes).forEach(child -> this.drawNode(child, node));
+				this.getChildren(node).forEach(child -> this.drawNode(child, node));
 			}
 			ImGui.treePop();
 		}
@@ -46,7 +44,6 @@ public abstract class TreeGui<N> extends EditorGui {
 		}
 		if(ImGui.isItemClicked()) {
 			this.onSelect(node);
-			this.selected = node;
 		}
 		if(ImGui.isItemHovered() && ImGui.isMouseDoubleClicked(ImGuiMouseButton.Left)) {
 			this.onDoubleClick(node);
@@ -71,6 +68,7 @@ public abstract class TreeGui<N> extends EditorGui {
 	}
 
 	private void inputRenameNode(String label, N node, N parent) {
+		// TODO: Stop renaming when another node is selected
 		if(!this.renaming && this.isSelected(node) && ImGui.isWindowFocused() && ImGui.isKeyPressed(257)) {
 			this.renaming = true;
 		}
@@ -91,11 +89,7 @@ public abstract class TreeGui<N> extends EditorGui {
 
 	protected abstract boolean isLeaf(N node);
 
-	protected abstract Stream<N> getChildren(N node);
-
-	protected int sortNodes(N node1, N node2) {
-		return 0;
-	}
+	protected abstract Iterable<N> getChildren(N node);
 
 	protected String dragDropType() {
 		return "";
@@ -106,7 +100,7 @@ public abstract class TreeGui<N> extends EditorGui {
 	}
 
 	protected void onSelect(N node) {
-
+		this.selected = node;
 	}
 
 	protected void onDoubleClick(N node) {

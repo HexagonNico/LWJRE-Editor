@@ -6,6 +6,7 @@ import gamma.editor.controls.EditorScene;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class FileSystemGui extends TreeGui<Path> {
@@ -37,20 +38,17 @@ public class FileSystemGui extends TreeGui<Path> {
 	}
 
 	@Override
-	protected Stream<Path> getChildren(Path path) {
-		try {
-			return Files.list(path);
+	protected Iterable<Path> getChildren(Path path) {
+		try(Stream<Path> files = Files.list(path)) {
+			return files.sorted((path1, path2) -> {
+				if(Files.isDirectory(path1) == Files.isDirectory(path2))
+					return path1.getFileName().toString().compareToIgnoreCase(path2.getFileName().toString());
+				return Files.isDirectory(path1) ? -1 : 1;
+			}).toList();
 		} catch (IOException e) {
 			e.printStackTrace();
-			return Stream.empty();
+			return List.of();
 		}
-	}
-
-	@Override
-	protected int sortNodes(Path path1, Path path2) {
-		if(Files.isDirectory(path1) == Files.isDirectory(path2))
-			return path1.getFileName().toString().compareToIgnoreCase(path2.getFileName().toString());
-		return Files.isDirectory(path1) ? -1 : 1;
 	}
 
 	@Override
@@ -71,7 +69,7 @@ public class FileSystemGui extends TreeGui<Path> {
 		}
 	}
 
-	public static boolean isDescendant(Path ancestor, Path descendant) {
+	private static boolean isDescendant(Path ancestor, Path descendant) {
 		if(descendant.getParent().equals(ancestor)) {
 			return true;
 		} else try(Stream<Path> files = Files.list(ancestor)) {

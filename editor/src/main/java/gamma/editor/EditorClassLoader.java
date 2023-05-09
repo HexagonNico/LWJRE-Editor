@@ -4,6 +4,7 @@ import gamma.engine.tree.Node;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -64,7 +65,7 @@ public class EditorClassLoader extends ClassLoader {
 							e.printStackTrace();
 							return Object.class;
 						}
-					}).filter(Node.class::isAssignableFrom).toList();
+					}).filter(nodeClass -> Node.class.isAssignableFrom(nodeClass) && !Modifier.isAbstract(nodeClass.getModifiers())).toList();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return List.of();

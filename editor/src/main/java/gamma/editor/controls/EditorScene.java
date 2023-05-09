@@ -48,14 +48,22 @@ public class EditorScene {
 		return node;
 	}
 
-	public static void putNode(NodeResource parentResource, NodeResource resource, String key, Node node) {
+	public static String putNode(NodeResource parentResource, NodeResource resource, String key, Node node) {
 		Node parentNode = getNode(parentResource);
+		if(parentNode.hasChild(key)) {
+			int index = 2;
+			while(parentNode.hasChild(key + index)) {
+				index ++;
+			}
+			key = key + index;
+		}
 		parentNode.addChild(key, node);
 		parentResource.children.put(key, resource);
 		NODES_IN_SCENE.put(resource, node);
+		return key;
 	}
 
-	public static void putNode(NodeResource parentResource, NodeResource resource, Node node) {
+	public static String putNode(NodeResource parentResource, NodeResource resource, Node node) {
 		Node parentNode = getNode(parentResource);
 		String key = node.getClass().getSimpleName();
 		if(parentNode.hasChild(key)) {
@@ -65,6 +73,9 @@ public class EditorScene {
 			}
 			key = key + index;
 		}
-		putNode(parentResource, resource, key, node);
+		parentNode.addChild(key, node);
+		parentResource.children.put(key, resource);
+		NODES_IN_SCENE.put(resource, node);
+		return key;
 	}
 }
