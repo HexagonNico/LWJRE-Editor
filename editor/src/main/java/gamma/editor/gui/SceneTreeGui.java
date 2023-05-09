@@ -62,9 +62,11 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 			}
 			ImGui.endPopup();
 		}
-		if(node.equals(this.getSelected())) {
-			if(ImGui.isKeyPressed(GLFW.GLFW_KEY_DELETE)) {
-				this.deleteNode(node, parent);
+		if(ImGui.isWindowFocused()) {
+			if(node.equals(this.getSelected())) {
+				if(ImGui.isKeyPressed(GLFW.GLFW_KEY_DELETE)) {
+					this.deleteNode(node, parent);
+				}
 			}
 		}
 	}

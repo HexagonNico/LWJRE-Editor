@@ -1,12 +1,16 @@
 package gamma.editor.controls;
 
+import gamma.engine.resources.YamlLoader;
 import gamma.engine.tree.Node;
 import gamma.engine.tree.NodeResource;
+import gamma.engine.utils.YamlSerializer;
 
 import java.nio.file.Path;
 import java.util.HashMap;
 
 public class EditorScene {
+
+	private static Path currentPath = null;
 
 	private static NodeResource rootResource = null;
 	private static Node rootNode = new Node();
@@ -15,11 +19,18 @@ public class EditorScene {
 
 	public static void changeScene(Path path) {
 		NODES_IN_SCENE.clear();
+		currentPath = path;
 		Path resourcesFolder = Path.of("demo/src/main/resources");
 		String sceneFile = resourcesFolder.relativize(path).toString();
-		rootResource = NodeResource.getOrLoad(sceneFile);
+		rootResource = (NodeResource) new YamlLoader().load(sceneFile);
 		rootNode = rootResource.instantiate();
 		storeNodes(rootResource, rootNode);
+	}
+
+	public static void saveScene() {
+		if(currentPath != null) {
+			YamlSerializer.writeToFile(rootResource, currentPath.toString());
+		}
 	}
 
 	private static void storeNodes(NodeResource resource, Node node) {

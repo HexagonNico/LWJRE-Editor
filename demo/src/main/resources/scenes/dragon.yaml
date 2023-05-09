@@ -1,13 +1,11 @@
 !!gamma.engine.tree.NodeResource
+children:
+  model: !!gamma.engine.tree.NodeResource
+    type: gamma.engine.tree.ModelRenderer
+    properties: {shader: !getOrLoad 'gamma/engine/shaders/default_shader.glsl', model: !getOrLoad 'models/dragon.obj'}
 type: gamma.engine.tree.DynamicBody3D
 properties:
   boundingBox: !!vecmatlib.vector.Vec3f [7.25, 4.8, 2.75]
   offset: !!vecmatlib.vector.Vec3f [-0.2, 2.75, -0.25]
-  mass: 100.0
   restitution: 0.25
-children:
-  model: !!gamma.engine.tree.NodeResource
-    type: gamma.engine.tree.ModelRenderer
-    properties:
-      model: !getOrLoad models/dragon.obj
-      shader: !getOrLoad gamma/engine/shaders/default_shader.glsl
+  mass: 100.0
