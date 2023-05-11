@@ -53,6 +53,10 @@ public class EditorScene {
 		return NODES_IN_SCENE.get(resource);
 	}
 
+	public static boolean contains(NodeResource resource) {
+		return NODES_IN_SCENE.containsKey(resource);
+	}
+
 	public static Node removeNode(NodeResource resource) {
 		Node node = NODES_IN_SCENE.remove(resource);
 		node.getParent().removeChild(node);

@@ -1,11 +1,11 @@
 package gamma.editor.gui;
 
 import gamma.editor.EditorClassLoader;
+import gamma.editor.controls.Clipboard;
 import gamma.editor.controls.DragDropPayload;
 import gamma.editor.controls.EditorScene;
 import gamma.engine.tree.Node;
 import gamma.engine.tree.NodeResource;
-import gamma.engine.utils.Reflection;
 import imgui.ImGui;
 import org.lwjgl.glfw.GLFW;
 
@@ -41,20 +41,34 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 				EditorClassLoader.getNodeClasses().forEach(nodeClass -> {
 					if(ImGui.menuItem(nodeClass.getSimpleName())) {
 						NodeResource addedNodeResource = new NodeResource(nodeClass.getName());
-						EditorScene.putNode(node, addedNodeResource, (Node) Reflection.instantiate(nodeClass));
+						EditorScene.putNode(node, addedNodeResource, addedNodeResource.instantiate());
 					}
 				});
 				ImGui.endMenu();
 			}
 			ImGui.separator();
 			if(ImGui.menuItem("Cut", "Ctrl+X")) {
-
+				Clipboard.setContent(node, () -> {
+					parent.children.values().remove(node);
+					return label;
+				});
 			}
 			if(ImGui.menuItem("Copy", "Ctrl+C")) {
-
+				Clipboard.setContent(new NodeResource(node), () -> label);
 			}
 			if(ImGui.menuItem("Paste", "Ctrl+V")) {
-
+				if(Clipboard.getContent() instanceof NodeResource nodeResource) {
+					if(EditorScene.contains(nodeResource)) {
+						Node actualNode = EditorScene.removeNode(nodeResource);
+						String key = (String) Clipboard.notifyPaste();
+						EditorScene.putNode(node, nodeResource, key, actualNode);
+						Clipboard.setContent(new NodeResource(nodeResource), () -> key);
+					} else {
+						String key = (String) Clipboard.notifyPaste();
+						EditorScene.putNode(node, nodeResource, key, nodeResource.instantiate());
+						Clipboard.setContent(new NodeResource(nodeResource), () -> key);
+					}
+				}
 			}
 			ImGui.separator();
 			if(ImGui.menuItem("Delete node", "Del")) {

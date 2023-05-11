@@ -1,7 +1,9 @@
 package gamma.editor.gui;
 
+import gamma.editor.controls.Clipboard;
 import gamma.editor.controls.DragDropPayload;
 import imgui.ImGui;
+import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiMouseButton;
 import imgui.flag.ImGuiTreeNodeFlags;
@@ -28,7 +30,13 @@ public abstract class TreeGui<N> extends EditorGui {
 			flags = flags | ImGuiTreeNodeFlags.Selected;
 		}
 		String label = parent != null ? this.getLabel(node, parent) : "root";
+		if(node.equals(Clipboard.getContent())) {
+			ImGui.pushStyleColor(ImGuiCol.Text, 0.7f, 0.7f, 0.7f, 1.0f);
+		}
 		if(ImGui.treeNodeEx(this.renaming && this.isSelected(node) ? "##" + label : label, flags)) {
+			if(node.equals(Clipboard.getContent())) {
+				ImGui.popStyleColor();
+			}
 			this.onDrawNode(node, label, parent);
 			if(!this.isLeaf(node)) {
 				this.getChildren(node).forEach(child -> this.drawNode(child, node));
