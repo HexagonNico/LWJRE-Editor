@@ -1,7 +1,10 @@
 package gamma.editor.gui;
 
+import gamma.editor.controls.Clipboard;
 import gamma.editor.controls.DragDropPayload;
 import gamma.editor.controls.EditorScene;
+import imgui.ImGui;
+import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,6 +23,92 @@ public class FileSystemGui extends TreeGui<Path> {
 	@Override
 	protected String title() {
 		return "File System";
+	}
+
+	@Override
+	protected void onDraw() {
+		super.onDraw();
+		if(ImGui.isWindowFocused()) {
+			if(ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_CONTROL)) {
+				if(ImGui.isKeyPressed(GLFW.GLFW_KEY_N)) {
+					newDirectory(this.getSelected(), this.getSelected().getParent());
+				} else if(!this.getSelected().equals(this.getRoot()) && ImGui.isKeyPressed(GLFW.GLFW_KEY_X)) {
+					cutPath(this.getSelected());
+				} else if(!this.getSelected().equals(this.getRoot()) && ImGui.isKeyPressed(GLFW.GLFW_KEY_C)) {
+					copyPath(this.getSelected());
+				} else if(ImGui.isKeyPressed(GLFW.GLFW_KEY_V)) {
+					pastePath(this.getSelected());
+				}
+			}
+		}
+	}
+
+	@Override
+	protected void onDrawNode(Path path, String label, Path parent) {
+		super.onDrawNode(path, label, parent);
+		if(ImGui.beginPopupContextItem()) {
+			this.onSelect(path);
+			if(ImGui.menuItem("New folder", "Ctrl+N")) {
+				newDirectory(path, parent);
+			}
+			ImGui.separator();
+			if(ImGui.menuItem("Cut", "Ctrl+X")) {
+				cutPath(path);
+			}
+			if(ImGui.menuItem("Copy", "Ctrl+C")) {
+				copyPath(path);
+			}
+			if(ImGui.menuItem("Paste", "Ctrl+V")) {
+				pastePath(path);
+			}
+			ImGui.separator();
+			if(ImGui.menuItem("Delete", "Del")) {
+
+			}
+			ImGui.endPopup();
+		}
+	}
+
+	private static void newDirectory(Path path, Path parent) {
+		try {
+			Path newPath = Files.isDirectory(path) ? Path.of(path.toString(), "folder") : Path.of(parent.toString(), "folder");
+			Files.createDirectories(newPath);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void cutPath(Path path) {
+		Clipboard.setContent(path, target -> {
+			try {
+				if(!Files.isDirectory((Path) target))
+					target = ((Path) target).getParent();
+				Path result = Files.move(path, Path.of(target.toString(), path.getFileName().toString()));
+				copyPath(result);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+	}
+
+	private static void copyPath(Path path) {
+		// TODO: Contents of directories are not copied
+		Clipboard.setContent(path.toAbsolutePath(), target -> {
+			try {
+				if(!Files.isDirectory((Path) target))
+					target = ((Path) target).getParent();
+				Files.copy(path, Path.of(target.toString(), path.getFileName().toString()));
+				copyPath(path);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+	}
+
+	private static void pastePath(Path target) {
+		if(Clipboard.getContent() instanceof Path) {
+			Clipboard.paste(target);
+		}
 	}
 
 	@Override
@@ -59,7 +148,7 @@ public class FileSystemGui extends TreeGui<Path> {
 	@Override
 	protected void onDragDropTarget(Path target, DragDropPayload payload) {
 		if(payload.object() instanceof Path dropPath) try {
-			if(!isDescendant(target, dropPath)) {
+			if(!isDescendant(dropPath, target)) {
 				target = Files.isDirectory(target) ? target : target.getParent();
 				target = Path.of(target.toString(), dropPath.getFileName().toString());
 				Files.move(dropPath, target);
@@ -69,11 +158,12 @@ public class FileSystemGui extends TreeGui<Path> {
 		}
 	}
 
+	// TODO: This is broken
 	private static boolean isDescendant(Path ancestor, Path descendant) {
 		if(descendant.getParent().equals(ancestor)) {
 			return true;
 		} else try(Stream<Path> files = Files.list(ancestor)) {
-			return files.anyMatch(next -> isDescendant(next, descendant));
+			return files.filter(Files::isDirectory).anyMatch(next -> isDescendant(next, descendant));
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;

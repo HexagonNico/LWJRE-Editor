@@ -25,14 +25,6 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 	}
 
 	@Override
-	protected void onDraw() {
-		super.onDraw();
-		if(ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_CONTROL)) {
-
-		}
-	}
-
-	@Override
 	protected void onDrawNode(NodeResource node, String label, NodeResource parent) {
 		super.onDrawNode(node, label, parent);
 		if(ImGui.beginPopupContextItem()) {
@@ -47,41 +39,57 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 				ImGui.endMenu();
 			}
 			ImGui.separator();
-			if(ImGui.menuItem("Cut", "Ctrl+X")) {
-				Clipboard.setContent(node, () -> {
-					parent.children.values().remove(node);
-					return label;
-				});
+			if(!node.equals(this.getRoot()) && ImGui.menuItem("Cut", "Ctrl+X")) {
+				cutNode(node, parent, label);
 			}
-			if(ImGui.menuItem("Copy", "Ctrl+C")) {
-				Clipboard.setContent(new NodeResource(node), () -> label);
+			if(!node.equals(this.getRoot()) && ImGui.menuItem("Copy", "Ctrl+C")) {
+				copyNode(node, label);
 			}
 			if(ImGui.menuItem("Paste", "Ctrl+V")) {
-				if(Clipboard.getContent() instanceof NodeResource nodeResource) {
-					if(EditorScene.contains(nodeResource)) {
-						Node actualNode = EditorScene.removeNode(nodeResource);
-						String key = (String) Clipboard.notifyPaste();
-						EditorScene.putNode(node, nodeResource, key, actualNode);
-						Clipboard.setContent(new NodeResource(nodeResource), () -> key);
-					} else {
-						String key = (String) Clipboard.notifyPaste();
-						EditorScene.putNode(node, nodeResource, key, nodeResource.instantiate());
-						Clipboard.setContent(new NodeResource(nodeResource), () -> key);
-					}
-				}
+				pasteNode(node);
 			}
 			ImGui.separator();
-			if(ImGui.menuItem("Delete node", "Del")) {
+			if(!node.equals(this.getRoot()) && ImGui.menuItem("Delete node", "Del")) {
 				this.deleteNode(node, parent);
 			}
 			ImGui.endPopup();
 		}
-		if(ImGui.isWindowFocused()) {
-			if(node.equals(this.getSelected())) {
-				if(ImGui.isKeyPressed(GLFW.GLFW_KEY_DELETE)) {
-					this.deleteNode(node, parent);
+		if(ImGui.isWindowFocused() && this.isSelected(node)) {
+			if(ImGui.isKeyPressed(GLFW.GLFW_KEY_DELETE)) {
+				this.deleteNode(node, parent);
+			}
+			if(ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_CONTROL)) {
+				if(!node.equals(this.getRoot()) && ImGui.isKeyPressed(GLFW.GLFW_KEY_X)) {
+					cutNode(node, parent, label);
+				} else if(!node.equals(this.getRoot()) && ImGui.isKeyPressed(GLFW.GLFW_KEY_C)) {
+					copyNode(node, label);
+				} else if(ImGui.isKeyPressed(GLFW.GLFW_KEY_V)) {
+					pasteNode(node);
 				}
 			}
+		}
+	}
+
+	private static void cutNode(NodeResource node, NodeResource parent, String label) {
+		Clipboard.setContent(node, target -> {
+			Node actualNode = EditorScene.removeNode(node);
+			parent.children.values().remove(node);
+			EditorScene.putNode((NodeResource) target, node, label, actualNode);
+			copyNode(node, label);
+		});
+	}
+
+	private static void copyNode(NodeResource node, String label) {
+		NodeResource copy = new NodeResource(node);
+		Clipboard.setContent(copy, target -> {
+			EditorScene.putNode((NodeResource) target, copy, label, copy.instantiate());
+			copyNode(node, label);
+		});
+	}
+
+	private static void pasteNode(NodeResource target) {
+		if(Clipboard.getContent() instanceof NodeResource) {
+			Clipboard.paste(target);
 		}
 	}
 
