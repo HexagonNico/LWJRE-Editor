@@ -158,16 +158,15 @@ public class FileSystemGui extends TreeGui<Path> {
 		}
 	}
 
-	// TODO: This is broken
 	private static boolean isDescendant(Path ancestor, Path descendant) {
 		if(descendant.getParent().equals(ancestor)) {
 			return true;
-		} else try(Stream<Path> files = Files.list(ancestor)) {
+		} else if(Files.isDirectory(ancestor)) try(Stream<Path> files = Files.list(ancestor)) {
 			return files.filter(Files::isDirectory).anyMatch(next -> isDescendant(next, descendant));
 		} catch (IOException e) {
 			e.printStackTrace();
-			return false;
 		}
+		return false;
 	}
 
 	@Override

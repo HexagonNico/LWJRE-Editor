@@ -52,7 +52,7 @@ public class EditorScene {
 		return !Objects.equals(first.type, second.type) ||
 				!Objects.equals(first.override, second.override) ||
 				!first.properties.equals(second.properties) ||
-				first.children.keySet().stream().anyMatch(key -> notEquals(first.children.get(key), second.children.get(key)));
+				first.children.keySet().stream().anyMatch(key -> !second.children.containsKey(key) || notEquals(first.children.get(key), second.children.get(key)));
 	}
 
 	private static void storeNodes(NodeResource resource, Node node) {
