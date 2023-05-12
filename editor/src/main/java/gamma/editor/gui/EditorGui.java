@@ -1,7 +1,5 @@
 package gamma.editor.gui;
 
-import imgui.ImGui;
-
 import java.util.HashSet;
 
 public abstract class EditorGui {
@@ -12,23 +10,16 @@ public abstract class EditorGui {
 		GUI.add(gui);
 	}
 
+	public static void remove(EditorGui gui) {
+		GUI.remove(gui);
+	}
+
 	public static void clear() {
 		GUI.clear();
 	}
 
 	public static void drawGui() {
-		GUI.forEach(gui -> {
-			if(ImGui.begin(gui.title(), gui.flags())) {
-				gui.onDraw();
-			}
-			ImGui.end();
-		});
-	}
-
-	protected abstract String title();
-
-	protected int flags() {
-		return 0;
+		GUI.forEach(EditorGui::onDraw);
 	}
 
 	protected abstract void onDraw();

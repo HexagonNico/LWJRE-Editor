@@ -9,13 +9,13 @@ import imgui.flag.ImGuiMouseButton;
 import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.type.ImString;
 
-public abstract class TreeGui<N> extends EditorGui {
+public abstract class TreeGui<N> extends WindowGui {
 
 	private N selected;
 	private boolean renaming = false;
 
 	@Override
-	protected void onDraw() {
+	protected void drawWindow() {
 		N root = this.getRoot();
 		if(root != null) {
 			this.drawNode(root, null);
@@ -29,7 +29,7 @@ public abstract class TreeGui<N> extends EditorGui {
 		if(node.equals(this.selected)) {
 			flags = flags | ImGuiTreeNodeFlags.Selected;
 		}
-		String label = parent != null ? this.getLabel(node, parent) : "root";
+		String label = this.getLabel(node, parent);
 		if(node.equals(Clipboard.getContent())) {
 			ImGui.pushStyleColor(ImGuiCol.Text, 0.7f, 0.7f, 0.7f, 1.0f);
 		}

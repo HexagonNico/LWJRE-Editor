@@ -26,8 +26,8 @@ public class FileSystemGui extends TreeGui<Path> {
 	}
 
 	@Override
-	protected void onDraw() {
-		super.onDraw();
+	protected void drawWindow() {
+		super.drawWindow();
 		if(ImGui.isWindowFocused()) {
 			if(ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_CONTROL)) {
 				if(ImGui.isKeyPressed(GLFW.GLFW_KEY_N)) {

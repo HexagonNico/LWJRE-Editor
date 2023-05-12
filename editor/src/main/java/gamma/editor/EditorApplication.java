@@ -26,6 +26,7 @@ public final class EditorApplication extends Application {
 		EditorGui.add(new SceneTreeGui(inspectorGui));
 		EditorGui.add(inspectorGui);
 		EditorGui.add(new SceneViewportGui());
+		EditorGui.add(new EditorMenuGui());
 	}
 
 	@Override

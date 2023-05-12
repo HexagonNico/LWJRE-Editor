@@ -18,7 +18,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 
-public class InspectorGui extends EditorGui {
+public class InspectorGui extends WindowGui {
 
 	private static final HashMap<Class<?>, InspectorField> FIELDS = new HashMap<>();
 
@@ -48,7 +48,7 @@ public class InspectorGui extends EditorGui {
 	}
 
 	@Override
-	protected void onDraw() {
+	protected void drawWindow() {
 		if(this.nodeResource != null) {
 			renderFields(this.nodeResource, this.nodeResource);
 		}

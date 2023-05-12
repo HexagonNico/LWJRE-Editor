@@ -7,11 +7,13 @@ import gamma.engine.utils.YamlSerializer;
 
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class EditorScene {
 
 	private static Path currentPath = null;
 
+	private static NodeResource copy = null;
 	private static NodeResource rootResource = null;
 	private static Node rootNode = new Node();
 
@@ -23,14 +25,34 @@ public class EditorScene {
 		Path resourcesFolder = Path.of("demo/src/main/resources");
 		String sceneFile = resourcesFolder.relativize(path).toString();
 		rootResource = (NodeResource) new YamlLoader().load(sceneFile);
+		copy = new NodeResource(rootResource);
 		rootNode = rootResource.instantiate();
 		storeNodes(rootResource, rootNode);
 	}
 
 	public static void saveScene() {
 		if(currentPath != null) {
+			copy = new NodeResource(rootResource);
 			YamlSerializer.writeToFile(rootResource, currentPath.toString());
 		}
+	}
+
+	public static String currentFileName() {
+		return currentPath.getFileName().toString();
+	}
+
+	public static boolean hasUnsavedChanges() {
+		if(rootResource != null && copy != null) {
+			return notEquals(rootResource, copy);
+		}
+		return false;
+	}
+
+	private static boolean notEquals(NodeResource first, NodeResource second) {
+		return !Objects.equals(first.type, second.type) ||
+				!Objects.equals(first.override, second.override) ||
+				!first.properties.equals(second.properties) ||
+				first.children.keySet().stream().anyMatch(key -> notEquals(first.children.get(key), second.children.get(key)));
 	}
 
 	private static void storeNodes(NodeResource resource, Node node) {

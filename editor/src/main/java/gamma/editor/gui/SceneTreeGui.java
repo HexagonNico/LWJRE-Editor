@@ -108,11 +108,16 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 
 	@Override
 	protected String getLabel(NodeResource node, NodeResource parent) {
-		return parent.children.entrySet().stream()
-				.filter(entry -> entry.getValue().equals(node))
-				.findFirst()
-				.map(Map.Entry::getKey)
-				.orElse("Node");
+		if(parent == null) {
+			String fileName = EditorScene.currentFileName();
+			return fileName.substring(0, fileName.lastIndexOf('.'));
+		} else {
+			return parent.children.entrySet().stream()
+					.filter(entry -> entry.getValue().equals(node))
+					.findFirst()
+					.map(Map.Entry::getKey)
+					.orElse("Node");
+		}
 	}
 
 	@Override

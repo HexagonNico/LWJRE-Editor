@@ -2,12 +2,14 @@ package gamma.editor.gui;
 
 import gamma.editor.controls.EditorCamera;
 import gamma.editor.controls.EditorFrameBuffer;
+import gamma.editor.controls.EditorScene;
 import gamma.engine.rendering.RenderingSystem;
 import imgui.ImGui;
 import imgui.ImVec2;
+import imgui.flag.ImGuiWindowFlags;
 import org.lwjgl.opengl.GL11;
 
-public class SceneViewportGui extends EditorGui {
+public class SceneViewportGui extends WindowGui {
 
 	private final EditorFrameBuffer frameBuffer = new EditorFrameBuffer(1920, 1080); // TODO: Use correct size
 	private final EditorCamera camera = new EditorCamera();
@@ -18,7 +20,12 @@ public class SceneViewportGui extends EditorGui {
 	}
 
 	@Override
-	protected void onDraw() {
+	protected int flags() {
+		return EditorScene.hasUnsavedChanges() ? ImGuiWindowFlags.UnsavedDocument : 0;
+	}
+
+	@Override
+	protected void drawWindow() {
 		this.frameBuffer.bindAndDraw(() -> {
 			GL11.glViewport(0, 0, 1920, 1080);
 			this.camera.update();
