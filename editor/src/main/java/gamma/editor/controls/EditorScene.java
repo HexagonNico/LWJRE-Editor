@@ -37,6 +37,10 @@ public class EditorScene {
 		}
 	}
 
+	public static Path currentPath() {
+		return currentPath;
+	}
+
 	public static String currentFileName() {
 		return currentPath.getFileName().toString();
 	}

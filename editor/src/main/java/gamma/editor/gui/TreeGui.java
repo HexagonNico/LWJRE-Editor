@@ -61,14 +61,14 @@ public abstract class TreeGui<N> extends WindowGui {
 	private void dragDrop(String label, N node) {
 		if(!this.dragDropType().isEmpty()) {
 			if(ImGui.beginDragDropSource()) {
-				ImGui.setDragDropPayload(this.dragDropType(), new DragDropPayload(node, label));
+				ImGui.setDragDropPayload(new DragDropPayload(node, label));
 				ImGui.text(label);
 				ImGui.endDragDropSource();
 			}
 			if(ImGui.beginDragDropTarget()) {
-				Object payload = ImGui.acceptDragDropPayload(this.dragDropType());
-				if(payload instanceof DragDropPayload) {
-					this.onDragDropTarget(node, (DragDropPayload) payload);
+				DragDropPayload payload = ImGui.acceptDragDropPayload(DragDropPayload.class);
+				if(payload != null) {
+					this.onDragDropTarget(node, payload);
 				}
 				ImGui.endDragDropTarget();
 			}

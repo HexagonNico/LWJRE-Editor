@@ -1,6 +1,10 @@
 !!gamma.engine.tree.NodeResource
 children:
-  dragon: !!gamma.engine.tree.NodeResource
+  dragon2: !!gamma.engine.tree.NodeResource
+    override: scenes/dragon.yaml
+    properties:
+      position: !!vecmatlib.vector.Vec3f [0.0, 15.0, 2.0]
+  dragon1: !!gamma.engine.tree.NodeResource
     override: scenes/dragon.yaml
     properties:
       position: !!vecmatlib.vector.Vec3f [0.0, 7.0, -1.0]

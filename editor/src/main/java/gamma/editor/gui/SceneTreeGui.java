@@ -9,7 +9,11 @@ import gamma.engine.tree.NodeResource;
 import imgui.ImGui;
 import org.lwjgl.glfw.GLFW;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class SceneTreeGui extends TreeGui<NodeResource> {
 
@@ -36,6 +40,20 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 						EditorScene.putNode(node, addedNodeResource, addedNodeResource.instantiate());
 					}
 				});
+				ImGui.endMenu();
+			}
+			if(ImGui.beginMenu("Add child scene")) {
+				try(Stream<Path> files = Files.walk(Path.of("demo/src/main/resources"))) {
+					files.forEach(path -> {
+						String fileName = path.getFileName().toString();
+						String menuItem = Path.of("demo/src/main/resources").relativize(path).toString();
+						if((fileName.endsWith(".yaml") || fileName.endsWith(".yml")) && ImGui.menuItem(menuItem)) {
+							instantiateChildScene(path, node);
+						}
+					});
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				ImGui.endMenu();
 			}
 			ImGui.separator();
@@ -101,6 +119,17 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 		}
 	}
 
+	private static void instantiateChildScene(Path filePath, NodeResource target) {
+		if(!filePath.equals(EditorScene.currentPath())) {
+			String path = Path.of("demo/src/main/resources").relativize(filePath).toString();
+			if(path.endsWith(".yaml") || path.endsWith(".yml")) {
+				NodeResource resource = new NodeResource();
+				resource.override = path;
+				EditorScene.putNode(target, resource, path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.')), resource.instantiate());
+			}
+		}
+	}
+
 	@Override
 	protected NodeResource getRoot() {
 		return EditorScene.rootResource();
@@ -146,6 +175,8 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 				Node node = EditorScene.removeNode(resource);
 				EditorScene.putNode(target, resource, payload.label(), node);
 			}
+		} else if(payload.object() instanceof Path filePath) {
+			instantiateChildScene(filePath, target);
 		}
 	}
 
