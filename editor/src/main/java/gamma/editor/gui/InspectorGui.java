@@ -60,7 +60,7 @@ public class InspectorGui extends WindowGui {
 				NodeResource override = NodeResource.getOrLoad(nodeResource.override);
 				renderFields(override, base);
 			} else if(nodeResource.type != null && !nodeResource.type.isEmpty()) {
-				Class<?> nodeClass = Class.forName(nodeResource.type);
+				Class<?> nodeClass = Thread.currentThread().getContextClassLoader().loadClass(nodeResource.type);
 				if(!nodeClass.equals(Node.class)) {
 					renderFields(nodeClass, base);
 				}

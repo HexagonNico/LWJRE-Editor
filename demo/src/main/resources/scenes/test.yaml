@@ -19,7 +19,7 @@ children:
         type: gamma.engine.tree.PointLight3D
         properties:
           color: !!vecmatlib.color.Color3f [1.0, 0.0, 1.0]
-          position: !!vecmatlib.vector.Vec3f [10.0, 10.0, 0.0]
+          position: !!vecmatlib.vector.Vec3f [-10.0, 10.0, 0.0]
       light2: !!gamma.engine.tree.NodeResource
         type: gamma.engine.tree.PointLight3D
         properties:

@@ -31,7 +31,7 @@ public class IntField implements InspectorField {
 		} else {
 			ImInt ptr = new ImInt(field.getInt(node));
 			if(ImGui.inputInt(label, ptr)) {
-				field.set(label, ptr.get());
+				field.set(node, ptr.get());
 				values.put(field.getName(), ptr.get());
 			}
 		}

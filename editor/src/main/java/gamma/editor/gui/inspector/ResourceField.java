@@ -1,5 +1,6 @@
 package gamma.editor.gui.inspector;
 
+import gamma.editor.ProjectPath;
 import gamma.editor.controls.DragDropPayload;
 import gamma.engine.annotations.DefaultResource;
 import gamma.engine.resources.FileUtils;
@@ -35,7 +36,7 @@ public class ResourceField implements InspectorField {
 		if(ImGui.beginDragDropTarget()) {
 			if(ImGui.acceptDragDropPayload("Path") instanceof DragDropPayload payload) {
 				if(payload.object() instanceof Path path) {
-					setResource(node, field, Path.of("demo/src/main/resources").relativize(path).toString(), values);
+					setResource(node, field, ProjectPath.resourcesFolder().relativize(path).toString(), values);
 				}
 			}
 			ImGui.endDragDropTarget();

@@ -1,5 +1,6 @@
 package gamma.editor.gui;
 
+import gamma.editor.ProjectPath;
 import gamma.editor.controls.Clipboard;
 import gamma.editor.controls.DragDropPayload;
 import gamma.editor.controls.EditorScene;
@@ -113,7 +114,7 @@ public class FileSystemGui extends TreeGui<Path> {
 
 	@Override
 	protected Path getRoot() {
-		return Path.of("demo/src/main/resources");
+		return ProjectPath.resourcesFolder();
 	}
 
 	@Override

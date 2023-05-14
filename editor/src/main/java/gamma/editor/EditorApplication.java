@@ -8,6 +8,7 @@ import imgui.ImGuiIO;
 import imgui.app.Application;
 import imgui.app.Configuration;
 import imgui.flag.ImGuiConfigFlags;
+import org.lwjgl.glfw.GLFW;
 
 public final class EditorApplication extends Application {
 
@@ -28,6 +29,14 @@ public final class EditorApplication extends Application {
 		EditorGui.add(inspectorGui);
 		EditorGui.add(new SceneViewportGui());
 		EditorGui.add(new EditorMenuGui());
+		// TODO: Move this in another class?
+		GLFW.glfwSetWindowFocusCallback(this.handle, (window, focused) -> {
+			if(focused) {
+				// TODO: Start `mvn clean install` here
+				Thread.currentThread().setContextClassLoader(new EditorClassLoader());
+				EditorScene.reload();
+			}
+		});
 	}
 
 	@Override

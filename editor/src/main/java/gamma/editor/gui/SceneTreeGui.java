@@ -1,6 +1,6 @@
 package gamma.editor.gui;
 
-import gamma.editor.EditorClassLoader;
+import gamma.editor.ProjectPath;
 import gamma.editor.controls.Clipboard;
 import gamma.editor.controls.DragDropPayload;
 import gamma.editor.controls.EditorScene;
@@ -34,7 +34,7 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 		if(ImGui.beginPopupContextItem()) {
 			this.onSelect(node);
 			if(ImGui.beginMenu("Add node")) {
-				EditorClassLoader.getNodeClasses().forEach(nodeClass -> {
+				ProjectPath.getNodeClasses().forEach(nodeClass -> {
 					if(ImGui.menuItem(nodeClass.getSimpleName())) {
 						NodeResource addedNodeResource = new NodeResource(nodeClass.getName());
 						EditorScene.putNode(node, addedNodeResource, addedNodeResource.instantiate());
@@ -43,10 +43,10 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 				ImGui.endMenu();
 			}
 			if(ImGui.beginMenu("Add child scene")) {
-				try(Stream<Path> files = Files.walk(Path.of("demo/src/main/resources"))) {
+				try(Stream<Path> files = Files.walk(ProjectPath.resourcesFolder())) {
 					files.forEach(path -> {
 						String fileName = path.getFileName().toString();
-						String menuItem = Path.of("demo/src/main/resources").relativize(path).toString();
+						String menuItem = ProjectPath.resourcesFolder().relativize(path).toString();
 						if((fileName.endsWith(".yaml") || fileName.endsWith(".yml")) && ImGui.menuItem(menuItem)) {
 							instantiateChildScene(path, node);
 						}
@@ -121,7 +121,7 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 
 	private static void instantiateChildScene(Path filePath, NodeResource target) {
 		if(!filePath.equals(EditorScene.currentPath())) {
-			String path = Path.of("demo/src/main/resources").relativize(filePath).toString();
+			String path = ProjectPath.resourcesFolder().relativize(filePath).toString();
 			if(path.endsWith(".yaml") || path.endsWith(".yml")) {
 				NodeResource resource = new NodeResource();
 				resource.override = path;
