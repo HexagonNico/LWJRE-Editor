@@ -1,5 +1,6 @@
 package gamma.editor;
 
+import gamma.editor.controls.EditorLayout;
 import gamma.editor.controls.EditorScene;
 import gamma.editor.gui.*;
 import imgui.ImGui;
@@ -38,6 +39,7 @@ public final class EditorApplication extends Application {
 
 	public static void main(String[] args) {
 		Thread.currentThread().setContextClassLoader(new EditorClassLoader());
+		EditorLayout.defaultLayout();
 		launch(new EditorApplication());
 	}
 }
