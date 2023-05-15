@@ -6,8 +6,8 @@ import gamma.engine.tree.Node3D;
 public class TestNode extends Node3D {
 
 	@EditorVariable
-	public int test = 0;
+	public String string = "Hello!";
 
 	@EditorVariable
-	public float test2 = 44.0f;
+	public int test = 0;
 }

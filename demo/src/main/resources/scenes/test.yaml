@@ -8,6 +8,9 @@ children:
     override: scenes/dragon.yaml
     properties:
       position: !!vecmatlib.vector.Vec3f [0.0, 7.0, -1.0]
+  test: !!gamma.engine.tree.NodeResource
+    type: gamma.editor.demo.TestNode
+    properties: {string: Gianni}
   camera: !!gamma.engine.tree.NodeResource
     type: gamma.engine.tree.Camera3D
     properties:

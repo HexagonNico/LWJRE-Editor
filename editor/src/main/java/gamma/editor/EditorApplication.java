@@ -8,7 +8,6 @@ import imgui.ImGuiIO;
 import imgui.app.Application;
 import imgui.app.Configuration;
 import imgui.flag.ImGuiConfigFlags;
-import org.lwjgl.glfw.GLFW;
 
 public final class EditorApplication extends Application {
 
@@ -23,27 +22,28 @@ public final class EditorApplication extends Application {
 		io.setIniFilename("editorLayout.ini");
 		io.setConfigFlags(ImGuiConfigFlags.DockingEnable);
 		io.setConfigWindowsMoveFromTitleBarOnly(true);
+		// TODO: Move this in another class
 		InspectorGui inspectorGui = new InspectorGui();
 		EditorGui.add(new FileSystemGui(inspectorGui));
 		EditorGui.add(new SceneTreeGui(inspectorGui));
 		EditorGui.add(inspectorGui);
 		EditorGui.add(new SceneViewportGui());
 		EditorGui.add(new EditorMenuGui());
-		// TODO: Move this in another class?
-		GLFW.glfwSetWindowFocusCallback(this.handle, (window, focused) -> {
-			if(focused) {
-				// TODO: Start `mvn clean install` here
-				Thread.currentThread().setContextClassLoader(new EditorClassLoader());
-				EditorScene.reload();
-			}
-		});
+		DynamicLoader.reloadDependencies();
+		DynamicLoader.reloadProject();
 	}
 
 	@Override
 	public void process() {
+		DynamicLoader.listenForChanges();
 		EditorScene.rootNode().editorProcess();
 		ImGui.dockSpaceOverViewport();
 		EditorGui.drawGui();
+	}
+
+	@Override
+	protected void postRun() {
+		DynamicLoader.closeWatchService();
 	}
 
 	public static void main(String[] args) {

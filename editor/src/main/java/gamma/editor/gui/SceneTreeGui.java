@@ -1,5 +1,6 @@
 package gamma.editor.gui;
 
+import gamma.editor.DynamicLoader;
 import gamma.editor.ProjectPath;
 import gamma.editor.controls.Clipboard;
 import gamma.editor.controls.DragDropPayload;
@@ -34,7 +35,7 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 		if(ImGui.beginPopupContextItem()) {
 			this.onSelect(node);
 			if(ImGui.beginMenu("Add node")) {
-				ProjectPath.getNodeClasses().forEach(nodeClass -> {
+				DynamicLoader.getNodeClasses().forEach(nodeClass -> {
 					if(ImGui.menuItem(nodeClass.getSimpleName())) {
 						NodeResource addedNodeResource = new NodeResource(nodeClass.getName());
 						EditorScene.putNode(node, addedNodeResource, addedNodeResource.instantiate());
