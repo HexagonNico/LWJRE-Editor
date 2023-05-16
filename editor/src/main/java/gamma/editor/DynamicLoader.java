@@ -59,11 +59,15 @@ public final class DynamicLoader {
 	public static void reloadProject() {
 		try {
 			// TODO: Execute this in the right directory
-			Runtime.getRuntime().exec("mvn clean install").waitFor();
-			Thread.currentThread().setContextClassLoader(new EditorClassLoader());
-			reloadProject(ProjectPath.append("target/classes"));
-			reloadProject(ProjectPath.append("build/classes/java/main"));
-			EditorScene.reload();
+			if(Runtime.getRuntime().exec("mvn clean install").waitFor() == 0) {
+				Thread.currentThread().setContextClassLoader(new EditorClassLoader());
+				reloadProject(ProjectPath.append("target/classes"));
+				reloadProject(ProjectPath.append("build/classes/java/main"));
+				EditorScene.reload();
+			} else {
+				// TODO: Show the error message in a gui
+				System.err.println("Could not compile sources");
+			}
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}

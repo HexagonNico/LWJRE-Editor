@@ -38,9 +38,11 @@ public class EditorScene {
 	}
 
 	public static void reload() {
-		NODES_IN_SCENE.clear();
-		rootNode = rootResource.instantiate();
-		storeNodes(rootResource, rootNode);
+		if(rootResource != null) {
+			NODES_IN_SCENE.clear();
+			rootNode = rootResource.instantiate();
+			storeNodes(rootResource, rootNode);
+		}
 	}
 
 	public static Path currentPath() {
