@@ -26,7 +26,7 @@ public class EditorScene {
 		String sceneFile = ProjectPath.resourcesFolder().relativize(path).toString();
 		rootResource = (NodeResource) new YamlLoader().load(sceneFile);
 		copy = new NodeResource(rootResource);
-		rootNode = rootResource.instantiate(); // FIXME: Classes cannot be found if they cannot be compiled
+		rootNode = rootResource.instantiate();
 		storeNodes(rootResource, rootNode);
 	}
 
@@ -40,7 +40,7 @@ public class EditorScene {
 	public static void reload() {
 		if(rootResource != null) {
 			NODES_IN_SCENE.clear();
-			rootNode = rootResource.instantiate(); // FIXME: Fields may have changed name when the class is reloaded
+			rootNode = rootResource.instantiate();
 			storeNodes(rootResource, rootNode);
 		}
 	}
@@ -69,10 +69,7 @@ public class EditorScene {
 
 	private static void storeNodes(NodeResource resource, Node node) {
 		NODES_IN_SCENE.put(resource, node);
-		resource.children.forEach((key, childResource) -> {
-			Node childNode = node.getChild(key).orElseThrow();
-			storeNodes(childResource, childNode);
-		});
+		resource.children.forEach((key, childResource) -> node.getChild(key).ifPresent(childNode -> storeNodes(childResource, childNode)));
 	}
 
 	public static NodeResource rootResource() {

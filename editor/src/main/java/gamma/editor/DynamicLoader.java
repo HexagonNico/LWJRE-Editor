@@ -1,7 +1,8 @@
 package gamma.editor;
 
 import gamma.editor.controls.EditorScene;
-import gamma.editor.gui.PopupModalGui;
+import gamma.editor.gui.CompileErrorPopupGui;
+import gamma.editor.gui.ReloadingPopupGui;
 import gamma.engine.tree.Node;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -64,18 +65,18 @@ public final class DynamicLoader {
 				reloadProject(ProjectPath.append("build/classes/java/main"));
 				EditorScene.reload();
 			} else {
-				PopupModalGui.show("Error", "Could not compile sources", true);
+				CompileErrorPopupGui.showPopup();
 			}
 			reloadProcess = null;
-			PopupModalGui.hide();
+			ReloadingPopupGui.hidePopup();
 		}
 	}
 
 	public static void reloadProject() {
-		PopupModalGui.show("Reloading...", "Compiling sources...");
+		ReloadingPopupGui.showPopup();
 		try {
 			// TODO: Execute this in the right directory
-			reloadProcess = Runtime.getRuntime().exec("mvn clean install");
+			reloadProcess = Runtime.getRuntime().exec("mvn install");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

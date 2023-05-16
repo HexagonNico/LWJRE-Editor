@@ -33,6 +33,8 @@ public abstract class EditorGui {
 		add(new InspectorGui());
 		add(new SceneViewportGui());
 		add(new EditorMenuGui());
+		add(new ReloadingPopupGui());
+		add(new CompileErrorPopupGui());
 	}
 
 	public static void drawGui() {
