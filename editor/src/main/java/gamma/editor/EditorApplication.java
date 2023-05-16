@@ -2,7 +2,7 @@ package gamma.editor;
 
 import gamma.editor.controls.EditorLayout;
 import gamma.editor.controls.EditorScene;
-import gamma.editor.gui.*;
+import gamma.editor.gui.EditorGui;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.app.Application;
@@ -22,13 +22,7 @@ public final class EditorApplication extends Application {
 		io.setIniFilename("editorLayout.ini");
 		io.setConfigFlags(ImGuiConfigFlags.DockingEnable);
 		io.setConfigWindowsMoveFromTitleBarOnly(true);
-		// TODO: Move this in another class
-		InspectorGui inspectorGui = new InspectorGui();
-		EditorGui.add(new FileSystemGui(inspectorGui));
-		EditorGui.add(new SceneTreeGui(inspectorGui));
-		EditorGui.add(inspectorGui);
-		EditorGui.add(new SceneViewportGui());
-		EditorGui.add(new EditorMenuGui());
+		EditorGui.showProjectGui();
 		DynamicLoader.reloadDependencies();
 		DynamicLoader.reloadProject();
 	}

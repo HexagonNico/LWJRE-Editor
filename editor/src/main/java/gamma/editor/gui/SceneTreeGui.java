@@ -18,12 +18,6 @@ import java.util.stream.Stream;
 
 public class SceneTreeGui extends TreeGui<NodeResource> {
 
-	private final InspectorGui inspector;
-
-	public SceneTreeGui(InspectorGui inspector) {
-		this.inspector = inspector;
-	}
-
 	@Override
 	protected String title() {
 		return "Scene tree";
@@ -116,7 +110,7 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 		if(!node.equals(this.getRoot())) {
 			EditorScene.removeNode(node);
 			parent.children.values().remove(node);
-			this.inspector.nodeResource = null;
+			EditorGui.get(InspectorGui.class).ifPresent(inspector -> inspector.nodeResource = null);
 		}
 	}
 
@@ -197,7 +191,7 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 
 	@Override
 	protected void onSelect(NodeResource node) {
-		this.inspector.nodeResource = node;
+		EditorGui.get(InspectorGui.class).ifPresent(inspector -> inspector.nodeResource = node);
 		super.onSelect(node);
 	}
 

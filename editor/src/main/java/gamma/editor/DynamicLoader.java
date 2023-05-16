@@ -57,6 +57,7 @@ public final class DynamicLoader {
 	}
 
 	public static void reloadProject() {
+		// TODO: Show a gui that says "reloading..."
 		try {
 			// TODO: Execute this in the right directory
 			if(Runtime.getRuntime().exec("mvn clean install").waitFor() == 0) {

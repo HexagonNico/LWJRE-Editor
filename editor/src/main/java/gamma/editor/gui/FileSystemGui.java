@@ -15,12 +15,6 @@ import java.util.stream.Stream;
 
 public class FileSystemGui extends TreeGui<Path> {
 
-	private final InspectorGui inspector;
-
-	public FileSystemGui(InspectorGui inspector) {
-		this.inspector = inspector;
-	}
-
 	@Override
 	protected String title() {
 		return "File System";
@@ -174,7 +168,7 @@ public class FileSystemGui extends TreeGui<Path> {
 	protected void onDoubleClick(Path path) {
 		String pathStr = path.toString();
 		if(pathStr.endsWith(".yaml") || pathStr.endsWith(".yml")) {
-			this.inspector.nodeResource = null;
+			EditorGui.get(InspectorGui.class).ifPresent(inspector -> inspector.nodeResource = null);
 			EditorScene.changeScene(path);
 		}
 	}
