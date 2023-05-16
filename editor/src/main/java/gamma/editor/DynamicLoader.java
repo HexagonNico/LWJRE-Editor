@@ -1,6 +1,7 @@
 package gamma.editor;
 
 import gamma.editor.controls.EditorScene;
+import gamma.editor.gui.PopupModalGui;
 import gamma.engine.tree.Node;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -43,6 +44,8 @@ public final class DynamicLoader {
 		return NODE_CLASSES.values();
 	}
 
+	private static Process reloadProcess;
+
 	public static void listenForChanges() {
 		WatchKey watchKey = WATCH_SERVICE.poll();
 		if(watchKey != null) {
@@ -54,22 +57,26 @@ public final class DynamicLoader {
 			}
 			watchKey.reset();
 		}
-	}
-
-	public static void reloadProject() {
-		// TODO: Show a gui that says "reloading..."
-		try {
-			// TODO: Execute this in the right directory
-			if(Runtime.getRuntime().exec("mvn clean install").waitFor() == 0) {
+		if(reloadProcess != null && !reloadProcess.isAlive()) {
+			if(reloadProcess.exitValue() == 0) {
 				Thread.currentThread().setContextClassLoader(new EditorClassLoader());
 				reloadProject(ProjectPath.append("target/classes"));
 				reloadProject(ProjectPath.append("build/classes/java/main"));
 				EditorScene.reload();
 			} else {
-				// TODO: Show the error message in a gui
-				System.err.println("Could not compile sources");
+				PopupModalGui.show("Error", "Could not compile sources", true);
 			}
-		} catch (IOException | InterruptedException e) {
+			reloadProcess = null;
+			PopupModalGui.hide();
+		}
+	}
+
+	public static void reloadProject() {
+		PopupModalGui.show("Reloading...", "Compiling sources...");
+		try {
+			// TODO: Execute this in the right directory
+			reloadProcess = Runtime.getRuntime().exec("mvn clean install");
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
