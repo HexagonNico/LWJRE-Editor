@@ -3,6 +3,7 @@ package gamma.editor.gui;
 import gamma.editor.controls.EditorCamera;
 import gamma.editor.controls.EditorFrameBuffer;
 import gamma.editor.controls.EditorScene;
+import gamma.engine.rendering.DebugRenderer;
 import gamma.engine.rendering.RenderingSystem;
 import imgui.ImGui;
 import imgui.ImVec2;
@@ -30,6 +31,9 @@ public class SceneViewportGui extends WindowGui {
 			GL11.glViewport(0, 0, 1920, 1080);
 			this.camera.update();
 			RenderingSystem.render();
+			DebugRenderer.render();
+			DebugRenderer.clear();
+			GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
 			RenderingSystem.clearRenderer();
 		});
 		// TODO: Delete the frame buffer when the application is closed
