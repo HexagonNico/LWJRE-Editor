@@ -13,21 +13,20 @@ children:
       position: !!vecmatlib.vector.Vec3f [0.0, 3.0, 15.0]
   floor: !!gamma.engine.tree.NodeResource
     children:
-      light1: !!gamma.engine.tree.NodeResource
+      lightBlue: !!gamma.engine.tree.NodeResource
         type: gamma.engine.tree.PointLight3D
         properties:
-          color: !!vecmatlib.color.Color3f [1.0, 0.0, 1.0]
-          position: !!vecmatlib.vector.Vec3f [-10.0, 20.0, 0.0]
-      light2: !!gamma.engine.tree.NodeResource
-        type: gamma.engine.tree.PointLight3D
-        properties:
-          color: !!vecmatlib.color.Color3f [0.0, 0.0, 1.0]
+          diffuse: !!vecmatlib.color.Color3f [0.0, 0.0, 1.0]
           position: !!vecmatlib.vector.Vec3f [0.0, 20.0, 0.0]
+      lightPurple: !!gamma.engine.tree.NodeResource
+        type: gamma.engine.tree.PointLight3D
+        properties:
+          diffuse: !!vecmatlib.color.Color3f [1.0, 0.0, 1.0]
+          position: !!vecmatlib.vector.Vec3f [-10.0, 20.0, 0.0]
     type: gamma.engine.tree.DynamicBody3D
     properties:
+      boundingBox: !!vecmatlib.vector.Vec3f [10.0, 1.0, 10.0]
       restitution: 1
       immovable: true
       mass: 10000.0
-      scale: !!vecmatlib.vector.Vec3f [10.0, 1.0, 10.0]
-      position: !!vecmatlib.vector.Vec3f [0.0, 0.0, 0.0]
 type: gamma.engine.tree.Node

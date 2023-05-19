@@ -4,6 +4,8 @@ import gamma.editor.ProjectPath;
 import gamma.engine.resources.YamlLoader;
 import gamma.engine.tree.Node;
 import gamma.engine.tree.NodeResource;
+import gamma.engine.utils.Reflection;
+import gamma.engine.utils.ReflectionException;
 import gamma.engine.utils.YamlSerializer;
 
 import java.nio.file.Path;
@@ -26,6 +28,7 @@ public class EditorScene {
 		String sceneFile = ProjectPath.resourcesFolder().relativize(path).toString();
 		rootResource = (NodeResource) new YamlLoader().load(sceneFile);
 		copy = new NodeResource(rootResource);
+		removeMissingFields(rootResource);
 		rootNode = rootResource.instantiate();
 		storeNodes(rootResource, rootNode);
 	}
@@ -40,9 +43,27 @@ public class EditorScene {
 	public static void reload() {
 		if(rootResource != null) {
 			NODES_IN_SCENE.clear();
+			removeMissingFields(rootResource);
 			rootNode = rootResource.instantiate();
 			storeNodes(rootResource, rootNode);
 		}
+	}
+
+	private static void removeMissingFields(NodeResource resource) {
+		resource.children.forEach((key, child) -> removeMissingFields(child));
+		String type = getActualType(resource);
+		resource.properties.keySet().removeIf(field -> {
+			try {
+				return !Reflection.hasField(field, type);
+			} catch (ReflectionException e) {
+				e.printStackTrace();
+				return true;
+			}
+		});
+	}
+
+	private static String getActualType(NodeResource resource) {
+		return resource.override == null || resource.override.isEmpty() ? resource.type : getActualType(NodeResource.getOrLoad(resource.override));
 	}
 
 	public static Path currentPath() {
@@ -69,7 +90,7 @@ public class EditorScene {
 
 	private static void storeNodes(NodeResource resource, Node node) {
 		NODES_IN_SCENE.put(resource, node);
-		resource.children.forEach((key, childResource) -> node.getChild(key).ifPresent(childNode -> storeNodes(childResource, childNode)));
+		resource.children.forEach((key, childResource) -> storeNodes(childResource, node.getChild(key)));
 	}
 
 	public static NodeResource rootResource() {
