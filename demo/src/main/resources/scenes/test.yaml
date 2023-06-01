@@ -3,32 +3,37 @@ children:
   test: !!gamma.engine.tree.NodeResource
     type: gamma.editor.demo.TestNode
     properties:
-      rotation: !!vecmatlib.vector.Vec3f [-0.253, 0.0, 0.0]
+      rotation: !Vec3f [0.0, 0.0, 0.0]
   dragon: !!gamma.engine.tree.NodeResource
     override: scenes/dragon.yaml
     properties:
-      position: !!vecmatlib.vector.Vec3f [0.0, 7.0, -1.0]
+      rotation: !Vec3f [0.0, -0.785, 0.0]
+      position: !Vec3f [-2.0, 10.0, -2.0]
   camera: !!gamma.engine.tree.NodeResource
     type: gamma.engine.tree.Camera3D
     properties:
       current: true
-      position: !!vecmatlib.vector.Vec3f [0.0, 3.0, 15.0]
+      rotation: !Vec3f [-0.3, 0.0, 0.0]
+      position: !Vec3f [0.0, 5.0, 12.0]
   floor: !!gamma.engine.tree.NodeResource
     children:
       lightBlue: !!gamma.engine.tree.NodeResource
         type: gamma.engine.tree.PointLight3D
         properties:
-          diffuse: !!vecmatlib.color.Color3f [0.0, 0.0, 1.0]
-          position: !!vecmatlib.vector.Vec3f [0.0, 20.0, 0.0]
+          diffuse: !Color3f [0.0, 0.0, 1.0]
+          position: !Vec3f [0.0, 20.0, 0.0]
       lightPurple: !!gamma.engine.tree.NodeResource
         type: gamma.engine.tree.PointLight3D
         properties:
-          diffuse: !!vecmatlib.color.Color3f [1.0, 0.0, 1.0]
-          position: !!vecmatlib.vector.Vec3f [-10.0, 20.0, 0.0]
-    type: gamma.engine.tree.DynamicBody3D
+          diffuse: !Color3f [1.0, 0.0, 1.0]
+          position: !Vec3f [-10.0, 20.0, 0.0]
+    type: gamma.engine.tree.CollisionObject3D
     properties:
-      boundingBox: !!vecmatlib.vector.Vec3f [10.0, 1.0, 10.0]
-      restitution: 1
-      immovable: true
-      mass: 10000.0
+      boundingBox: !Vec3f [10.0, 1.0, 10.0]
+      scale: !Vec3f [1.0, 1.0, 1.0]
+  bunny: !!gamma.engine.tree.NodeResource
+    override: scenes/bunny.yaml
+    properties:
+      rotation: !Vec3f [0.0, -0.4, 0.0]
+      position: !Vec3f [2.0, 20.0, 2.0]
 type: gamma.engine.tree.Node

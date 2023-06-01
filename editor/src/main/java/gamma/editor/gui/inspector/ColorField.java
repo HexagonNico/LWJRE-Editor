@@ -2,8 +2,8 @@ package gamma.editor.gui.inspector;
 
 import gamma.engine.tree.Node;
 import imgui.ImGui;
-import vecmatlib.color.Color3f;
-import vecmatlib.color.Color4f;
+import io.github.hexagonnico.vecmatlib.color.Color3f;
+import io.github.hexagonnico.vecmatlib.color.Color4f;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;

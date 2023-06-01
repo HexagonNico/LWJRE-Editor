@@ -11,7 +11,7 @@ public class EditorMenuGui implements EditorGui {
 		if(ImGui.beginMainMenuBar()) {
 			if(ImGui.beginMenu("File")) {
 				if(ImGui.menuItem("New scene", "Ctrl+N")) {
-//					NewScenePopupGui.showPopup();
+					NewScenePopupGui.showPopup();
 				}
 				if(ImGui.menuItem("Save", "Ctrl+S")) {
 					EditorScene.saveScene();

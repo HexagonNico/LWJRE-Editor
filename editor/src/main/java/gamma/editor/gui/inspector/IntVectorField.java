@@ -3,7 +3,7 @@ package gamma.editor.gui.inspector;
 import gamma.engine.annotations.EditorRange;
 import gamma.engine.annotations.EditorSlider;
 import gamma.engine.tree.Node;
-import vecmatlib.vector.VecInt;
+import io.github.hexagonnico.vecmatlib.vector.VecInt;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;

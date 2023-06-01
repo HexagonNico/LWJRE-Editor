@@ -3,11 +3,9 @@ children:
   model: !!gamma.engine.tree.NodeResource
     type: gamma.engine.tree.ModelRenderer
     properties:
-      shader: !getOrLoad 'gamma/engine/shaders/default_shader.glsl'
-      model: !getOrLoad 'models/dragon.obj'
-      position: !Vec3f [0.2, -2.75, 0.25]
+      model: !getOrLoad 'models/bunny.obj'
+      position: !Vec3f [0.36, -0.75, -0.175]
 type: gamma.engine.tree.RigidBody3D
 properties:
-  boundingBox: !Vec3f [7.25, 4.8, 2.75]
+  boundingBox: !Vec3f [3.3, 2.25, 1.65]
   restitution: 0.25
-  mass: 100.0

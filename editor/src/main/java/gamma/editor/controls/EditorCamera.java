@@ -4,9 +4,9 @@ import gamma.engine.rendering.Shader;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.ImVec2;
-import vecmatlib.matrix.Mat4f;
-import vecmatlib.vector.Vec2i;
-import vecmatlib.vector.Vec3f;
+import io.github.hexagonnico.vecmatlib.matrix.Mat4f;
+import io.github.hexagonnico.vecmatlib.vector.Vec2i;
+import io.github.hexagonnico.vecmatlib.vector.Vec3f;
 
 public final class EditorCamera {
 

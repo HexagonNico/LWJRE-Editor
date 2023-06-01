@@ -51,6 +51,15 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 				}
 				ImGui.endMenu();
 			}
+			if(ImGui.beginMenu("Change type")) {
+				DynamicLoader.getNodeClasses().forEach(nodeClass -> {
+					if(ImGui.menuItem(nodeClass.getSimpleName())) {
+						node.type = nodeClass.getName();
+						EditorScene.putNode(parent, node, label, EditorScene.getNode(node));
+					}
+				});
+				ImGui.endMenu();
+			}
 			ImGui.separator();
 			if(!node.equals(this.getRoot()) && ImGui.menuItem("Cut", "Ctrl+X")) {
 				cutNode(node, parent, label);

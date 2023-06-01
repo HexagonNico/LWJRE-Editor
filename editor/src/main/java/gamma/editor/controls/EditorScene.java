@@ -116,17 +116,28 @@ public class EditorScene {
 	}
 
 	public static String putNode(NodeResource parentResource, NodeResource resource, String key, Node node) {
-		Node parentNode = getNode(parentResource);
-		if(parentNode.hasChild(key)) {
-			int index = 2;
-			while(parentNode.hasChild(key + index)) {
-				index ++;
+		if(parentResource != null) {
+			Node parentNode = getNode(parentResource);
+			if(node.getParent() == parentNode) {
+				parentNode.removeChild(key);
+				parentNode.addChild(node);
+			} else {
+				if(parentNode.hasChild(key)) {
+					int index = 2;
+					while(parentNode.hasChild(key + index)) {
+						index ++;
+					}
+					key = key + index;
+				}
+				parentNode.addChild(key, node);
+				parentResource.children.put(key, resource);
 			}
-			key = key + index;
+			NODES_IN_SCENE.put(resource, node);
+		} else {
+			NODES_IN_SCENE.clear();
+			rootNode = resource.instantiate();
+			storeNodes(resource, rootNode);
 		}
-		parentNode.addChild(key, node);
-		parentResource.children.put(key, resource);
-		NODES_IN_SCENE.put(resource, node);
 		return key;
 	}
 

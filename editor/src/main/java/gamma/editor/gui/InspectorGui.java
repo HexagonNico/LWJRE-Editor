@@ -10,9 +10,9 @@ import gamma.engine.tree.NodeResource;
 import imgui.ImGui;
 import imgui.flag.ImGuiTableColumnFlags;
 import imgui.flag.ImGuiTableFlags;
-import vecmatlib.color.Color3f;
-import vecmatlib.color.Color4f;
-import vecmatlib.vector.*;
+import io.github.hexagonnico.vecmatlib.color.Color3f;
+import io.github.hexagonnico.vecmatlib.color.Color4f;
+import io.github.hexagonnico.vecmatlib.vector.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
