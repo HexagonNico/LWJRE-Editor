@@ -168,7 +168,7 @@ public class FileSystemGui extends TreeGui<Path> {
 	protected void onDoubleClick(Path path) {
 		String pathStr = path.toString();
 		if(pathStr.endsWith(".yaml") || pathStr.endsWith(".yml")) {
-			EditorGui.get(InspectorGui.class).ifPresent(inspector -> inspector.nodeResource = null);
+			GuiManager.get(InspectorGui.class).setNode(null);
 			EditorScene.changeScene(path);
 		}
 	}

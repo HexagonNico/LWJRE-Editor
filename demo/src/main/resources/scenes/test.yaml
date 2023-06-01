@@ -2,6 +2,8 @@
 children:
   test: !!gamma.engine.tree.NodeResource
     type: gamma.editor.demo.TestNode
+    properties:
+      rotation: !!vecmatlib.vector.Vec3f [-0.253, 0.0, 0.0]
   dragon: !!gamma.engine.tree.NodeResource
     override: scenes/dragon.yaml
     properties:

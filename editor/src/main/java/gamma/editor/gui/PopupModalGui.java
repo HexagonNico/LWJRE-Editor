@@ -5,41 +5,45 @@ import imgui.ImGuiIO;
 import imgui.flag.ImGuiCond;
 import imgui.flag.ImGuiWindowFlags;
 
-public abstract class PopupModalGui extends EditorGui {
+public abstract class PopupModalGui implements EditorGui {
 
-	private boolean hide = false;
+	private Visibility visibility = Visibility.HIDDEN;
 
 	@Override
-	protected final void onDraw() {
+	public void draw() {
 		ImGuiIO io = ImGui.getIO();
 		ImGui.setNextWindowPos(io.getDisplaySizeX() * 0.5f, io.getDisplaySizeY() * 0.5f, ImGuiCond.Always, 0.5f, 0.5f);
 		ImGui.setNextWindowSize(io.getDisplaySizeX() / 3.0f, io.getDisplaySizeY() / 3.0f, ImGuiCond.Always);
-		if(ImGui.beginPopupModal(this.text(), ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoTitleBar)) {
-			ImGui.setCursorPosX((ImGui.getWindowSizeX() - ImGui.calcTextSize(this.text()).x) * 0.5f);
-			ImGui.text(this.text());
-			ImGui.setCursorPosX((ImGui.getWindowSizeX() - 120.0f) * 0.5f);
-			if(this.closeable() && ImGui.button("Close", 120.0f, 20.0f)) {
-				this.hide();
-			}
-			if(this.hide) {
+		if(ImGui.beginPopupModal(this.title(), ImGuiWindowFlags.NoResize)) {
+			this.drawPopup();
+			if(this.visibility == Visibility.HIDE) {
 				ImGui.closeCurrentPopup();
-				this.hide = false;
+				this.visibility = Visibility.HIDDEN;
 			}
 			ImGui.endPopup();
 		}
-	}
-
-	protected abstract String text();
-
-	protected boolean closeable() {
-		return false;
+		if(this.visibility == Visibility.SHOW) {
+			ImGui.openPopup(this.title());
+			this.visibility = Visibility.VISIBLE;
+		}
 	}
 
 	public final void show() {
-		ImGui.openPopup(this.text());
+		this.visibility = Visibility.SHOW;
 	}
 
 	public final void hide() {
-		this.hide = true;
+		this.visibility = Visibility.HIDE;
+	}
+
+	protected abstract void drawPopup();
+
+	protected abstract String title();
+
+	private enum Visibility {
+		VISIBLE,
+		SHOW,
+		HIDE,
+		HIDDEN
 	}
 }

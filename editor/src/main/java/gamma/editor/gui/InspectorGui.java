@@ -40,7 +40,7 @@ public class InspectorGui extends WindowGui {
 		FIELDS.put(Shader.class, new ResourceField(Shader::getOrLoad));
 	}
 
-	public NodeResource nodeResource;
+	private NodeResource nodeResource;
 
 	@Override
 	protected String title() {
@@ -52,6 +52,10 @@ public class InspectorGui extends WindowGui {
 		if(this.nodeResource != null) {
 			renderFields(this.nodeResource, this.nodeResource);
 		}
+	}
+
+	public void setNode(NodeResource nodeResource) {
+		this.nodeResource = nodeResource;
 	}
 
 	private static void renderFields(NodeResource nodeResource, NodeResource base) {

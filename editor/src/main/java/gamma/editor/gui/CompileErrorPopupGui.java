@@ -1,18 +1,23 @@
 package gamma.editor.gui;
 
+import imgui.ImGui;
+
 public class CompileErrorPopupGui extends PopupModalGui {
 
 	public static void showPopup() {
-		EditorGui.get(CompileErrorPopupGui.class).ifPresent(PopupModalGui::show);
+		GuiManager.get(CompileErrorPopupGui.class).show();
 	}
 
 	@Override
-	protected String text() {
-		return "Could not compile sources";
+	protected void drawPopup() {
+		ImGui.text("Could not compile sources");
+		if(ImGui.button("Close", 120.0f, 20.0f)) {
+			this.hide();
+		}
 	}
 
 	@Override
-	protected boolean closeable() {
-		return true;
+	protected String title() {
+		return "Error";
 	}
 }

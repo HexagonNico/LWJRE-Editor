@@ -4,12 +4,15 @@ import gamma.editor.controls.EditorScene;
 import imgui.ImGui;
 import org.lwjgl.glfw.GLFW;
 
-public class EditorMenuGui extends EditorGui {
+public class EditorMenuGui implements EditorGui {
 
 	@Override
-	protected void onDraw() {
+	public void draw() {
 		if(ImGui.beginMainMenuBar()) {
 			if(ImGui.beginMenu("File")) {
+				if(ImGui.menuItem("New scene", "Ctrl+N")) {
+//					NewScenePopupGui.showPopup();
+				}
 				if(ImGui.menuItem("Save", "Ctrl+S")) {
 					EditorScene.saveScene();
 				}
@@ -30,7 +33,9 @@ public class EditorMenuGui extends EditorGui {
 			ImGui.endMainMenuBar();
 		}
 		if(ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_CONTROL)) {
-			if(ImGui.isKeyPressed(GLFW.GLFW_KEY_S)) {
+			if(ImGui.isKeyPressed(GLFW.GLFW_KEY_N)) {
+				NewScenePopupGui.showPopup();
+			} else if(ImGui.isKeyPressed(GLFW.GLFW_KEY_S)) {
 				EditorScene.saveScene();
 			} else if(ImGui.isKeyPressed(GLFW.GLFW_KEY_Z)) {
 

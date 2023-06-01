@@ -1,0 +1,8 @@
+gamma.editor.gui.CompileErrorPopupGui
+gamma.editor.gui.EditorMenuGui
+gamma.editor.gui.FileSystemGui
+gamma.editor.gui.InspectorGui
+gamma.editor.gui.NewScenePopupGui
+gamma.editor.gui.ReloadingPopupGui
+gamma.editor.gui.SceneTreeGui
+gamma.editor.gui.SceneViewportGui

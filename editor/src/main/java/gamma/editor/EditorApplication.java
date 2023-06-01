@@ -2,7 +2,7 @@ package gamma.editor;
 
 import gamma.editor.controls.EditorLayout;
 import gamma.editor.controls.EditorScene;
-import gamma.editor.gui.EditorGui;
+import gamma.editor.gui.GuiManager;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.app.Application;
@@ -22,7 +22,6 @@ public final class EditorApplication extends Application {
 		io.setIniFilename("editorLayout.ini");
 		io.setConfigFlags(ImGuiConfigFlags.DockingEnable);
 		io.setConfigWindowsMoveFromTitleBarOnly(true);
-		EditorGui.showProjectGui();
 		DynamicLoader.reloadDependencies();
 		DynamicLoader.reloadProject();
 	}
@@ -32,7 +31,7 @@ public final class EditorApplication extends Application {
 		DynamicLoader.listenForChanges();
 		EditorScene.rootNode().editorProcess();
 		ImGui.dockSpaceOverViewport();
-		EditorGui.drawGui();
+		GuiManager.drawGui();
 	}
 
 	@Override

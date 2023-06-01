@@ -59,6 +59,7 @@ public final class DynamicLoader {
 			watchKey.reset();
 		}
 		if(reloadProcess != null && !reloadProcess.isAlive()) {
+			ReloadingPopupGui.hidePopup();
 			if(reloadProcess.exitValue() == 0) {
 				Thread.currentThread().setContextClassLoader(new EditorClassLoader());
 				reloadProject(ProjectPath.append("target/classes"));
@@ -68,7 +69,6 @@ public final class DynamicLoader {
 				CompileErrorPopupGui.showPopup();
 			}
 			reloadProcess = null;
-			ReloadingPopupGui.hidePopup();
 		}
 	}
 

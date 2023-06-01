@@ -2,10 +2,10 @@ package gamma.editor.gui;
 
 import imgui.ImGui;
 
-public abstract class WindowGui extends EditorGui {
+public abstract class WindowGui implements EditorGui {
 
 	@Override
-	protected final void onDraw() {
+	public void draw() {
 		if(ImGui.begin(this.title(), this.flags())) {
 			this.drawWindow();
 		}

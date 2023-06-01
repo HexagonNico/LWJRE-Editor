@@ -31,8 +31,10 @@ public class SceneViewportGui extends WindowGui {
 			GL11.glViewport(0, 0, 1920, 1080);
 			this.camera.update();
 			RenderingSystem.render();
+			GL11.glLineWidth(3.0f);
 			DebugRenderer.render();
 			DebugRenderer.clear();
+			GL11.glLineWidth(1.0f);
 			GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
 			RenderingSystem.clearRenderer();
 		});

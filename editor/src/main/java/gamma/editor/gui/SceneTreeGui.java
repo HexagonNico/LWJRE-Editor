@@ -110,7 +110,7 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 		if(!node.equals(this.getRoot())) {
 			EditorScene.removeNode(node);
 			parent.children.values().remove(node);
-			EditorGui.get(InspectorGui.class).ifPresent(inspector -> inspector.nodeResource = null);
+			GuiManager.get(InspectorGui.class).setNode(null);
 		}
 	}
 
@@ -191,7 +191,7 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 
 	@Override
 	protected void onSelect(NodeResource node) {
-		EditorGui.get(InspectorGui.class).ifPresent(inspector -> inspector.nodeResource = node);
+		GuiManager.get(InspectorGui.class).setNode(node);
 		super.onSelect(node);
 	}
 
