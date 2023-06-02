@@ -36,6 +36,7 @@ public final class EditorApplication extends Application {
 
 	@Override
 	protected void postRun() {
+		GuiManager.onEditorClose();
 		DynamicLoader.closeWatchService();
 	}
 

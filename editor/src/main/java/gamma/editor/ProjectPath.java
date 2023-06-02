@@ -1,10 +1,19 @@
 package gamma.editor;
 
+import java.io.File;
 import java.nio.file.Path;
 
 public final class ProjectPath {
 
 	private static Path current = Path.of("demo");
+
+	public static Path current() {
+		return current;
+	}
+
+	public static File currentFile() {
+		return current.toFile();
+	}
 
 	public static Path append(String... path) {
 		return Path.of(current.toString(), path);

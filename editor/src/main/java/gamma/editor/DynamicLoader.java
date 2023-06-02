@@ -75,8 +75,7 @@ public final class DynamicLoader {
 	public static void reloadProject() {
 		ReloadingPopupGui.showPopup();
 		try {
-			// TODO: Execute this in the right directory
-			reloadProcess = Runtime.getRuntime().exec("mvn install");
+			reloadProcess = Runtime.getRuntime().exec("mvn install", null, ProjectPath.currentFile());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

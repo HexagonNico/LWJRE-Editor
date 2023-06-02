@@ -136,11 +136,6 @@ public class FileSystemGui extends TreeGui<Path> {
 	}
 
 	@Override
-	protected String dragDropType() {
-		return "Path";
-	}
-
-	@Override
 	protected void onDragDropTarget(Path target, DragDropPayload payload) {
 		if(payload.object() instanceof Path dropPath) try {
 			if(!isDescendant(dropPath, target)) {

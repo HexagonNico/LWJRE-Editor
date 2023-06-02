@@ -23,4 +23,8 @@ public final class GuiManager {
 		GUI.forEach((key, gui) -> gui.draw());
 		REMOVE_QUEUE.removeIf(gui -> GUI.remove(gui) != null);
 	}
+
+	public static void onEditorClose() {
+		GUI.forEach((key, gui) -> gui.onEditorClosed());
+	}
 }

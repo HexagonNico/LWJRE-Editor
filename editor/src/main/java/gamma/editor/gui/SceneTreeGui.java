@@ -7,6 +7,7 @@ import gamma.editor.controls.DragDropPayload;
 import gamma.editor.controls.EditorScene;
 import gamma.engine.tree.Node;
 import gamma.engine.tree.NodeResource;
+import gamma.engine.utils.Reflection;
 import imgui.ImGui;
 import org.lwjgl.glfw.GLFW;
 
@@ -55,6 +56,7 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 				DynamicLoader.getNodeClasses().forEach(nodeClass -> {
 					if(ImGui.menuItem(nodeClass.getSimpleName())) {
 						node.type = nodeClass.getName();
+						node.properties.entrySet().removeIf(entry -> !Reflection.hasField(entry.getKey(), nodeClass));
 						EditorScene.putNode(parent, node, label, EditorScene.getNode(node));
 					}
 				});
@@ -164,11 +166,6 @@ public class SceneTreeGui extends TreeGui<NodeResource> {
 				.sorted(Map.Entry.comparingByKey())
 				.map(Map.Entry::getValue)
 				.toList();
-	}
-
-	@Override
-	protected String dragDropType() {
-		return "EntityResource";
 	}
 
 	@Override

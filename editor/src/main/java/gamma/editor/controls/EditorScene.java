@@ -66,6 +66,10 @@ public class EditorScene {
 		return resource.override == null || resource.override.isEmpty() ? resource.type : getActualType(NodeResource.getOrLoad(resource.override));
 	}
 
+	public static Path currentResource() {
+		return ProjectPath.resourcesFolder().relativize(currentPath);
+	}
+
 	public static Path currentPath() {
 		return currentPath;
 	}

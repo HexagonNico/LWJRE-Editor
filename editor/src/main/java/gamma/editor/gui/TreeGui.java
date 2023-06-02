@@ -59,19 +59,17 @@ public abstract class TreeGui<N> extends WindowGui {
 	}
 
 	private void dragDrop(String label, N node) {
-		if(!this.dragDropType().isEmpty()) {
-			if(ImGui.beginDragDropSource()) {
-				ImGui.setDragDropPayload(new DragDropPayload(node, label));
-				ImGui.text(label);
-				ImGui.endDragDropSource();
+		if(ImGui.beginDragDropSource()) {
+			ImGui.setDragDropPayload(new DragDropPayload(node, label));
+			ImGui.text(label);
+			ImGui.endDragDropSource();
+		}
+		if(ImGui.beginDragDropTarget()) {
+			DragDropPayload payload = ImGui.acceptDragDropPayload(DragDropPayload.class);
+			if(payload != null) {
+				this.onDragDropTarget(node, payload);
 			}
-			if(ImGui.beginDragDropTarget()) {
-				DragDropPayload payload = ImGui.acceptDragDropPayload(DragDropPayload.class);
-				if(payload != null) {
-					this.onDragDropTarget(node, payload);
-				}
-				ImGui.endDragDropTarget();
-			}
+			ImGui.endDragDropTarget();
 		}
 	}
 
@@ -98,10 +96,6 @@ public abstract class TreeGui<N> extends WindowGui {
 	protected abstract boolean isLeaf(N node);
 
 	protected abstract Iterable<N> getChildren(N node);
-
-	protected String dragDropType() {
-		return "";
-	}
 
 	protected void onDragDropTarget(N target, DragDropPayload payload) {
 

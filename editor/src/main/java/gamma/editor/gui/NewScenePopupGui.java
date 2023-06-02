@@ -3,6 +3,7 @@ package gamma.editor.gui;
 import gamma.editor.DynamicLoader;
 import gamma.editor.ProjectPath;
 import gamma.editor.controls.EditorScene;
+import gamma.engine.resources.FileUtils;
 import gamma.engine.tree.Node;
 import gamma.engine.tree.NodeResource;
 import gamma.engine.utils.YamlSerializer;
@@ -47,17 +48,9 @@ public class NewScenePopupGui extends PopupModalGui {
 				ImGui.endCombo();
 			}
 			ImGui.tableNextColumn();
-			if(ImGui.button("Create new scene")) {
+			if(!FileUtils.resourceExists(this.actualPath()) && ImGui.button("Create new scene")) {
 				NodeResource newScene = new NodeResource(this.currentRoot.getName());
-				if(!this.currentPath.endsWith(".yaml") && !this.currentPath.endsWith(".yml")) {
-					int index = this.currentPath.lastIndexOf('.');
-					if(index != -1) {
-						this.currentPath = this.currentPath.substring(0, index) + ".yaml";
-					} else {
-						this.currentPath = this.currentPath + ".yaml";
-					}
-				}
-				Path path = ProjectPath.resourcesFolder(this.currentPath);
+				Path path = ProjectPath.resourcesFolder(this.actualPath());
 				YamlSerializer.writeToFile(newScene, path.toString());
 				EditorScene.changeScene(path);
 				this.hide();
@@ -67,7 +60,22 @@ public class NewScenePopupGui extends PopupModalGui {
 				this.hide();
 			}
 			ImGui.endTable();
+			if(FileUtils.resourceExists(this.actualPath())) {
+				ImGui.text("A resource already exists at the given path");
+			}
 		}
+	}
+
+	private String actualPath() {
+		if(!this.currentPath.endsWith(".yaml") && !this.currentPath.endsWith(".yml")) {
+			int index = this.currentPath.lastIndexOf('.');
+			if(index != -1) {
+				return this.currentPath.substring(0, index) + ".yaml";
+			} else {
+				return this.currentPath + ".yaml";
+			}
+		}
+		return this.currentPath;
 	}
 
 	@Override

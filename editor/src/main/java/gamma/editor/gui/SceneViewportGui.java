@@ -1,5 +1,6 @@
 package gamma.editor.gui;
 
+import gamma.editor.ProjectPath;
 import gamma.editor.controls.EditorCamera;
 import gamma.editor.controls.EditorFrameBuffer;
 import gamma.editor.controls.EditorScene;
@@ -10,10 +11,14 @@ import imgui.ImVec2;
 import imgui.flag.ImGuiWindowFlags;
 import org.lwjgl.opengl.GL11;
 
+import java.io.IOException;
+
 public class SceneViewportGui extends WindowGui {
 
 	private final EditorFrameBuffer frameBuffer = new EditorFrameBuffer(1920, 1080); // TODO: Use correct size
 	private final EditorCamera camera = new EditorCamera();
+
+	private Process runningProcess = null;
 
 	@Override
 	protected String title() {
@@ -27,6 +32,19 @@ public class SceneViewportGui extends WindowGui {
 
 	@Override
 	protected void drawWindow() {
+		if(this.runningProcess == null || !this.runningProcess.isAlive()) {
+			if(ImGui.button("Run Project")) try {
+				this.runningProcess = Runtime.getRuntime().exec("mvn exec:java", null, ProjectPath.currentFile());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			ImGui.sameLine();
+			if(ImGui.button("Run scene")) try {
+				this.runningProcess = Runtime.getRuntime().exec("mvn exec:java -Dexec.args=\"" + EditorScene.currentResource() + "\"", null, ProjectPath.currentFile());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		this.frameBuffer.bindAndDraw(() -> {
 			GL11.glViewport(0, 0, 1920, 1080);
 			this.camera.update();
@@ -38,7 +56,6 @@ public class SceneViewportGui extends WindowGui {
 			GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
 			RenderingSystem.clearRenderer();
 		});
-		// TODO: Delete the frame buffer when the application is closed
 		ImVec2 viewportSize = getLargestSizeForViewport();
 		ImVec2 viewportPos = getCenteredPositionForViewport(viewportSize);
 		ImGui.setCursorPos(viewportPos.x, viewportPos.y);
@@ -67,5 +84,13 @@ public class SceneViewportGui extends WindowGui {
 		float viewportX = (windowSize.x / 2.0f) - (aspectSize.x / 2.0f);
 		float viewportY = (windowSize.y / 2.0f) - (aspectSize.y / 2.0f);
 		return new ImVec2(viewportX + ImGui.getCursorPosX(), viewportY + ImGui.getCursorPosY());
+	}
+
+	@Override
+	public void onEditorClosed() {
+		this.frameBuffer.delete();
+		if(this.runningProcess != null && this.runningProcess.isAlive()) {
+			this.runningProcess.destroy();
+		}
 	}
 }
