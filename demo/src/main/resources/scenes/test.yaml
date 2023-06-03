@@ -1,5 +1,10 @@
 !!gamma.engine.tree.NodeResource
 children:
+  bunny2: !!gamma.engine.tree.NodeResource
+    override: scenes/bunny.yaml
+    properties:
+      rotation: &id001 !Vec3f [0.0, -0.4, 0.0]
+      position: !Vec3f [-4.0, 20.0, 2.0]
   test: !!gamma.engine.tree.NodeResource
     type: gamma.editor.demo.TestNode
     properties:
@@ -34,6 +39,6 @@ children:
   bunny: !!gamma.engine.tree.NodeResource
     override: scenes/bunny.yaml
     properties:
-      rotation: !Vec3f [0.0, -0.4, 0.0]
+      rotation: *id001
       position: !Vec3f [2.0, 20.0, 2.0]
 type: gamma.engine.tree.Node

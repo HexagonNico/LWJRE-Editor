@@ -30,4 +30,8 @@ public final class ProjectPath {
 	public static Path resourcesFolder(String... path) {
 		return Path.of(resourcesFolder().toString(), path);
 	}
+
+	public static Path resourcesFolder(Path path) {
+		return resourcesFolder(path.toString());
+	}
 }
