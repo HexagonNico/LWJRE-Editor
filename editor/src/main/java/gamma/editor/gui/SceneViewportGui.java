@@ -34,13 +34,13 @@ public class SceneViewportGui extends WindowGui {
 	protected void drawWindow() {
 		if(this.runningProcess == null || !this.runningProcess.isAlive()) {
 			if(ImGui.button("Run Project")) try {
-				this.runningProcess = Runtime.getRuntime().exec("mvn exec:java", null, ProjectPath.currentFile());
+				this.runningProcess = Runtime.getRuntime().exec("mvn clean install exec:java", null, ProjectPath.currentFile());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			ImGui.sameLine();
 			if(ImGui.button("Run scene")) try {
-				this.runningProcess = Runtime.getRuntime().exec("mvn exec:java -Dexec.args=\"" + EditorScene.currentResource() + "\"", null, ProjectPath.currentFile());
+				this.runningProcess = Runtime.getRuntime().exec("mvn clean install exec:java -Dexec.args=\"" + EditorScene.currentResource() + "\"", null, ProjectPath.currentFile());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

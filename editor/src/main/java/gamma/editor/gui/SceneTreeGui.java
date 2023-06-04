@@ -139,13 +139,13 @@ public class SceneTreeGui extends TreeWindowGui<NodeResource> {
 	}
 
 	@Override
-	protected Class<?>[] acceptablePayloads() {
-		return new Class[] {Payload.class, Path.class};
+	protected String[] acceptablePayloads() {
+		return new String[] {"NodeResource", "SceneFile"};
 	}
 
 	@Override
-	protected Object onDrag(NodeResource node, String label, NodeResource parent) {
-		return new Payload(node, label, parent);
+	protected void onDrag(NodeResource node, String label, NodeResource parent) {
+		ImGui.setDragDropPayload("NodeResource", new Payload(node, label, parent));
 	}
 
 	private record Payload(NodeResource node, String label, NodeResource oldParent) {}
@@ -175,11 +175,11 @@ public class SceneTreeGui extends TreeWindowGui<NodeResource> {
 
 	private static void instantiateChildScene(Path filePath, NodeResource target) {
 		if(!filePath.equals(EditorScene.currentPath())) {
-			String path = ProjectPath.resourcesFolder(filePath).toString();
+			String path = ProjectPath.resourcesFolder().relativize(filePath).toString();
 			if(path.endsWith(".yaml") || path.endsWith(".yml")) {
 				NodeResource resource = new NodeResource();
 				resource.override = path;
-				target.children.put(findUnusedKey(path.replaceAll("(.yaml|.yml)", ""), target), resource);
+				target.children.put(findUnusedKey(filePath.getFileName().toString().replaceAll("(.yaml|.yml)", ""), target), resource);
 				EditorScene.reload();
 			}
 		}

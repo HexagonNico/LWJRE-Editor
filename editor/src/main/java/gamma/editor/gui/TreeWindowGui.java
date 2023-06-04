@@ -37,16 +37,19 @@ public abstract class TreeWindowGui<N> extends WindowGui {
 					this.onSelect(node, label);
 					this.renaming = null;
 				}
-				if(parent != null) {
+				if(parent != null && ImGui.isWindowFocused()) {
 					if(node.equals(this.selected)) {
 						if(ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_SHIFT)) {
 							if(ImGui.isKeyPressed(GLFW.GLFW_KEY_F6)) {
 								this.renaming = node;
 							}
 						}
+						if(this.renaming != null && (ImGui.isKeyPressed(GLFW.GLFW_KEY_ESCAPE) || ImGui.isMouseClicked(ImGuiMouseButton.Left))) {
+							this.renaming = null;
+						}
 					}
 					if(ImGui.isItemHovered() && ImGui.isMouseDoubleClicked(ImGuiMouseButton.Left)) {
-						this.renaming = node;
+						this.onDoubleClick(node);
 					}
 					if(node.equals(this.renaming)) {
 						this.renamingInput(node, label, parent);
@@ -80,23 +83,22 @@ public abstract class TreeWindowGui<N> extends WindowGui {
 
 	protected abstract void drawChildren(N node);
 
-	protected abstract Class<?>[] acceptablePayloads();
-
-	protected Object onDrag(N node, String label, N parent) {
-		return null;
+	protected String[] acceptablePayloads() {
+		return new String[0];
 	}
+
+	protected void onDrag(N node, String label, N parent) {}
 
 	private void dragDrop(N node, String label, N parent) {
 		if(parent != null) {
-			Object dragPayload = this.onDrag(node, label, parent);
-			if(dragPayload != null && ImGui.beginDragDropSource()) {
-				ImGui.setDragDropPayload(dragPayload);
+			if(ImGui.beginDragDropSource()) {
+				this.onDrag(node, label, parent);
 				ImGui.text(label);
 				ImGui.endDragDropSource();
 			}
 		}
 		if(ImGui.beginDragDropTarget()) {
-			for(Class<?> type : this.acceptablePayloads()) {
+			for(String type : this.acceptablePayloads()) {
 				Object dropPayload = ImGui.acceptDragDropPayload(type);
 				if(dropPayload != null) {
 					this.onDrop(node, dropPayload);
@@ -120,6 +122,10 @@ public abstract class TreeWindowGui<N> extends WindowGui {
 			this.onRename(node, label, ptr.get(), parent);
 			this.renaming = null;
 		}
+	}
+
+	protected void onDoubleClick(N node) {
+		this.renaming = node;
 	}
 
 	protected void onRename(N node, String oldName, String newName, N parent) {}
