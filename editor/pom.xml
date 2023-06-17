@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>gamma.editor</groupId>
-		<artifactId>gamma-editor</artifactId>
+		<groupId>io.github.lwjre</groupId>
+		<artifactId>lwjre</artifactId>
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>editor</artifactId>
+	<artifactId>lwjre-editor</artifactId>
 
 	<properties>
 		<maven.compiler.source>17</maven.compiler.source>
@@ -18,9 +18,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>gamma.engine</groupId>
-			<artifactId>gamma-engine-core</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<groupId>io.github.lwjre</groupId>
+			<artifactId>lwjre-engine</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.github.spair</groupId>

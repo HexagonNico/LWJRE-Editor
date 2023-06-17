@@ -1,11 +1,11 @@
-!!gamma.engine.tree.NodeResource
+!!io.github.lwjre.engine.resources.NodeResource
 children:
-  model: !!gamma.engine.tree.NodeResource
-    type: gamma.engine.tree.ModelRenderer
+  model:
+    type: io.github.lwjre.engine.nodes.ModelRenderer
     properties:
       model: !getOrLoad 'models/bunny.obj'
       position: !Vec3f [0.36, -0.75, -0.175]
-type: gamma.engine.tree.RigidBody3D
+type: io.github.lwjre.engine.nodes.RigidBody3D
 properties:
   boundingBox: !Vec3f [3.3, 2.25, 1.65]
   restitution: 0.25
