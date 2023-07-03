@@ -1,9 +1,8 @@
 package io.github.lwjre.editor.gui.inspector;
 
-import io.github.lwjre.editor.ProjectPath;
-import io.github.lwjre.editor.controls.DragDropPayload;
 import imgui.ImGui;
 import imgui.type.ImString;
+import io.github.lwjre.editor.ProjectPath;
 import io.github.lwjre.engine.annotations.DefaultResource;
 import io.github.lwjre.engine.nodes.Node;
 import io.github.lwjre.engine.resources.Resources;
@@ -34,8 +33,8 @@ public class ResourceField implements InspectorField {
 			setResource(node, field, ptr.get(), values);
 		}
 		if(ImGui.beginDragDropTarget()) {
-			DragDropPayload payload = ImGui.acceptDragDropPayload(DragDropPayload.class);
-			if(payload != null && payload.object() instanceof Path path) {
+			Object payload = ImGui.acceptDragDropPayload("Path");
+			if(payload instanceof Path path) {
 				setResource(node, field, ProjectPath.resourcesFolder().relativize(path).toString(), values);
 			}
 			ImGui.endDragDropTarget();
@@ -51,7 +50,6 @@ public class ResourceField implements InspectorField {
 	private void setResource(Node node, Field field, String path, HashMap<String, Object> values) throws IllegalAccessException {
 		if(path.isEmpty() || (FileUtils.resourceExists(path) && Resources.hasLoader(path))) {
 			Object resource = this.getOrLoad.apply(path);
-			// TODO: Setting models causes crash
 			if(resource.getClass().isAssignableFrom(field.getType())) {
 				field.set(node, resource);
 				values.put(field.getName(), resource);

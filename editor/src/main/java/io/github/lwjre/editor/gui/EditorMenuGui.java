@@ -1,17 +1,22 @@
 package io.github.lwjre.editor.gui;
 
-import io.github.lwjre.editor.controls.EditorScene;
+import io.github.lwjre.editor.controllers.EditorScene;
 import imgui.ImGui;
 import org.lwjgl.glfw.GLFW;
 
 public class EditorMenuGui implements EditorGui {
 
 	@Override
+	public void init() {
+
+	}
+
+	@Override
 	public void draw() {
 		if(ImGui.beginMainMenuBar()) {
 			if(ImGui.beginMenu("File")) {
 				if(ImGui.menuItem("New scene", "Ctrl+N")) {
-					NewScenePopupGui.showPopup();
+
 				}
 				if(ImGui.menuItem("Save", "Ctrl+S")) {
 					EditorScene.saveScene();
@@ -34,7 +39,7 @@ public class EditorMenuGui implements EditorGui {
 		}
 		if(ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_CONTROL)) {
 			if(ImGui.isKeyPressed(GLFW.GLFW_KEY_N)) {
-				NewScenePopupGui.showPopup();
+
 			} else if(ImGui.isKeyPressed(GLFW.GLFW_KEY_S)) {
 				EditorScene.saveScene();
 			} else if(ImGui.isKeyPressed(GLFW.GLFW_KEY_Z)) {
@@ -46,5 +51,10 @@ public class EditorMenuGui implements EditorGui {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void cleanUp() {
+
 	}
 }

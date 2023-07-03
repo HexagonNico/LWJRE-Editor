@@ -1,4 +1,4 @@
-package io.github.lwjre.editor.controls;
+package io.github.lwjre.editor.controllers;
 
 import imgui.ImGui;
 import imgui.ImGuiIO;

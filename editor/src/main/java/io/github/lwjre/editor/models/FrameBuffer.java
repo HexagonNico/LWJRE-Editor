@@ -1,16 +1,16 @@
-package io.github.lwjre.editor.controls;
+package io.github.lwjre.editor.models;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL30;
 
-public class EditorFrameBuffer {
+public class FrameBuffer {
 
 	public final int frameBuffer;
 	public final int texture;
 	public final int renderBuffer;
 
-	public EditorFrameBuffer(int width, int height) {
+	public FrameBuffer(int width, int height) {
 		this.frameBuffer = GL30.glGenFramebuffers();
 		GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, this.frameBuffer);
 		this.texture = GL11.glGenTextures();

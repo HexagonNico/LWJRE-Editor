@@ -6,7 +6,6 @@ import imgui.flag.ImGuiTableFlags;
 import io.github.hexagonnico.vecmatlib.color.Color3f;
 import io.github.hexagonnico.vecmatlib.color.Color4f;
 import io.github.hexagonnico.vecmatlib.vector.*;
-import io.github.lwjre.editor.controls.EditorScene;
 import io.github.lwjre.editor.gui.inspector.*;
 import io.github.lwjre.engine.annotations.EditorVariable;
 import io.github.lwjre.engine.nodes.Node;
@@ -18,8 +17,16 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 
+/**
+ * Class that represents the inspector gui window.
+ * Needs a {@link NodeResource} and a {@link Node} to be set using {@link InspectorGui#setNode(Node, NodeResource)} to display their fields.
+ * Shows the fields of a class annotated with {@link EditorVariable} as editable fields.
+ *
+ * @author Nico
+ */
 public class InspectorGui extends WindowGui {
 
+	/** Map of field renderers that contains supported field types */
 	private static final HashMap<Class<?>, InspectorField> FIELDS = new HashMap<>();
 
 	static {
@@ -40,7 +47,15 @@ public class InspectorGui extends WindowGui {
 		FIELDS.put(Shader.class, new ResourceField(Shader::getOrLoad));
 	}
 
-	private NodeResource nodeResource;
+	/** The actual node */
+	private Node node = null;
+	/** The node resource */
+	private NodeResource nodeResource = null;
+
+	@Override
+	public void init() {
+
+	}
 
 	@Override
 	protected String title() {
@@ -50,23 +65,39 @@ public class InspectorGui extends WindowGui {
 	@Override
 	protected void drawWindow() {
 		if(this.nodeResource != null) {
-			renderFields(this.nodeResource, this.nodeResource);
+			renderFields(this.nodeResource, this.node, this.nodeResource);
 		}
 	}
 
-	public void setNode(NodeResource nodeResource) {
-		this.nodeResource = nodeResource;
+	/**
+	 * Sets the node that the inspector should show.
+	 * Can be set to null to not show any node.
+	 *
+	 * @param node The actual node
+	 * @param resource The node resource
+	 */
+	public void setNode(Node node, NodeResource resource) {
+		this.node = node;
+		this.nodeResource = resource;
 	}
 
-	private static void renderFields(NodeResource nodeResource, NodeResource base) {
+	/**
+	 * Renders the fields of the given node.
+	 * If the given node resource has an override, this function will call itself recursively to show its base's fields as well.
+	 *
+	 * @param nodeResource The resource to show
+	 * @param node The actual node
+	 * @param base The base resource if the given resource has an override or the same resource if it doesn't
+	 */
+	private static void renderFields(NodeResource nodeResource, Node node, NodeResource base) {
 		try {
 			if(nodeResource.override != null && !nodeResource.override.isEmpty()) {
 				NodeResource override = NodeResource.getOrLoad(nodeResource.override);
-				renderFields(override, base);
+				renderFields(override, node, base);
 			} else if(nodeResource.type != null && !nodeResource.type.isEmpty()) {
 				Class<?> nodeClass = Thread.currentThread().getContextClassLoader().loadClass(nodeResource.type);
 				if(!nodeClass.equals(Node.class)) {
-					renderFields(nodeClass, base);
+					renderFields(nodeClass, base, node);
 				}
 			}
 		} catch (ClassNotFoundException e) {
@@ -74,7 +105,15 @@ public class InspectorGui extends WindowGui {
 		}
 	}
 
-	private static void renderFields(Class<?> fromClass, NodeResource nodeResource) {
+	/**
+	 * Renders the fields of the given class from the given node resource.
+	 * This function calls itself recursively to render fields of parent classes as well.
+	 *
+	 * @param fromClass Class to start from
+	 * @param nodeResource The node resource
+	 * @param node The actual node
+	 */
+	private static void renderFields(Class<?> fromClass, NodeResource nodeResource, Node node) {
 		ImGui.text(fromClass.getSimpleName());
 		if(ImGui.beginTable("##" + fromClass, 2, ImGuiTableFlags.SizingStretchProp)) {
 			ImGui.tableSetupColumn("0", ImGuiTableColumnFlags.WidthFixed);
@@ -92,7 +131,7 @@ public class InspectorGui extends WindowGui {
 						FIELDS.keySet().stream().filter(type -> type.isAssignableFrom(field.getType())).findFirst().ifPresent(type -> {
 							try {
 								ImGui.setNextItemWidth(-1);
-								FIELDS.get(type).inputGui(field, EditorScene.getNode(nodeResource), nodeResource.properties);
+								FIELDS.get(type).inputGui(field, node, nodeResource.properties);
 							} catch (IllegalAccessException e) {
 								e.printStackTrace();
 							}
@@ -105,7 +144,12 @@ public class InspectorGui extends WindowGui {
 		ImGui.separator();
 		fromClass = fromClass.getSuperclass();
 		if(!fromClass.equals(Node.class)) {
-			renderFields(fromClass, nodeResource);
+			renderFields(fromClass, nodeResource, node);
 		}
+	}
+
+	@Override
+	public void cleanUp() {
+
 	}
 }

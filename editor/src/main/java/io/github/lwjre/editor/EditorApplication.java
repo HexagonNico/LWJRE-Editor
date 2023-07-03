@@ -1,19 +1,21 @@
 package io.github.lwjre.editor;
 
-import io.github.lwjre.editor.controls.EditorLayout;
-import io.github.lwjre.editor.controls.EditorScene;
-import io.github.lwjre.editor.gui.GuiManager;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.app.Application;
 import imgui.app.Configuration;
 import imgui.flag.ImGuiConfigFlags;
+import io.github.lwjre.editor.controllers.EditorScene;
+import io.github.lwjre.editor.controllers.RuntimeHelper;
+import io.github.lwjre.editor.gui.RootGui;
 
 public final class EditorApplication extends Application {
 
+	private final RootGui rootGui = new RootGui();
+
 	@Override
 	protected void configure(Configuration config) {
-		config.setTitle("Gamma Engine - Editor");
+		config.setTitle("LWJRE - Editor");
 	}
 
 	@Override
@@ -22,27 +24,24 @@ public final class EditorApplication extends Application {
 		io.setIniFilename("editorLayout.ini");
 		io.setConfigFlags(ImGuiConfigFlags.DockingEnable);
 		io.setConfigWindowsMoveFromTitleBarOnly(true);
-		DynamicLoader.reloadDependencies();
-		DynamicLoader.reloadProject();
+		this.rootGui.init();
 	}
 
 	@Override
 	public void process() {
-		DynamicLoader.listenForChanges();
+		RuntimeHelper.process();
 		EditorScene.rootNode().editorProcess();
 		ImGui.dockSpaceOverViewport();
-		GuiManager.drawGui();
+		this.rootGui.draw();
 	}
 
 	@Override
 	protected void postRun() {
-		GuiManager.onEditorClose();
-		DynamicLoader.closeWatchService();
+		RuntimeHelper.terminate();
+		this.rootGui.cleanUp();
 	}
 
 	public static void main(String[] args) {
-		Thread.currentThread().setContextClassLoader(new EditorClassLoader());
-		EditorLayout.defaultLayout();
 		launch(new EditorApplication());
 	}
 }

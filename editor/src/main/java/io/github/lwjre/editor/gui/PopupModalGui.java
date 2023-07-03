@@ -5,45 +5,113 @@ import imgui.ImGuiIO;
 import imgui.flag.ImGuiCond;
 import imgui.flag.ImGuiWindowFlags;
 
-public abstract class PopupModalGui implements EditorGui {
+/**
+ * Class that represents a popup modal.
+ * Guis that can cause a popup to show up should contain an instance of a {@code PopupModalGui}
+ * and call {@link PopupModalGui#draw()} in their {@link EditorGui#draw()} method.
+ *
+ * @author Nico
+ */
+public class PopupModalGui implements EditorGui {
 
-	private Visibility visibility = Visibility.HIDDEN;
+	/** Title of the popup */
+	private String title;
+	/** Content of the popup */
+	private String[] content;
+
+	/** Set to true when the popup should be opened */
+	private boolean openRequested = false;
+	/** Set to true when the popup should be closed */
+	private boolean closeRequested = false;
+
+	/**
+	 * Constructs a popup with the given content.
+	 *
+	 * @param title Title of the popup
+	 * @param content Content of the popup
+	 */
+	public PopupModalGui(String title, String... content) {
+		this.title = title;
+		this.content = content;
+	}
+
+	@Override
+	public void init() {
+
+	}
 
 	@Override
 	public void draw() {
 		ImGuiIO io = ImGui.getIO();
 		ImGui.setNextWindowPos(io.getDisplaySizeX() * 0.5f, io.getDisplaySizeY() * 0.5f, ImGuiCond.Always, 0.5f, 0.5f);
 		ImGui.setNextWindowSize(io.getDisplaySizeX() / 3.0f, io.getDisplaySizeY() / 3.0f, ImGuiCond.Always);
-		if(ImGui.beginPopupModal(this.title(), ImGuiWindowFlags.NoResize)) {
-			this.drawPopup();
-			if(this.visibility == Visibility.HIDE) {
+		if(ImGui.beginPopupModal(this.title, ImGuiWindowFlags.NoResize)) {
+			for(String text : this.content) {
+				ImGui.text(text);
+			}
+			this.onDrawPopup();
+			if(this.closeRequested) {
 				ImGui.closeCurrentPopup();
-				this.visibility = Visibility.HIDDEN;
+				this.closeRequested = false;
 			}
 			ImGui.endPopup();
 		}
-		if(this.visibility == Visibility.SHOW) {
-			ImGui.openPopup(this.title());
-			this.visibility = Visibility.VISIBLE;
+		if(this.openRequested) {
+			ImGui.openPopup(this.title);
+			this.openRequested = false;
 		}
 	}
 
-	public final void show() {
-		this.visibility = Visibility.SHOW;
+	/**
+	 * Used by classes that override {@link PopupModalGui} to draw to the popup.
+	 */
+	protected void onDrawPopup() {
+
 	}
 
-	public final void hide() {
-		this.visibility = Visibility.HIDE;
+	/**
+	 * Gets the popup's title.
+	 *
+	 * @return The popup's title
+	 */
+	public String getTitle() {
+		return title;
 	}
 
-	protected abstract void drawPopup();
+	/**
+	 * Sets the title of the popup.
+	 *
+	 * @param title Title of the popup
+	 */
+	public void setTitle(String title) {
+		this.title = title;
+	}
 
-	protected abstract String title();
+	/**
+	 * Sets the content of the popup.
+	 *
+	 * @param content Content of the popup
+	 */
+	public void setContent(String... content) {
+		this.content = content;
+	}
 
-	private enum Visibility {
-		VISIBLE,
-		SHOW,
-		HIDE,
-		HIDDEN
+	/**
+	 * Requests to open the popup.
+	 */
+	public void open() {
+		this.openRequested = true;
+	}
+
+	/**
+	 * Requests to close the popup.
+	 */
+	public void close() {
+		this.closeRequested = true;
+	}
+
+	@Override
+	public void cleanUp() {
+
 	}
 }

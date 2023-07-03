@@ -1,21 +1,52 @@
 package io.github.lwjre.editor.gui;
 
-import io.github.lwjre.editor.ProjectPath;
-import io.github.lwjre.editor.controls.Clipboard;
-import io.github.lwjre.editor.controls.EditorScene;
 import imgui.ImGui;
+import io.github.lwjre.editor.ProjectPath;
+import io.github.lwjre.editor.controllers.EditorScene;
+import io.github.lwjre.editor.controllers.Clipboard;
+import io.github.lwjre.engine.resources.NodeResource;
+import io.github.lwjre.engine.utils.YamlParser;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.stream.Stream;
 
+/**
+ * Represents the file system gui.
+ *
+ * @author Nico
+ */
 public class FileSystemGui extends TreeWindowGui<Path> {
+
+	/** Popup to show when creating a new folder */
+	private final TextInputPopup newFolderPopup = new TextInputPopup("New folder", "Create new folder");
+	/** Popup to show when a file is being deleted */
+	private final ConfirmPopupGui confirmDeletePopup = new ConfirmPopupGui("Delete file");
+
+	/** Popup to show when a file is being renamed */
+	private final TextInputPopup renameFilePopup = new TextInputPopup("Rename file");
+
+	@Override
+	public void init() {
+
+	}
 
 	@Override
 	protected String title() {
 		return "File system";
+	}
+
+	@Override
+	public void draw() {
+		this.newFolderPopup.draw();
+		this.confirmDeletePopup.draw();
+		this.renameFilePopup.draw();
+		super.draw();
 	}
 
 	@Override
@@ -24,26 +55,16 @@ public class FileSystemGui extends TreeWindowGui<Path> {
 	}
 
 	@Override
-	protected String getRootLabel() {
-		return "src/main/resources";
+	protected String getLabel(Path node) {
+		if(node.equals(this.getRoot())) {
+			return "src/main/resources";
+		}
+		return node.getFileName().toString();
 	}
 
 	@Override
-	protected void drawNode(Path node, String label, Path parent) {
-		super.drawNode(node, label, parent);
-		if(this.isSelected(node) && ImGui.isWindowFocused()) {
-			if(ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_CONTROL)) {
-				if (ImGui.isKeyPressed(GLFW.GLFW_KEY_N)) {
-					newDirectory(node, parent);
-				} else if (parent != null && ImGui.isKeyPressed(GLFW.GLFW_KEY_X)) {
-					cutPath(node);
-				} else if (parent != null && ImGui.isKeyPressed(GLFW.GLFW_KEY_C)) {
-					copyPath(node);
-				} else if (ImGui.isKeyPressed(GLFW.GLFW_KEY_V)) {
-					pastePath(node);
-				}
-			}
-		}
+	protected boolean isLeaf(Path node) {
+		return !Files.isDirectory(node);
 	}
 
 	@Override
@@ -53,111 +74,90 @@ public class FileSystemGui extends TreeWindowGui<Path> {
 				if(Files.isDirectory(path1) == Files.isDirectory(path2))
 					return path1.getFileName().toString().compareToIgnoreCase(path2.getFileName().toString());
 				return Files.isDirectory(path1) ? -1 : 1;
-			}).forEach(path -> this.drawNode(path, path.getFileName().toString(), node));
+			}).forEach(this::drawNode);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	@Override
-	protected boolean isLeaf(Path node) {
-		return !Files.isDirectory(node);
+	protected void onSelect(Path node) {
+
 	}
 
 	@Override
-	protected ContextMenu contextMenu(Path node, String label, Path parent) {
-		ContextMenu contextMenu = super.contextMenu(node, label, parent);
-		contextMenu.menuItem("New folder", "Ctrl+N", () -> newDirectory(node, parent));
+	protected void onDoubleClick(Path node) {
+		String path = ProjectPath.resourcesFolder().relativize(node).toString();
+		if(path.endsWith(".yaml") || path.endsWith(".yml")) {
+			// TODO: Remove selected node from the inspector
+			Object resource = YamlParser.parseResource(path);
+			if(resource instanceof NodeResource nodeResource) {
+				EditorScene.changeScene(nodeResource, path);
+			}
+		}
+	}
+
+	@Override
+	protected ContextMenu contextMenu(Path node) {
+		ContextMenu contextMenu = super.contextMenu(node);
+		contextMenu.menuItem("New folder", "Ctrl + N", () -> this.newFolder(node));
 		contextMenu.separator();
-		contextMenu.menuItem("Cut", "Ctrl+X", () -> cutPath(node));
-		contextMenu.menuItem("Copy", "Ctrl+C", () -> copyPath(node));
-		contextMenu.menuItem("Paste", "Ctrl+V", () -> pastePath(node));
-		contextMenu.separator();
-		contextMenu.menuItem("Delete", "Del"); // TODO: Ask confirm popup
+		boolean isRoot = node.equals(this.getRoot());
+		if(!isRoot) {
+			contextMenu.menuItem("Cut", "Ctrl + X", () -> cutPath(node));
+			contextMenu.menuItem("Copy", "Ctrl + C", () -> copyPath(node));
+		}
+		contextMenu.menuItem("Paste", "Ctrl + V", () -> pastePath(node));
+		if(!isRoot) {
+			contextMenu.separator();
+			contextMenu.menuItem("Rename", "Shift + F6", () -> this.rename(node));
+			contextMenu.menuItem("Delete", "Del", () -> this.delete(node));
+		}
 		return contextMenu;
 	}
 
 	@Override
-	protected String[] acceptablePayloads() {
-		return new String[] {"Path", "SceneFile"};
-	}
-
-	@Override
-	protected void onDrag(Path node, String label, Path parent) {
-		if(label.endsWith(".yaml") || label.endsWith(".yml")) {
-			ImGui.setDragDropPayload("SceneFile", node);
-		} else {
-			ImGui.setDragDropPayload("Path", node);
-		}
-	}
-
-	@Override
-	protected void onDrop(Path target, Object payload) {
-		System.out.println(payload);
-		if(payload instanceof Path path) try {
-			if(!isDescendant(path, target)) {
-				target = Files.isDirectory(target) ? target : target.getParent();
-				target = Path.of(target.toString(), path.getFileName().toString());
-				Files.move(path, target);
+	protected void hotkeys(Path node) {
+		if(ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_CONTROL)) {
+			if(ImGui.isKeyPressed(GLFW.GLFW_KEY_N)) {
+				this.newFolder(node);
+			} else if(ImGui.isKeyPressed(GLFW.GLFW_KEY_X)) {
+				cutPath(node);
+			} else if(ImGui.isKeyPressed(GLFW.GLFW_KEY_C)) {
+				copyPath(node);
+			} else if(ImGui.isKeyPressed(GLFW.GLFW_KEY_V)) {
+				pastePath(node);
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static boolean isDescendant(Path ancestor, Path descendant) {
-		if(descendant.getParent().equals(ancestor)) {
-			return true;
-		} else if(Files.isDirectory(ancestor)) {
-			try(Stream<Path> files = Files.list(ancestor)) {
-				return files.filter(Files::isDirectory).anyMatch(next -> isDescendant(next, descendant));
-			} catch (IOException e) {
-				e.printStackTrace();
+		} else if(ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_SHIFT)) {
+			if(ImGui.isKeyPressed(GLFW.GLFW_KEY_F6)) {
+				this.rename(node);
 			}
-		}
-		return false;
-	}
-
-	@Override
-	protected void onRename(Path node, String oldName, String newName, Path parent) {
-		if(!EditorScene.currentPath().equals(node)) try {
-			int newDotIndex = newName.lastIndexOf('.');
-			if(newDotIndex != -1) {
-				newName = newName.substring(0, newDotIndex);
-			}
-			Path newPath = Path.of(parent.toString(), newName);
-			int oldDotIndex = oldName.lastIndexOf('.');
-			if(oldDotIndex != -1) {
-				newPath = Path.of(newPath + oldName.substring(oldDotIndex));
-			}
-			Files.move(node, newPath);
-		} catch (IOException e) {
-			e.printStackTrace();
+		} else if(ImGui.isKeyPressed(GLFW.GLFW_KEY_DELETE)) {
+			this.delete(node);
 		}
 	}
 
-	private static void newDirectory(Path path, Path parent) {
-		try {
-			Path newPath = Files.isDirectory(path) ? Path.of(path.toString(), "folder") : Path.of(parent.toString(), "folder");
-			Files.createDirectories(newPath);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static void cutPath(Path path) {
-		Clipboard.setContent(path, target -> {
+	/**
+	 * Starts showing the popup for creating a new folder.
+	 *
+	 * @param path The path at which the folder should be created
+	 */
+	private void newFolder(Path path) {
+		this.newFolderPopup.open("folder", name -> {
 			try {
-				if(!Files.isDirectory((Path) target))
-					target = ((Path) target).getParent();
-				Path result = Files.move(path, Path.of(target.toString(), path.getFileName().toString()));
-				copyPath(result);
+				Path newPath = Files.isDirectory(path) ? Path.of(path.toString(), name) : Path.of(path.getParent().toString(), name);
+				Files.createDirectories(newPath);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		});
 	}
 
+	/**
+	 * Copies a {@link Path} to the {@link Clipboard}.
+	 *
+	 * @param path The path to copy
+	 */
 	private static void copyPath(Path path) {
 		// TODO: Contents of directories are not copied
 		Clipboard.setContent(path.toAbsolutePath(), target -> {
@@ -172,18 +172,107 @@ public class FileSystemGui extends TreeWindowGui<Path> {
 		});
 	}
 
+	/**
+	 * Cuts a {@link Path} to the {@link Clipboard}.
+	 *
+	 * @param path The path to cut
+	 */
+	private static void cutPath(Path path) {
+		Clipboard.setContent(path, target -> {
+			try {
+				if(!Files.isDirectory((Path) target))
+					target = ((Path) target).getParent();
+				Path result = Files.move(path, Path.of(target.toString(), path.getFileName().toString()));
+				copyPath(result);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+	}
+
+	/**
+	 * Pastes the content of the {@link Clipboard} if it is a {@link Path} object.
+	 *
+	 * @param target The target on which the path was pasted
+	 */
 	private static void pastePath(Path target) {
 		if(Clipboard.getContent() instanceof Path) {
 			Clipboard.paste(target);
 		}
 	}
 
-	@Override
-	protected void onDoubleClick(Path node) {
-		String pathStr = node.toString();
-		if(pathStr.endsWith(".yaml") || pathStr.endsWith(".yml")) {
-			GuiManager.get(InspectorGui.class).setNode(null);
-			EditorScene.changeScene(node);
+	/**
+	 * Starts showing the popup for renaming a file.
+	 *
+	 * @param path Path to the file to rename
+	 */
+	private void rename(Path path) {
+		String fileName = path.getFileName().toString();
+		this.renameFilePopup.setContent("Rename file '" + fileName + "' to:");
+		this.renameFilePopup.open(fileName, name -> {
+			try {
+				// TODO: Update path when the currently open scene is renamed
+				Files.move(path, Path.of(path.getParent().toString(), name));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+	}
+
+	/**
+	 * Starts showing the popup for deleting a file.
+	 *
+	 * @param path The file that should be deleted
+	 */
+	private void delete(Path path) {
+		if(Files.isDirectory(path)) {
+			this.confirmDeletePopup.setContent("Delete directory \"" + path + "\"");
+		} else {
+			this.confirmDeletePopup.setContent("Delete file \"" + path + "\"");
 		}
+		this.confirmDeletePopup.open(() -> {
+			try {
+				Files.walkFileTree(path, new SimpleFileVisitor<>() {
+					@Override
+					public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+						Files.delete(dir);
+						return FileVisitResult.CONTINUE;
+					}
+					@Override
+					public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+						Files.delete(file);
+						return FileVisitResult.CONTINUE;
+					}
+				});
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+	}
+
+	@Override
+	protected String dragType() {
+		return "Path";
+	}
+
+	@Override
+	protected String[] acceptablePayloads() {
+		return new String[] {"Path"};
+	}
+
+	@Override
+	protected void onDrop(Path target, Object payload) {
+		if(payload instanceof Path path) try {
+			target = Files.isDirectory(target) ? target : target.getParent();
+			target = Path.of(target.toString(), path.getFileName().toString());
+			Files.move(path, target);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void cleanUp() {
+
 	}
 }

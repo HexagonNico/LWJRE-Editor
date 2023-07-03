@@ -1,24 +1,43 @@
 package io.github.lwjre.editor.gui;
 
-import io.github.lwjre.editor.ProjectPath;
-import io.github.lwjre.editor.controls.EditorCamera;
-import io.github.lwjre.editor.controls.EditorFrameBuffer;
-import io.github.lwjre.editor.controls.EditorScene;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiWindowFlags;
+import io.github.lwjre.editor.controllers.EditorCamera;
+import io.github.lwjre.editor.controllers.EditorScene;
+import io.github.lwjre.editor.controllers.RuntimeHelper;
+import io.github.lwjre.editor.models.FrameBuffer;
+import io.github.lwjre.engine.ApplicationProperties;
 import io.github.lwjre.engine.debug.DebugRenderer;
 import io.github.lwjre.engine.servers.RenderingServer;
-import org.lwjgl.opengl.GL11;
 
-import java.io.IOException;
-
+/**
+ * Class that represents the gui that shows the scene viewport.
+ *
+ * @author Nico
+ */
 public class SceneViewportGui extends WindowGui {
 
-	private final EditorFrameBuffer frameBuffer = new EditorFrameBuffer(1920, 1080); // TODO: Use correct size
+	// TODO: Update the size if the value is changed
+	private final FrameBuffer frameBuffer = new FrameBuffer(
+			ApplicationProperties.get("window.viewport.width", 1920),
+			ApplicationProperties.get("window.viewport.height", 1080)
+	);
+	/** The editor camera */
 	private final EditorCamera camera = new EditorCamera();
 
-	private Process runningProcess = null;
+	/** Popup to show when the project is running */
+	private final PopupModalGui runningPopup = new PopupModalGui("Running project");
+	/** Popup to show if the project could not be compiled */
+	private final AlertPopupGui errorPopup = new AlertPopupGui("Cannot run project", "There was an error compiling the project");
+
+	/** Keeps track of whether the project is running */
+	private boolean isRunning = false;
+
+	@Override
+	public void init() {
+
+	}
 
 	@Override
 	protected String title() {
@@ -31,22 +50,27 @@ public class SceneViewportGui extends WindowGui {
 	}
 
 	@Override
+	public void draw() {
+		this.runningPopup.draw();
+		this.errorPopup.draw();
+		super.draw();
+	}
+
+	@Override
 	protected void drawWindow() {
-		if(this.runningProcess == null || !this.runningProcess.isAlive()) {
-			if(ImGui.button("Run Project")) try {
-				this.runningProcess = Runtime.getRuntime().exec("mvn clean install exec:java", null, ProjectPath.currentFile());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			ImGui.sameLine();
-			if(ImGui.button("Run scene")) try {
-				this.runningProcess = Runtime.getRuntime().exec("mvn clean install exec:java -Dexec.args=\"" + EditorScene.currentResource() + "\"", null, ProjectPath.currentFile());
-			} catch (IOException e) {
-				e.printStackTrace();
+		if(!this.isRunning) {
+			if(ImGui.button("Run Project")) {
+				this.isRunning = true;
+				this.runningPopup.open();
+				this.runningPopup.setContent("mvn install -DskipTests");
+				RuntimeHelper.execute("mvn install -DskipTests").onExit(() -> {
+					RuntimeHelper.execute("mvn exec:java").onExit(() -> this.isRunning = false);
+					this.runningPopup.close();
+				}).onError(this.errorPopup::open);
 			}
 		}
 		this.frameBuffer.bindAndDraw(() -> {
-			GL11.glViewport(0, 0, 1920, 1080);
+			RenderingServer.setViewport(ApplicationProperties.get("window.viewport.width", 1920), ApplicationProperties.get("window.viewport.height", 1080));
 			this.camera.update();
 			RenderingServer.deptTest(true);
 			RenderingServer.backFaceCulling(true);
@@ -65,20 +89,32 @@ public class SceneViewportGui extends WindowGui {
 		ImGui.image(this.frameBuffer.texture, viewportSize.x, viewportSize.y, 0, 1, 1, 0);
 	}
 
+	/**
+	 * Computes the viewport size.
+	 *
+	 * @return Size of the viewport
+	 */
 	private static ImVec2 getLargestSizeForViewport() {
 		ImVec2 windowSize = new ImVec2();
 		ImGui.getContentRegionAvail(windowSize);
 		windowSize.x -= ImGui.getScrollX();
 		windowSize.y -= ImGui.getScrollY();
 		float aspectWidth = windowSize.x;
-		float aspectHeight = aspectWidth / (1920.0f / 1080.0f); // TODO: Use correct size
+		float aspectRatio = ApplicationProperties.get("window.viewport.width", 1920.0f) / ApplicationProperties.get("window.viewport.height", 1080.0f);
+		float aspectHeight = aspectWidth / aspectRatio;
 		if(aspectHeight > windowSize.y) {
 			aspectHeight = windowSize.y;
-			aspectWidth = aspectHeight * (1920.0f / 1080.0f);
+			aspectWidth = aspectHeight * aspectRatio;
 		}
 		return new ImVec2(aspectWidth, aspectHeight);
 	}
 
+	/**
+	 * Computes the viewport position.
+	 *
+	 * @param aspectSize Viewport size
+	 * @return Viewport position
+	 */
 	private static ImVec2 getCenteredPositionForViewport(ImVec2 aspectSize) {
 		ImVec2 windowSize = new ImVec2();
 		ImGui.getContentRegionAvail(windowSize);
@@ -90,10 +126,7 @@ public class SceneViewportGui extends WindowGui {
 	}
 
 	@Override
-	public void onEditorClosed() {
+	public void cleanUp() {
 		this.frameBuffer.delete();
-		if(this.runningProcess != null && this.runningProcess.isAlive()) {
-			this.runningProcess.destroy();
-		}
 	}
 }

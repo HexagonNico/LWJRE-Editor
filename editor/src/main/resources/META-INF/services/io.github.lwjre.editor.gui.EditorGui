@@ -1,8 +1,0 @@
-io.github.lwjre.editor.gui.CompileErrorPopupGui
-io.github.lwjre.editor.gui.EditorMenuGui
-io.github.lwjre.editor.gui.FileSystemGui
-io.github.lwjre.editor.gui.InspectorGui
-io.github.lwjre.editor.gui.NewScenePopupGui
-io.github.lwjre.editor.gui.ReloadingPopupGui
-io.github.lwjre.editor.gui.SceneTreeGui
-io.github.lwjre.editor.gui.SceneViewportGui
