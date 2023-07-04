@@ -8,7 +8,6 @@ import io.github.lwjre.engine.utils.ReflectionException;
 import io.github.lwjre.engine.utils.YamlSerializer;
 
 import java.nio.file.Path;
-import java.util.Objects;
 
 /**
  * Static class used to store the scene that is currently running in the editor.
@@ -116,17 +115,9 @@ public class EditorScene {
 	 */
 	public static boolean hasUnsavedChanges() {
 		if(rootResource != null && copy != null) {
-			return notEquals(rootResource, copy);
+			return !rootResource.equals(copy);
 		}
 		return false;
-	}
-
-	// TODO: Check if this can be replaced by the 'equals' method
-	private static boolean notEquals(NodeResource first, NodeResource second) {
-		return !Objects.equals(first.type, second.type) ||
-				!Objects.equals(first.override, second.override) ||
-				!first.properties.equals(second.properties) ||
-				first.children.keySet().stream().anyMatch(key -> !second.children.containsKey(key) || notEquals(first.children.get(key), second.children.get(key)));
 	}
 
 	/**
