@@ -24,6 +24,8 @@ public class EditorClassLoader extends ClassLoader implements Closeable {
 	 * and closes the current class loader if it is an instance of {@link Closeable}.
 	 *
 	 * @see Thread#setContextClassLoader(ClassLoader)
+	 *
+	 * @throws UncheckedIOException If an {@link IOException} occurs while trying to close the current class loader
 	 */
 	public static void changeCurrentThreadClassLoader() {
 		Thread thread = Thread.currentThread();
@@ -70,11 +72,7 @@ public class EditorClassLoader extends ClassLoader implements Closeable {
 	}
 
 	@Override
-	public void close() {
-		try {
-			this.urlClassLoader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void close() throws IOException {
+		this.urlClassLoader.close();
 	}
 }
