@@ -1,0 +1,4 @@
+!!io.github.lwjre.engine.resources.NodeResource
+type: io.github.lwjre.engine.nodes.KinematicBody3D
+properties:
+  rotation: !Vec3f [0.0, 0.0, 0.0]

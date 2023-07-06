@@ -101,7 +101,7 @@ public class SceneTreeGui extends TreeWindowGui<EditorNode> {
 	protected ContextMenu contextMenu(EditorNode node) {
 		ContextMenu contextMenu = super.contextMenu(node);
 		ContextMenu addNodeSubmenu = new ContextMenu();
-		this.classesLoader.getNodeClasses().forEach(nodeClass -> addNodeSubmenu.menuItem(nodeClass.getSimpleName(), () -> node.addChild(nodeClass)));
+		ProjectClassesLoader.getNodeClasses().forEach(nodeClass -> addNodeSubmenu.menuItem(nodeClass.getSimpleName(), () -> node.addChild(nodeClass)));
 		contextMenu.submenu("Add node", addNodeSubmenu);
 		ContextMenu addChildSceneSubmenu = new ContextMenu();
 		try(Stream<Path> files = Files.walk(ProjectPath.resourcesFolder())) {

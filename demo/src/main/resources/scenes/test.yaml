@@ -27,6 +27,10 @@ children:
     properties:
       boundingBox: !Vec3f [10.0, 1.0, 10.0]
       scale: !Vec3f [10.0, 1.0, 10.0]
+  testBoi: !!io.github.lwjre.engine.resources.NodeResource
+    override: scenes/newScene.yaml
+    properties:
+      position: !Vec3f [0.0, 5.0, 0.0]
   bunny: !!io.github.lwjre.engine.resources.NodeResource
     override: scenes/bunny.yaml
     properties:

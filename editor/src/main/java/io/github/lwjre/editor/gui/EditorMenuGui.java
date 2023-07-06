@@ -6,6 +6,8 @@ import org.lwjgl.glfw.GLFW;
 
 public class EditorMenuGui implements EditorGui {
 
+	private final NewScenePopupGui newScenePopupGui = new NewScenePopupGui("New scene...");
+
 	@Override
 	public void init() {
 
@@ -13,21 +15,22 @@ public class EditorMenuGui implements EditorGui {
 
 	@Override
 	public void draw() {
+		this.newScenePopupGui.draw();
 		if(ImGui.beginMainMenuBar()) {
 			if(ImGui.beginMenu("File")) {
-				if(ImGui.menuItem("New scene", "Ctrl+N")) {
-
+				if(ImGui.menuItem("New scene", "Ctrl + N")) {
+					this.newScenePopupGui.open();
 				}
-				if(ImGui.menuItem("Save", "Ctrl+S")) {
+				if(ImGui.menuItem("Save", "Ctrl + S")) {
 					EditorScene.saveScene();
 				}
 				ImGui.endMenu();
 			}
 			if(ImGui.beginMenu("Edit")) {
-				if(ImGui.menuItem("Undo", "Ctrl+Z")) {
+				if(ImGui.menuItem("Undo", "Ctrl + Z")) {
 
 				}
-				if(ImGui.menuItem("Redo", "Ctrl+Shift+Z")) {
+				if(ImGui.menuItem("Redo", "Ctrl + Shift + Z")) {
 
 				}
 				ImGui.endMenu();
@@ -39,7 +42,7 @@ public class EditorMenuGui implements EditorGui {
 		}
 		if(ImGui.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) || ImGui.isKeyDown(GLFW.GLFW_KEY_RIGHT_CONTROL)) {
 			if(ImGui.isKeyPressed(GLFW.GLFW_KEY_N)) {
-
+				this.newScenePopupGui.open();
 			} else if(ImGui.isKeyPressed(GLFW.GLFW_KEY_S)) {
 				EditorScene.saveScene();
 			} else if(ImGui.isKeyPressed(GLFW.GLFW_KEY_Z)) {

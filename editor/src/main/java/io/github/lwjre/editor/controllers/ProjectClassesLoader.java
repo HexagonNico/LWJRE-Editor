@@ -31,7 +31,17 @@ import java.util.stream.Stream;
 public class ProjectClassesLoader implements Closeable {
 
 	/** Maps the class name to the class object */
-	private final HashMap<String, Class<?>> nodeClasses = new HashMap<>();
+	private static final HashMap<String, Class<?>> NODE_CLASSES = new HashMap<>();
+
+	/**
+	 * Gets the loaded {@link Node} classes.
+	 *
+	 * @return A {@link Collection} of the loaded {@code Node} classes
+	 */
+	public static Collection<Class<?>> getNodeClasses() {
+		return NODE_CLASSES.values();
+	}
+
 	/** Detects when the project's classes change */
 	private final WatchService watchService;
 
@@ -125,7 +135,7 @@ public class ProjectClassesLoader implements Closeable {
 					String className = path.relativize(file).toString().replace('/', '.').replace(".class", "");
 					Class<?> classObject = Thread.currentThread().getContextClassLoader().loadClass(className);
 					if (Node.class.isAssignableFrom(classObject) && !Modifier.isAbstract(classObject.getModifiers())) {
-						this.nodeClasses.put(className, classObject);
+						NODE_CLASSES.put(className, classObject);
 					}
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
@@ -158,7 +168,7 @@ public class ProjectClassesLoader implements Closeable {
 							String className = name.replace('/', '.').replace(".class", "");
 							Class<?> classObject = Thread.currentThread().getContextClassLoader().loadClass(className);
 							if(Node.class.isAssignableFrom(classObject) && !Modifier.isAbstract(classObject.getModifiers())) {
-								this.nodeClasses.put(className, classObject);
+								NODE_CLASSES.put(className, classObject);
 							}
 						} catch (ClassNotFoundException e) {
 							e.printStackTrace();
@@ -171,15 +181,6 @@ public class ProjectClassesLoader implements Closeable {
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * Gets the loaded {@link Node} classes.
-	 *
-	 * @return A {@link Collection} of the loaded {@code Node} classes
-	 */
-	public Collection<Class<?>> getNodeClasses() {
-		return this.nodeClasses.values();
 	}
 
 	@Override
