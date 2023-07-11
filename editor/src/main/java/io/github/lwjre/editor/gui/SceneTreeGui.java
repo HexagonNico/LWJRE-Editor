@@ -35,7 +35,7 @@ public class SceneTreeGui extends TreeWindowGui<EditorNode> {
 	/**
 	 * Constructs the scene tree gui.
 	 *
-	 * @param inspector Reference to the inspector gui
+	 * @param inspector Reference to the fields gui
 	 */
 	public SceneTreeGui(InspectorGui inspector) {
 		this.inspector = inspector;

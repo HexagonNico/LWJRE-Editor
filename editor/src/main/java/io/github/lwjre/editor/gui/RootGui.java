@@ -25,7 +25,7 @@ public final class RootGui implements EditorGui {
 			InspectorGui inspector = new InspectorGui();
 			this.guis.add(inspector);
 			this.guis.add(new SceneTreeGui(inspector));
-			this.guis.add(new EditorMenuGui());
+			this.guis.add(new EditorMenuGui(this));
 			this.guis.add(new SceneViewportGui());
 		} else {
 			this.guis.add(new OpenProjectGui(this));

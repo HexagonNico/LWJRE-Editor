@@ -89,7 +89,7 @@ public class FileSystemGui extends TreeWindowGui<Path> {
 	protected void onDoubleClick(Path node) {
 		String path = ProjectPath.resourcesFolder().relativize(node).toString();
 		if(path.endsWith(".yaml") || path.endsWith(".yml")) {
-			// TODO: Remove selected node from the inspector
+			// TODO: Remove selected node from the fields
 			Object resource = YamlParser.parseResource(path);
 			if(resource instanceof NodeResource nodeResource) {
 				EditorScene.changeScene(nodeResource, path);

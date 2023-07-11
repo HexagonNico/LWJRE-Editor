@@ -3,49 +3,22 @@ package io.github.lwjre.editor.gui;
 import imgui.ImGui;
 import imgui.flag.ImGuiTableColumnFlags;
 import imgui.flag.ImGuiTableFlags;
-import io.github.hexagonnico.vecmatlib.color.Color3f;
-import io.github.hexagonnico.vecmatlib.color.Color4f;
-import io.github.hexagonnico.vecmatlib.vector.*;
-import io.github.lwjre.editor.gui.inspector.*;
+import io.github.lwjre.editor.gui.fields.FieldGuis;
 import io.github.lwjre.engine.annotations.EditorVariable;
 import io.github.lwjre.engine.nodes.Node;
-import io.github.lwjre.engine.resources.Model;
 import io.github.lwjre.engine.resources.NodeResource;
-import io.github.lwjre.engine.resources.Shader;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
 
 /**
- * Class that represents the inspector gui window.
+ * Class that represents the fields gui window.
  * Needs a {@link NodeResource} and a {@link Node} to be set using {@link InspectorGui#setNode(Node, NodeResource)} to display their fields.
  * Shows the fields of a class annotated with {@link EditorVariable} as editable fields.
  *
  * @author Nico
  */
 public class InspectorGui extends WindowGui {
-
-	/** Map of field renderers that contains supported field types */
-	private static final HashMap<Class<?>, InspectorField> FIELDS = new HashMap<>();
-
-	static {
-		FIELDS.put(float.class, new FloatField());
-		FIELDS.put(double.class, new DoubleField());
-		FIELDS.put(int.class, new IntField());
-		FIELDS.put(boolean.class, new CheckboxField());
-		FIELDS.put(String.class, new TextField());
-		FIELDS.put(Vec2f.class, new FloatVectorField(ImGui::inputFloat2, ImGui::dragFloat2, ImGui::sliderFloat2, array -> new Vec2f(array[0], array[1])));
-		FIELDS.put(Vec3f.class, new FloatVectorField(ImGui::inputFloat3, ImGui::dragFloat3, ImGui::sliderFloat3, array -> new Vec3f(array[0], array[1], array[2])));
-		FIELDS.put(Vec4f.class, new FloatVectorField(ImGui::inputFloat4, ImGui::dragFloat4, ImGui::sliderFloat4, array -> new Vec4f(array[0], array[1], array[2], array[3])));
-		FIELDS.put(Vec2i.class, new IntVectorField(ImGui::inputInt2, ImGui::dragInt2, ImGui::sliderInt2, array -> new Vec2i(array[0], array[1])));
-		FIELDS.put(Vec3i.class, new IntVectorField(ImGui::inputInt3, ImGui::dragInt3, ImGui::sliderInt3, array -> new Vec3i(array[0], array[1], array[2])));
-		FIELDS.put(Vec4i.class, new IntVectorField(ImGui::inputInt4, ImGui::dragInt4, ImGui::sliderInt4, array -> new Vec4i(array[0], array[1], array[2], array[3])));
-		FIELDS.put(Color3f.class, new ColorField());
-		FIELDS.put(Color4f.class, new ColorField());
-		FIELDS.put(Model.class, new ResourceField(Model::getOrLoad));
-		FIELDS.put(Shader.class, new ResourceField(Shader::getOrLoad));
-	}
 
 	/** The actual node */
 	private Node node = null;
@@ -70,7 +43,7 @@ public class InspectorGui extends WindowGui {
 	}
 
 	/**
-	 * Sets the node that the inspector should show.
+	 * Sets the node that the fields should show.
 	 * Can be set to null to not show any node.
 	 *
 	 * @param node The actual node
@@ -128,14 +101,7 @@ public class InspectorGui extends WindowGui {
 						String label = editorVariable.name().isEmpty() ? field.getName() : editorVariable.name();
 						ImGui.textColored(0.75f, 0.75f, 0.75f, 1.0f, label);
 						ImGui.tableNextColumn();
-						FIELDS.keySet().stream().filter(type -> type.isAssignableFrom(field.getType())).findFirst().ifPresent(type -> {
-							try {
-								ImGui.setNextItemWidth(-1);
-								FIELDS.get(type).inputGui(field, node, nodeResource.properties);
-							} catch (IllegalAccessException e) {
-								e.printStackTrace();
-							}
-						});
+						FieldGuis.inputGui(field, node, nodeResource.properties);
 					}
 				}
 			}
