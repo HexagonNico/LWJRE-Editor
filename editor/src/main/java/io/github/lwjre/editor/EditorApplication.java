@@ -5,13 +5,28 @@ import imgui.ImGuiIO;
 import imgui.app.Application;
 import imgui.app.Configuration;
 import imgui.flag.ImGuiConfigFlags;
-import io.github.lwjre.editor.controllers.EditorScene;
-import io.github.lwjre.editor.controllers.RuntimeHelper;
-import io.github.lwjre.editor.gui.RootGui;
 
+/**
+ * Main editor application class.
+ *
+ * @author Nico
+ */
 public final class EditorApplication extends Application {
 
-	private final RootGui rootGui = new RootGui();
+	/** Current application state */
+	private static ApplicationState currentState;
+	/** Next application state */
+	private static ApplicationState nextState = new ProjectManagerState();
+
+	/**
+	 * Changes the state of the application to the given one.
+	 * The change is not immediate, but will happen on the next frame.
+	 *
+	 * @param state The state to change to
+	 */
+	public static void changeState(ApplicationState state) {
+		nextState = state;
+	}
 
 	@Override
 	protected void configure(Configuration config) {
@@ -24,21 +39,26 @@ public final class EditorApplication extends Application {
 		io.setIniFilename("editorLayout.ini");
 		io.setConfigFlags(ImGuiConfigFlags.DockingEnable);
 		io.setConfigWindowsMoveFromTitleBarOnly(true);
-		this.rootGui.init();
 	}
 
 	@Override
 	public void process() {
-		RuntimeHelper.process();
-		EditorScene.rootNode().editorProcess();
-		ImGui.dockSpaceOverViewport();
-		this.rootGui.draw();
+		if(nextState != null) {
+			if(currentState != null) {
+				currentState.terminate();
+			}
+			currentState = nextState;
+			currentState.init();
+			nextState = null;
+		}
+		currentState.process();
 	}
 
 	@Override
 	protected void postRun() {
-		RuntimeHelper.terminate();
-		this.rootGui.cleanUp();
+		if(currentState != null) {
+			currentState.terminate();
+		}
 	}
 
 	public static void main(String[] args) {

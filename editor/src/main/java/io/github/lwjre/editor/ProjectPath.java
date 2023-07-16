@@ -1,6 +1,5 @@
 package io.github.lwjre.editor;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -12,15 +11,6 @@ public final class ProjectPath {
 
 	/** Path to the folder containing the current project */
 	private static Path current = Path.of(".");
-
-	/**
-	 * Checks if the current path is a maven project.
-	 *
-	 * @return True if we are inside a project, otherwise false
-	 */
-	public static boolean isInsideProject() {
-		return Files.exists(append("pom.xml")) && (Files.exists(resourcesFolder()) || Files.exists(sourcesFolder()));
-	}
 
 	/**
 	 * Changes the current project path.

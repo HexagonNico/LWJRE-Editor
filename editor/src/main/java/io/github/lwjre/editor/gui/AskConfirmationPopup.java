@@ -1,30 +1,24 @@
 package io.github.lwjre.editor.gui;
 
 import imgui.ImGui;
-import imgui.flag.ImGuiInputTextFlags;
-import imgui.type.ImString;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Objects;
-import java.util.function.Consumer;
 
 /**
- * A popup that can take a string input.
+ * A popup modal that asks confirmation about something.
  *
  * @author Nico
  */
-public class TextInputPopup implements GuiComponent {
+public class AskConfirmationPopup implements GuiComponent {
 
 	/** The popup's title */
-	private String title = "Text input";
+	private String title = "Confirm";
 	/** Text to write in the popup's body */
 	private String content = "";
 
-	/** The text input */
-	private String input = "";
-	/** Action to perform when the text is entered */
-	private Consumer<String> onConfirm = str -> {};
-
+	/** Action to run when the "Confirm" button is pressed */
+	private Runnable onConfirm = () -> {};
 	/** Set to true to open the popup */
 	private boolean shouldOpen = false;
 
@@ -36,12 +30,11 @@ public class TextInputPopup implements GuiComponent {
 		}
 		if(ImGui.beginPopupModal(this.title)) {
 			ImGui.text(this.content);
-			ImString ptr = new ImString(this.input, 256);
-			ImGui.setKeyboardFocusHere();
-			if(ImGui.inputText("##input", ptr, ImGuiInputTextFlags.EnterReturnsTrue)) {
-				this.onConfirm.accept(ptr.get());
+			if(ImGui.button("Confirm") || ImGui.isKeyPressed(GLFW.GLFW_KEY_ENTER)) {
+				this.onConfirm.run();
 				ImGui.closeCurrentPopup();
 			}
+			ImGui.sameLine();
 			if(ImGui.button("Cancel") || ImGui.isKeyPressed(GLFW.GLFW_KEY_ESCAPE)) {
 				ImGui.closeCurrentPopup();
 			}
@@ -68,20 +61,11 @@ public class TextInputPopup implements GuiComponent {
 	}
 
 	/**
-	 * Sets the current text input.
-	 *
-	 * @param input The text input (must not be null)
-	 */
-	public void setInput(String input) {
-		this.input = Objects.requireNonNull(input);
-	}
-
-	/**
 	 * Opens the popup.
 	 *
-	 * @param onConfirm Action to perform when the text is entered
+	 * @param onConfirm Action to run when the "Confirm" button is pressed
 	 */
-	public void open(Consumer<String> onConfirm) {
+	public void open(Runnable onConfirm) {
 		this.onConfirm = Objects.requireNonNull(onConfirm);
 		this.shouldOpen = true;
 	}

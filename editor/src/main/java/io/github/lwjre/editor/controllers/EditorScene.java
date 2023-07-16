@@ -34,8 +34,10 @@ public class EditorScene {
 	 */
 	public static void changeScene(NodeResource nodeResource, String path) {
 		rootResource = nodeResource;
-		copy = new NodeResource(nodeResource);
-		rootNode = rootResource.instantiate();
+		if(nodeResource != null) {
+			copy = new NodeResource(nodeResource);
+			rootNode = rootResource.instantiate();
+		}
 		currentPath = path;
 	}
 
@@ -45,18 +47,27 @@ public class EditorScene {
 	 */
 	public static void reload() {
 		if(rootResource != null) {
-			removeMissingFields(rootResource);
+			removeMissing(rootResource);
 			rootNode = rootResource.instantiate();
 		}
 	}
 
 	/**
-	 * Removes missing fields from the given resource and its children.
+	 * Removes nodes whose class does not exist and properties they do not have.
+	 * Used when reloading the scene after the project's classes have been updated.
 	 *
-	 * @param resource The resource to remove children from
+	 * @param resource Resource to remove missing nodes and fields from
 	 */
-	private static void removeMissingFields(NodeResource resource) {
-		resource.children.forEach((key, child) -> removeMissingFields(child));
+	private static void removeMissing(NodeResource resource) {
+		resource.children.values().removeIf(childResource -> {
+			try {
+				Thread.currentThread().getContextClassLoader().loadClass(childResource.type);
+			} catch (ClassNotFoundException e) {
+				return true;
+			}
+			return false;
+		});
+		resource.children.forEach((key, child) -> removeMissing(child));
 		String type = getActualType(resource);
 		resource.properties.keySet().removeIf(field -> {
 			try {

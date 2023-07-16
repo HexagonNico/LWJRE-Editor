@@ -1,5 +1,6 @@
 package io.github.lwjre.editor.models;
 
+import io.github.lwjre.editor.gui.SceneTreeWindow;
 import io.github.lwjre.engine.nodes.Node;
 import io.github.lwjre.engine.resources.NodeResource;
 import io.github.lwjre.engine.utils.YamlParser;
@@ -7,24 +8,19 @@ import io.github.lwjre.engine.utils.YamlParser;
 import java.nio.file.Path;
 
 /**
- * Node used in the {@link io.github.lwjre.editor.gui.SceneTreeGui}.
+ * Node used in the {@link SceneTreeWindow}.
  * Represents a {@link Node} and a {@link NodeResource} pair with their label and parent.
  *
  * @param node The actual node
  * @param resource The node resource
- * @param label The node's lable
+ * @param label The node's label
  * @param parent The node resource's parent
  */
 public record EditorNode(Node node, NodeResource resource, String label, NodeResource parent) {
 
-	/**
-	 * Instantiates a child node to this node.
-	 *
-	 * @param type Type of child to instantiate
-	 */
-	public void addChild(Class<?> type) {
-		NodeResource resource = new NodeResource(type.getName());
-		String key = this.findUnusedKey(type.getSimpleName());
+	public void addChild(String className) {
+		NodeResource resource = new NodeResource(className);
+		String key = this.findUnusedKey(className.substring(className.lastIndexOf('.') + 1));
 		this.resource().children.put(key, resource);
 		this.node().addChild(key, resource.instantiate());
 	}
