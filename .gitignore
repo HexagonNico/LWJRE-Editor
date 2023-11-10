@@ -5,7 +5,7 @@
 # Maven
 target/
 
-# Gamma Editor / ImGui
+# LWJRE Editor / ImGui
 editorLayout.ini
 
 # JVM Error files
@@ -24,5 +24,6 @@ hs_err_pid*
 # Visual Studio Code
 .vscode/
 
-# Mac OS X
+# Directories
 .DS_Store
+.directory
